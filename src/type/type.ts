@@ -1,14 +1,3 @@
-export interface ErrorType {
-    PICKER_OBJECT_CONFIG_ERROR:string;
-    PICKER_CONFIG_ERROR:string;
-    DOM_OBJECT_ERROR:string;
-    DOM_ERROR:string;
-    CONFIG_SIZE_ERROR:string;
-    DOM_NOT_ERROR:string;
-    PREDEFINE_COLOR_ERROR:string;
-    CONSTRUCTOR_ERROR:string;
-    DEFAULT_COLOR_ERROR:string
-}
 export interface SizeType {
   width: string | number;
   height: string | number;

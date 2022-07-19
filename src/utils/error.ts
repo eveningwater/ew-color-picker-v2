@@ -1,9 +1,8 @@
-import { ErrorType } from '../type/type';
 const NOT_DOM_ELEMENTS:string [] = ['html','head','meta','title','link','style','script'];
 /**
  * 错误对象
  */
-export const ERROR_VARIABLE:ErrorType = {
+export const ERROR_VARIABLE = {
     PICKER_OBJECT_CONFIG_ERROR:'you should pass a param which is el and el must be a string or a dom element!',
     PICKER_CONFIG_ERROR:'you should pass a param that it must be a string or a dom element!',
     DOM_OBJECT_ERROR:'can not find the element by el property,make sure to pass a correct value!',
@@ -14,4 +13,5 @@ export const ERROR_VARIABLE:ErrorType = {
     CONSTRUCTOR_ERROR:'ewColorPicker is a constructor and should be called with the new keyword',
     DEFAULT_COLOR_ERROR:'the "defaultColor" is not a invalid color,make sure to use the correct color!'
 }
+export type PickerError = typeof ERROR_VARIABLE;
 export default ERROR_VARIABLE;
