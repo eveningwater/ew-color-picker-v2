@@ -1,0 +1,4 @@
+@import "./variable.scss";
+.#{$baseSelector}color-picker {
+    position: absolute;
+}
