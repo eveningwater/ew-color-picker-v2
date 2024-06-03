@@ -1,4 +1,4 @@
-import { InstanceType } from "../type/type";
+import { UtilType } from "../type/type";
 import {
   basicDataTypeList,
   objDataTypeList,
@@ -8,7 +8,7 @@ import {
   consoleList,
   isMobile,
 } from "./const";
-const util = Object.create(null);
+const util: UtilType = Object.create(null);
 /**
  * 基本数据类型判断
  */
@@ -31,26 +31,17 @@ consoleList.forEach((c) => {
     console[c](`[ewColorPicker ${c}]\n` + v);
 });
 /**
- * 往原型上添加方法
- * @param instance
- * @param method
- * @param func
- * @returns
- */
-util.addMethod = (instance: InstanceType, method: string, func: Function) =>
-  ((instance as InstanceType).prototype[method] = func);
-/**
  * 判断是null
  * @param value
  * @returns
  */
-util.isNull = <T>(value: T): boolean => value === null;
+util.isNull = (value) => value === null;
 /**
  * 判断是否是一个对象
  * @param value
  * @returns
  */
-util.isShallowObject = <T>(value: T): boolean =>
+util.isShallowObject = (value) =>
   typeof value === "object" && !util.isNull(value);
 /**
  * 伪数组转数组
@@ -65,7 +56,7 @@ util["ewObjToArray"] = <T>(value: T) =>
  * @param args
  * @returns
  */
-util.ewAssign = function (target: object, args: object) {
+util.ewAssign = function (target, args) {
   if (util.isNull(target)) {
     return;
   }
@@ -91,13 +82,13 @@ util.ewAssign = function (target: object, args: object) {
  * @param tag
  * @returns
  */
-util.create = (tag: string): HTMLElement => document.createElement(tag);
+util.create = (tag) => document.createElement(tag);
 /**
  * 根据字符串模板创建节点
  * @param temp
  * @returns
  */
-util.createByTemplate = (temp: string) => {
+util.createByTemplate = (temp) => {
   const element = util.create("div");
   element.innerHTML = temp;
   return element.firstElementChild as HTMLElement;
@@ -108,35 +99,29 @@ util.createByTemplate = (temp: string) => {
  * @param className
  * @returns
  */
-util.addClass = (el: HTMLElement | Element, className: string) =>
-  el.classList.add(className);
+util.addClass = (el, className) => el.classList.add(className);
 /**
  * 移除类名
  * @param el
  * @param className
  * @returns
  */
-util.removeClass = (el: HTMLElement | Element, className: string) =>
-  el.classList.remove(className);
+util.removeClass = (el, className) => el.classList.remove(className);
 /**
  * 设置样式
  * @param el
  * @param style
  * @returns
  */
-util.setStyle = (el: HTMLElement, style: CSSStyleDeclaration) =>
-  util.ewAssign(el.style, style);
+util.setStyle = (el, style) => util.ewAssign(el.style, style);
 /**
  * 设置属性
  * @param el
  * @param values
  * @returns
  */
-util.setAttr = <T extends string>(
-  el: HTMLElement,
-  values: Record<string, T>
-) => {
-  if (!util.isObject(values)) {
+util.setAttr = (el, values) => {
+  if (!util.isShallowObject(values)) {
     return;
   }
   for (const [key, value] of Object.entries(values)) {
@@ -150,21 +135,20 @@ util.setAttr = <T extends string>(
  * @param value
  * @returns
  */
-util.setSingleAttr = (el: HTMLElement, key: string, value: string) =>
-  util.setAttr(el, { [key]: value });
+util.setSingleAttr = (el, key, value) => util.setAttr(el, { [key]: value });
 /**
  * 获取属性
  * @param el
  * @param key
  * @returns
  */
-util.getAttr = (el: HTMLElement, key: string) => el.getAttribute(key);
+util.getAttr = (el, key) => el.getAttribute(key);
 /**
  * 判断是否是DOM元素
  * @param el
  * @returns
  */
-util.isDom = (el: HTMLElement | Element) =>
+util.isDom = (el) =>
   util.isShallowObject(HTMLElement)
     ? el instanceof HTMLElement
     : (el &&
@@ -178,13 +162,13 @@ util.isDom = (el: HTMLElement | Element) =>
  * @param obj
  * @returns
  */
-util.deepCloneObjByJSON = (obj: object) => JSON.parse(JSON.stringify(obj));
+util.deepCloneObjByJSON = (obj) => JSON.parse(JSON.stringify(obj));
 /**
  * 深度克隆对象(递归)
  * @param obj
  * @returns
  */
-util.deepCloneObjByRecursion = function f<T>(obj: object | Array<T>) {
+util.deepCloneObjByRecursion = function f(obj) {
   if (!util.isShallowObject(obj)) {
     return;
   }
@@ -200,26 +184,21 @@ util.deepCloneObjByRecursion = function f<T>(obj: object | Array<T>) {
  * @param prop
  * @returns
  */
-util.getStyle = (el: HTMLElement | Element, prop: string) =>
-  window.getComputedStyle(el, null)[prop];
+util.getStyle = (el, prop) => window.getComputedStyle(el, null)[prop];
 /**
  * 获取dom元素
  * @param selector
  * @param el
  * @returns
  */
-util.$ = (
-  selector: string,
-  el: HTMLElement | Element | Document
-): HTMLElement | Element | null => el.querySelector(selector);
+util.$ = (selector, el) => el.querySelector(selector);
 /**
  * 获取DOMList
  * @param selector
  * @param el
  * @returns
  */
-util.$$ = (selector: string, el: HTMLElement | Element | Document): NodeList =>
-  el.querySelectorAll(selector);
+util.$$ = (selector, el) => el.querySelectorAll(selector);
 /**
  * 添加事件
  * @param element
@@ -227,12 +206,7 @@ util.$$ = (selector: string, el: HTMLElement | Element | Document): NodeList =>
  * @param handler
  * @param useCapture
  */
-util["on"] = (
-  element: HTMLElement | Element | Document | Window,
-  type: string,
-  handler: EventListenerOrEventListenerObject,
-  useCapture = false
-): void => {
+util["on"] = (element, type, handler, useCapture = false) => {
   if (element && type && handler) {
     element.addEventListener(type, handler, useCapture);
   }
@@ -244,12 +218,7 @@ util["on"] = (
  * @param handler
  * @param useCapture
  */
-util["off"] = (
-  element: HTMLElement | Element | Document | Window,
-  type: string,
-  handler: EventListenerOrEventListenerObject,
-  useCapture = false
-) => {
+util["off"] = (element, type, handler, useCapture = false) => {
   if (element && type && handler) {
     element.removeEventListener(type, handler, useCapture);
   }

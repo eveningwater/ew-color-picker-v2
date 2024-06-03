@@ -6,11 +6,10 @@ import "../style/index.scss";
 //<reference path="index.d.ts" />
 export default class ewColorPicker {
   constructor(option: WrapperType | OptionType) {
-      if (util.isUndefined(new.target)) {
-          return util.ewError(ERROR_VARIABLE.CONSTRUCTOR_ERROR);
-      }
+    if (util.isUndefined(new.target) && __DEV__) {
+      util.ewError(ERROR_VARIABLE.CONSTRUCTOR_ERROR);
+      return;
+    }
   }
-  render(){
-    
-  }
+  render() {}
 }
