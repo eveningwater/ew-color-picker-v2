@@ -1,5 +1,5 @@
 {
-  "name": "ew-color-picker-utils",
+  "name": "@ew-color-picker/utils",
   "version": "0.0.1",
   "description": "color-picker utils library",
   "main": "index.js",

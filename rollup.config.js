@@ -4,7 +4,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import scss from 'rollup-plugin-scss';
 const rollupTypescript = require('rollup-plugin-typescript');
 export default {
-  input: 'packages/src/index.ts',
+  input: 'packages/core/index.ts',
   output: [
     {
       file: './dist/ew-color-picker.js',

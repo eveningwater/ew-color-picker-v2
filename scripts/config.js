@@ -16,28 +16,28 @@ const resolve = p => path.resolve(__dirname, '../', p);
 
 const builds = {
   'ew-color-picker-umd-dev': {
-    entry: resolve('packages/src/index.ts'),
+    entry: resolve('packages/core/index.ts'),
     dest: resolve('dist/ew-color-picker.js'),
     format: 'umd',
     env: 'development',
     banner
   },
   'ew-color-picker-umd-build': {
-    entry: resolve('src/index.ts'),
+    entry: resolve('core/index.ts'),
     dest: resolve('dist/ew-color-picker.min.js'),
     format: 'umd',
     env: 'production',
     banner
   },
   'ew-color-picker-esm-dev': {
-    entry: resolve('src/index.ts'),
+    entry: resolve('core/index.ts'),
     dest: resolve('dist/ew-color-picker.esm.js'),
     format: 'esm',
     env: 'development',
     banner
   },
   'ew-color-picker-esm-build': {
-    entry: resolve('src/index.ts'),
+    entry: resolve('core/index.ts'),
     dest: resolve('dist/ew-color-picker.esm.min.js'),
     format: 'esm',
     env: 'production',
