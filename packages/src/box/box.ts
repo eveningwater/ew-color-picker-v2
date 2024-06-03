@@ -1,5 +1,5 @@
 import { arrowIcon, closeIcon } from "../icons/const";
-import util from "../utils/util";
+import util from "ew-color-picker-utils";
 import { BOX_TEMPLATE } from "./template";
 
 export interface BoxProps extends Partial<SizeType> {
@@ -23,8 +23,8 @@ export default class Box {
   getChildren() {
     const { boxNoColorIcon = "", boxHasColorIcon = "" } = this.options;
     return this.hasColor
-      ? boxHasColorIcon || arrowIcon()
-      : boxNoColorIcon || closeIcon();
+      ? boxHasColorIcon || arrowIcon("ew-color-picker-box-arrow-icon")
+      : boxNoColorIcon || closeIcon("ew-color-picker-box-close-icon");
   }
   updateChildren() {
     if (this.box) {

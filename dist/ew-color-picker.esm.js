@@ -275,8 +275,8 @@ class Box {
     getChildren() {
         const { boxNoColorIcon = "", boxHasColorIcon = "" } = this.options;
         return this.hasColor
-            ? boxHasColorIcon || arrowIcon()
-            : boxNoColorIcon || closeIcon();
+            ? boxHasColorIcon || arrowIcon("ew-color-picker-box-arrow-icon")
+            : boxNoColorIcon || closeIcon("ew-color-picker-box-close-icon");
     }
     updateChildren() {
         if (this.box) {
@@ -408,6 +408,9 @@ class ewColorPicker {
         }
         this.render();
     }
+    onBoxClickHandler(v) {
+        console.log(v);
+    }
     render() {
         const { el, hasBox, boxHasColorIcon, boxNoColorIcon, defaultColor } = this.config;
         el?.appendChild(util.createByTemplate(CORE_TEMPLATE));
@@ -421,9 +424,7 @@ class ewColorPicker {
                 boxNoColorIcon,
                 boxHasColorIcon,
                 defaultColor,
-                onClick(v) {
-                    console.log(v);
-                },
+                onClick: this.onBoxClickHandler,
             });
         }
     }

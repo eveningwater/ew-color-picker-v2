@@ -1,6 +1,6 @@
 import { defaultConfig } from "../config";
 import ERROR_VARIABLE from "../utils/error";
-import util from "../utils/util";
+import util from "ew-color-picker-utils";
 
 export const initConfig = (options?: WrapperType | OptionType) => {
   if (util.isShallowObject(options)) {

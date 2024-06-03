@@ -7,26 +7,26 @@ import {
   consoleList,
   isMobile,
 } from "./const";
-const util: UtilType = Object.create(null);
+const util = Object.create(null);
 /**
  * 基本数据类型判断
  */
 basicDataTypeList.forEach((type) => {
-  util["is" + type] = <T>(value: T): boolean =>
+  util["is" + type] = (value) =>
     typeof value === type.toLowerCase();
 });
 /**
  * 对象数据类型判断
  */
 objDataTypeList.forEach((type) => {
-  util["isDeep" + type] = <T>(value: T) =>
+  util["isDeep" + type] = (value) =>
     _toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase();
 });
 /**
  * 控制台打印方法
  */
 consoleList.forEach((c) => {
-  util["ew" + c.slice(0, 1).toUpperCase() + c.slice(1)] = (...v: string[]) =>
+  util["ew" + c.slice(0, 1).toUpperCase() + c.slice(1)] = (...v) =>
     console[c](...v);
 });
 /**
@@ -47,7 +47,7 @@ util.isShallowObject = (value) =>
  * @param value
  * @returns
  */
-util["ewObjToArray"] = <T>(value: T) =>
+util["ewObjToArray"] = value =>
   util.isShallowObject(value) ? _arrSlice.call(value) : value;
 /**
  * 合并对象
@@ -90,7 +90,7 @@ util.create = (tag) => document.createElement(tag);
 util.createByTemplate = (temp) => {
   const element = util.create("div");
   element.innerHTML = temp;
-  return element.firstElementChild as HTMLElement;
+  return element.firstElementChild;
 };
 /**
  * 添加类名
@@ -228,12 +228,12 @@ util["off"] = (element, type, handler, useCapture = false) => {
  * @returns
  */
 util.checkContainer = (el) => {
-  if (util.isDom(el as HTMLElement)) {
-    return el as HTMLElement;
+  if (util.isDom(el)) {
+    return el;
   } else if (util.isString(el)) {
-    const ele = util.$(el as string);
+    const ele = util.$(el);
     if (ele) {
-      return ele as HTMLElement;
+      return ele;
     }
   }
   return document.body;

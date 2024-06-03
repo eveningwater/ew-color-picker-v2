@@ -1,5 +1,3 @@
-import { OptionType } from "./type/type";
-
 export const defaultConfig: Omit<OptionType, "el"> = {
   hasBox: true,
   hue: true,

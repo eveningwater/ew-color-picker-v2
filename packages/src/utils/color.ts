@@ -1,5 +1,4 @@
-import { HsbType } from "../type/type";
-import util from "./util";
+import util from "ew-color-picker-utils";
 /**
  * hex to rgba
  * @param {*} hex

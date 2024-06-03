@@ -4,26 +4,26 @@ import resolve from 'rollup-plugin-node-resolve';
 import scss from 'rollup-plugin-scss';
 const rollupTypescript = require('rollup-plugin-typescript');
 export default {
-  input: 'src/index.ts',
+  input: 'packages/src/index.ts',
   output: [
     {
-      file: './dist/ew-message.js',
+      file: './dist/ew-color-picker.js',
       format: 'umd',
       name: 'ewMessage'
     },
     {
-      file: './dist/ew-message.min.js',
+      file: './dist/ew-color-picker.min.js',
       format: 'umd',
       name: 'ewMessage',
       plugins: [terser()]
     },
     {
-      file: './dist/ew-message.esm.js',
+      file: './dist/ew-color-picker.esm.js',
       format: 'es',
       name: 'ewMessage'
     },
     {
-      file: './dist/ew-message.esm.min.js',
+      file: './dist/ew-color-picker.esm.min.js',
       format: 'es',
       name: 'ewMessage',
       plugins: [terser()]
@@ -37,7 +37,7 @@ export default {
     rollupTypescript(),
     scss({
       include: ['/**/*.css', '/**/*.scss', '/**/*.sass'],
-      output: 'dist/ew-message.min.css',
+      output: 'dist/ew-color-picker.min.css',
       failOnError: true,
       outputStyle: 'compressed' //压缩
     })

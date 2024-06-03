@@ -16,7 +16,7 @@ const resolve = p => path.resolve(__dirname, '../', p);
 
 const builds = {
   'ew-color-picker-umd-dev': {
-    entry: resolve('src/index.ts'),
+    entry: resolve('packages/src/index.ts'),
     dest: resolve('dist/ew-color-picker.js'),
     format: 'umd',
     env: 'development',

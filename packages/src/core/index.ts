@@ -1,5 +1,5 @@
 import ERROR_VARIABLE from "../utils/error";
-import util from "../utils/util";
+import util from "ew-color-picker-utils";
 import "../style/index.scss";
 import Box from "../box/box";
 import { CORE_TEMPLATE } from "./template";
@@ -22,6 +22,9 @@ export default class ewColorPicker {
     }
     this.render();
   }
+  onBoxClickHandler(v: InstanceType<typeof Box>) {
+    console.log(v);
+  }
   render() {
     const { el, hasBox, boxHasColorIcon, boxNoColorIcon, defaultColor } =
       this.config;
@@ -36,9 +39,7 @@ export default class ewColorPicker {
         boxNoColorIcon,
         boxHasColorIcon,
         defaultColor,
-        onClick(v) {
-          console.log(v);
-        },
+        onClick: this.onBoxClickHandler,
       });
     }
   }

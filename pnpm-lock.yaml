@@ -1,48 +1,52 @@
 lockfileVersion: 5.3
 
-specifiers:
-  '@babel/core': ^7.12.10
-  '@rollup/plugin-alias': ^4.0.3
-  '@rollup/plugin-replace': ^5.0.2
-  '@types/ms': ^0.7.31
-  babel-plugin-external-helpers: ^6.22.0
-  babel-preset-latest: ^6.24.1
-  gh-pages: ^6.0.0
-  node-sass: ^9.0.0
-  rollup: ^2.38.4
-  rollup-plugin-babel: ^4.4.0
-  rollup-plugin-commonjs: ^10.1.0
-  rollup-plugin-node-resolve: ^5.2.0
-  rollup-plugin-scss: ^3.0.0
-  rollup-plugin-terser: ^7.0.2
-  rollup-plugin-typescript: ^1.0.1
-  terser: ^5.16.6
-  ts-loader: ^8.0.14
-  ts-node: ^9.1.1
-  tslib: ^2.1.0
-  typescript: ^4.1.3
+importers:
 
-devDependencies:
-  '@babel/core': 7.24.6
-  '@rollup/plugin-alias': 4.0.4_rollup@2.79.1
-  '@rollup/plugin-replace': 5.0.5_rollup@2.79.1
-  '@types/ms': 0.7.34
-  babel-plugin-external-helpers: 6.22.0
-  babel-preset-latest: 6.24.1
-  gh-pages: 6.1.1
-  node-sass: 9.0.0
-  rollup: 2.79.1
-  rollup-plugin-babel: 4.4.0_@babel+core@7.24.6+rollup@2.79.1
-  rollup-plugin-commonjs: 10.1.0_rollup@2.79.1
-  rollup-plugin-node-resolve: 5.2.0_rollup@2.79.1
-  rollup-plugin-scss: 3.0.0
-  rollup-plugin-terser: 7.0.2_rollup@2.79.1
-  rollup-plugin-typescript: 1.0.1_tslib@2.6.2+typescript@4.9.5
-  terser: 5.31.0
-  ts-loader: 8.4.0_typescript@4.9.5
-  ts-node: 9.1.1_typescript@4.9.5
-  tslib: 2.6.2
-  typescript: 4.9.5
+  .:
+    specifiers:
+      '@babel/core': ^7.24.6
+      '@rollup/plugin-alias': ^4.0.4
+      '@rollup/plugin-replace': ^5.0.5
+      '@types/ms': ^0.7.34
+      babel-plugin-external-helpers: ^6.22.0
+      babel-preset-latest: ^6.24.1
+      ew-color-picker-utils: link:packages/utils:*
+      gh-pages: ^6.1.1
+      node-sass: ^9.0.0
+      rollup: ^2.79.1
+      rollup-plugin-babel: ^4.4.0
+      rollup-plugin-commonjs: ^10.1.0
+      rollup-plugin-node-resolve: ^5.2.0
+      rollup-plugin-scss: ^3.0.0
+      rollup-plugin-terser: ^7.0.2
+      rollup-plugin-typescript: ^1.0.1
+      terser: ^5.31.0
+      ts-loader: ^8.4.0
+      ts-node: ^9.1.1
+      tslib: ^2.6.2
+      typescript: ^4.9.5
+    devDependencies:
+      '@babel/core': 7.24.6
+      '@rollup/plugin-alias': 4.0.4_rollup@2.79.1
+      '@rollup/plugin-replace': 5.0.5_rollup@2.79.1
+      '@types/ms': 0.7.34
+      babel-plugin-external-helpers: 6.22.0
+      babel-preset-latest: 6.24.1
+      ew-color-picker-utils: link:packages/utils:*
+      gh-pages: 6.1.1
+      node-sass: 9.0.0
+      rollup: 2.79.1
+      rollup-plugin-babel: 4.4.0_@babel+core@7.24.6+rollup@2.79.1
+      rollup-plugin-commonjs: 10.1.0_rollup@2.79.1
+      rollup-plugin-node-resolve: 5.2.0_rollup@2.79.1
+      rollup-plugin-scss: 3.0.0
+      rollup-plugin-terser: 7.0.2_rollup@2.79.1
+      rollup-plugin-typescript: 1.0.1_tslib@2.6.2+typescript@4.9.5
+      terser: 5.31.0
+      ts-loader: 8.4.0_typescript@4.9.5
+      ts-node: 9.1.1_typescript@4.9.5
+      tslib: 2.6.2
+      typescript: 4.9.5
 
 packages:
 
@@ -1013,7 +1017,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001626
+      caniuse-lite: 1.0.30001627
       electron-to-chromium: 1.4.788
       node-releases: 2.0.14
       update-browserslist-db: 1.0.16_browserslist@4.23.0
@@ -1094,8 +1098,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /caniuse-lite/1.0.30001626:
-    resolution: {integrity: sha512-JRW7kAH8PFJzoPCJhLSHgDgKg5348hsQ68aqb+slnzuB5QFERv846oA/mRChmlLAOdEDeOkRn3ynb1gSFnjt3w==}
+  /caniuse-lite/1.0.30001627:
+    resolution: {integrity: sha512-4zgNiB8nTyV/tHhwZrFs88ryjls/lHiqFhrxCW4qSTeuRByBVnPYpDInchOIySWknznucaf31Z4KYqjfbrecVw==}
     dev: true
 
   /chalk/1.1.3:
