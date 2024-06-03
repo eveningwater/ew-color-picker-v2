@@ -7,7 +7,7 @@ export type OptionType = {
   el: WrapperType;
   alpha?: boolean;
   hue?: boolean;
-  size?:string | Partial<SizeType>;
+  size?: string | Partial<SizeType>;
   predefineColor?: string[];
   disabled?: boolean;
   defaultColor?: string;
@@ -17,13 +17,12 @@ export type OptionType = {
   isLog?: boolean;
   togglePicker?: Function;
 };
-export type UtilType = Record<string,Function>
 export interface InstanceType {
-  prototype:Record<string,unknown>
+  prototype: Record<string, unknown>;
 }
 export interface HsbType {
-  a?:number;
-  h:number;
-  s:number;
-  b:number;
+  a?: number;
+  h: number;
+  s: number;
+  b: number;
 }
