@@ -1,5 +1,5 @@
 import ERROR_VARIABLE from "../utils/error";
-import util from "ew-color-picker-utils";
+import util from "@ew-color-picker/utils";
 import "../style/index.scss";
 import Box from "../box/box";
 import { CORE_TEMPLATE } from "./template";

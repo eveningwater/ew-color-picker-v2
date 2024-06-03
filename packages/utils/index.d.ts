@@ -55,3 +55,5 @@ interface UtilType {
 }
 
 declare const util: UtilType;
+
+export default util;

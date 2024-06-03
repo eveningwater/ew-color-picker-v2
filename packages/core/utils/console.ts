@@ -1,4 +1,4 @@
-import util from "ew-color-picker-utils";
+import util from "@ew-color-picker/utils";
 export const consoleColorPickerInfo = () =>
   util.ewLog(
     `%c ew-color-picker@2.0.0%c 联系QQ：854806732 %c 联系微信：eveningwater %c github:https://github.com/eveningwater/ew-color-picker %c `,

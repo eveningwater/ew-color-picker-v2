@@ -1,4 +1,4 @@
-import util from "ew-color-picker-utils";
+import util from "@ew-color-picker/utils";
 /**
  * hex to rgba
  * @param {*} hex

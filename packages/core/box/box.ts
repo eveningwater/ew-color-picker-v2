@@ -1,5 +1,5 @@
 import { arrowIcon, closeIcon } from "../icons/const";
-import util from "ew-color-picker-utils";
+import util from "@ew-color-picker/utils";
 import { BOX_TEMPLATE } from "./template";
 
 export interface BoxProps extends Partial<SizeType> {
