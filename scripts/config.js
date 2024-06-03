@@ -5,6 +5,7 @@ const replace = require('@rollup/plugin-replace');
 const node = require('rollup-plugin-node-resolve');
 const ts = require('rollup-plugin-typescript');
 const scss = require('rollup-plugin-scss');
+const babel = require('rollup-plugin-babel');
 const banner =
   '/*!\n' +
   ` * ew-color-picker.js v${version.version}\n` +
@@ -16,28 +17,28 @@ const resolve = p => path.resolve(__dirname, '../', p);
 
 const builds = {
   'ew-color-picker-umd-dev': {
-    entry: resolve('packages/index.ts'),
+    entry: resolve('src/index.ts'),
     dest: resolve('dist/ew-color-picker.js'),
     format: 'umd',
     env: 'development',
     banner
   },
   'ew-color-picker-umd-build': {
-    entry: resolve('packages/index.ts'),
+    entry: resolve('src/index.ts'),
     dest: resolve('dist/ew-color-picker.min.js'),
     format: 'umd',
     env: 'production',
     banner
   },
   'ew-color-picker-esm-dev': {
-    entry: resolve('packages/index.ts'),
+    entry: resolve('src/index.ts'),
     dest: resolve('dist/ew-color-picker.esm.js'),
     format: 'esm',
     env: 'development',
     banner
   },
   'ew-color-picker-esm-build': {
-    entry: resolve('packages/index.ts'),
+    entry: resolve('src/index.ts'),
     dest: resolve('dist/ew-color-picker.esm.min.js'),
     format: 'esm',
     env: 'production',
@@ -59,7 +60,10 @@ function genConfig(name) {
         failOnError: true,
         outputStyle: 'compressed' //压缩
       }),
-      node()
+      node(),
+      babel({
+        exclude: 'node_modules/**' // 只编译我们的源代码
+      }),
     ].concat(opts.plugins || []),
     output: {
       file: opts.dest,
