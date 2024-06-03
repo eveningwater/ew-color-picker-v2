@@ -24,6 +24,13 @@ export default class ewColorPicker {
   }
   onBoxClickHandler(v: InstanceType<typeof Box>) {
     console.log(v);
+    const { defaultColor } = v.options;
+    if (defaultColor) {
+      v.options.defaultColor = "";
+    } else {
+      v.options.defaultColor = "#2396ef";
+    }
+    v.update();
   }
   render() {
     const { el, hasBox, boxHasColorIcon, boxNoColorIcon, defaultColor } =

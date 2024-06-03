@@ -1,6 +1,6 @@
-import { arrowIcon, closeIcon } from "../icons/const";
 import util from "@ew-color-picker/utils";
 import { BOX_TEMPLATE } from "./template";
+import { getChildren, normalizeSize } from "./box-method";
 
 export interface BoxProps extends Partial<SizeType> {
   defaultColor?: string;
@@ -13,29 +13,53 @@ export default class Box {
   hasColor: boolean;
   options: BoxProps;
   box: HTMLElement | null;
+  cacheBoxTemp!: string;
+  cacheOptions: BoxProps;
   constructor(options: BoxProps = {}) {
     const { defaultColor = "" } = options;
     this.hasColor = !!defaultColor;
     this.options = util.ewAssign({}, options);
+    this.cacheOptions = this.options;
     this.box = null;
+    this.cacheBoxTemp = "";
     this.render();
-  }
-  getChildren() {
-    const { boxNoColorIcon = "", boxHasColorIcon = "" } = this.options;
-    return this.hasColor
-      ? boxHasColorIcon || arrowIcon("ew-color-picker-box-arrow-icon")
-      : boxNoColorIcon || closeIcon("ew-color-picker-box-close-icon");
   }
   updateChildren() {
     if (this.box) {
-      this.hasColor = !this.hasColor;
-      this.box.innerHTML = this.getChildren();
+      const { defaultColor } = this.options;
+      this.hasColor = !!defaultColor;
+      this.box.replaceChildren(
+        util.createByTemplate(getChildren(this.hasColor, this.options))
+      );
+    }
+  }
+  destroy() {
+    if (this.box) {
+      util.removeElement(this.box);
+    }
+  }
+  update(keys: string[] = ["defaultColor", "size"]) {
+    if (!this.box) {
+      this.render();
+    } else {
+      if (keys.includes("defaultColor")) {
+        const { defaultColor } = this.options;
+        this.updateChildren();
+        this.setBoxBgColor(defaultColor);
+      }
+      if (keys.includes("size")) {
+        this.setBoxSize();
+      }
     }
   }
   render() {
     const { container, defaultColor } = this.options;
-    const temp = BOX_TEMPLATE(this.getChildren());
-    container?.appendChild(util.createByTemplate(temp));
+    if (!this.cacheBoxTemp) {
+      this.cacheBoxTemp = BOX_TEMPLATE(
+        getChildren(this.hasColor, this.options)
+      );
+    }
+    container?.appendChild(util.createByTemplate(this.cacheBoxTemp));
     this.box = util.$(".ew-color-picker-box", container);
     this.setBoxSize();
     this.setBoxBgColor(defaultColor);
@@ -49,20 +73,14 @@ export default class Box {
       });
     }
   }
-  normalizeSize(v: string | number) {
-    if (util.isNumber(v)) {
-      return v;
-    }
-    return parseInt(`${v}`);
-  }
   setBoxSize() {
     const { width = "", height = "" } = this.options;
     if (this.box) {
       if (width) {
-        util.setStyle(this.box, { width: `${this.normalizeSize(width)}px` });
+        util.setStyle(this.box, { width: `${normalizeSize(width)}px` });
       }
       if (height) {
-        util.setStyle(this.box, { height: `${this.normalizeSize(height)}px` });
+        util.setStyle(this.box, { height: `${normalizeSize(height)}px` });
       }
     }
   }
@@ -71,7 +89,14 @@ export default class Box {
       if (color) {
         const { defaultColor } = this.options;
         util.setStyle(this.box, { backgroundColor: color ?? defaultColor });
+      } else {
+        this.clearBoxBgColor();
       }
+    }
+  }
+  clearBoxBgColor() {
+    if (this.box) {
+      util.removeStyle(this.box, ["background-color"]);
     }
   }
 }

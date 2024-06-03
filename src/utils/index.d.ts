@@ -1,7 +1,9 @@
 type QueryElement = HTMLElement | Document;
 type EventElement = QueryElement | Element | Window;
 type WrapperType = string | HTMLElement;
-interface UtilType {
+export interface UtilType {
+  removeStyle: (el: HTMLElement, props: string[]) => void;
+  removeElement: (el: HTMLElement) => void;
   checkContainer: (el?: WrapperType) => HTMLElement;
   $$: (selector: string, el?: QueryElement) => NodeList;
   $: (selector: string, el?: QueryElement) => HTMLElement | null;
@@ -57,3 +59,5 @@ interface UtilType {
 declare const util: UtilType;
 
 export default util;
+
+export {};

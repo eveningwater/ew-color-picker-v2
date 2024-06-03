@@ -50,6 +50,7 @@ function genConfig(name) {
   const config = {
     input: opts.entry,
     plugins: [
+      node(),
       alias({
         entries: Object.assign({}, opts.alias)
       }),
@@ -60,7 +61,6 @@ function genConfig(name) {
         failOnError: true,
         outputStyle: 'compressed' //压缩
       }),
-      node(),
       babel({
         exclude: 'node_modules/**' // 只编译我们的源代码
       }),

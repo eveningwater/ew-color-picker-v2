@@ -50,7 +50,9 @@ const r = Object.create(null);
 }, r.create = e => document.createElement(e), r.createByTemplate = e => {
   const t = r.create("div");
   return t.innerHTML = e, t.firstElementChild;
-}, r.addClass = (e, t) => e.classList.add(t), r.removeClass = (e, t) => e.classList.remove(t), r.setStyle = (e, t = {}) => r.ewAssign(e.style, t), r.setAttr = (e, t) => {
+}, r.addClass = (e, t) => e.classList.add(t), r.removeClass = (e, t) => e.classList.remove(t), r.setStyle = (e, t = {}) => r.ewAssign(e.style, t), r.removeStyle = (e, t) => {
+  for (const o of t) e.style.removeProperty(o);
+}, r.setAttr = (e, t) => {
   if (r.isShallowObject(t)) for (const [o, r] of Object.entries(t)) e.setAttribute(o, `${r}`);
 }, r.setSingleAttr = (e, t, o) => r.setAttr(e, {
   [t]: o
@@ -70,41 +72,71 @@ const r = Object.create(null);
     if (t) return t;
   }
   return document.body;
+}, r.removeElement = e => {
+  e?.parentElement?.removeChild(e);
 };
+
+const BOX_TEMPLATE = (children, style) => `<div class="ew-color-picker-box" ${style ? `style="${style}"` : ""}>${children}</div>`;
 
 const handleClassName = (c) => (c ? ` ${c}` : "");
 const closeIcon = (className) => `<svg t="1690189203554" class="ew-color-picker-icon${handleClassName(className)}" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2272" fill="currentColor"><path d="M504.224 470.288l207.84-207.84a16 16 0 0 1 22.608 0l11.328 11.328a16 16 0 0 1 0 22.624l-207.84 207.824 207.84 207.84a16 16 0 0 1 0 22.608l-11.328 11.328a16 16 0 0 1-22.624 0l-207.824-207.84-207.84 207.84a16 16 0 0 1-22.608 0l-11.328-11.328a16 16 0 0 1 0-22.624l207.84-207.824-207.84-207.84a16 16 0 0 1 0-22.608l11.328-11.328a16 16 0 0 1 22.624 0l207.824 207.84z" p-id="2273"></path></svg>`;
 const arrowIcon = (className) => `<svg t="1717384498630" class="ew-color-picker-icon${handleClassName(className)}" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4234" width="200" height="200"><path d="M512 714.666667c-8.533333 0-17.066667-2.133333-23.466667-8.533334l-341.333333-341.333333c-12.8-12.8-12.8-32 0-44.8 12.8-12.8 32-12.8 44.8 0l320 317.866667 317.866667-320c12.8-12.8 32-12.8 44.8 0 12.8 12.8 12.8 32 0 44.8L533.333333 704c-4.266667 8.533333-12.8 10.666667-21.333333 10.666667z" fill="#666666" p-id="4235"></path></svg>`;
 
-const BOX_TEMPLATE = (children, style) => `<div class="ew-color-picker-box" ${style ? `style="${style}"` : ""}>${children}</div>`;
+const getChildren = (hasColor, options) => {
+    const { boxNoColorIcon = "", boxHasColorIcon = "" } = options;
+    return hasColor
+        ? boxHasColorIcon || arrowIcon("ew-color-picker-box-arrow-icon")
+        : boxNoColorIcon || closeIcon("ew-color-picker-box-close-icon");
+};
+const normalizeSize = (v) => {
+    if (r.isNumber(v)) {
+        return v;
+    }
+    return parseInt(`${v}`);
+};
 
 class Box {
     hasColor;
     options;
     box;
+    cacheBoxTemp;
+    cacheOptions;
     constructor(options = {}) {
         const { defaultColor = "" } = options;
         this.hasColor = !!defaultColor;
         this.options = r.ewAssign({}, options);
+        this.cacheOptions = this.options;
         this.box = null;
+        this.cacheBoxTemp = "";
         this.render();
-    }
-    getChildren() {
-        const { boxNoColorIcon = "", boxHasColorIcon = "" } = this.options;
-        return this.hasColor
-            ? boxHasColorIcon || arrowIcon("ew-color-picker-box-arrow-icon")
-            : boxNoColorIcon || closeIcon("ew-color-picker-box-close-icon");
     }
     updateChildren() {
         if (this.box) {
-            this.hasColor = !this.hasColor;
-            this.box.innerHTML = this.getChildren();
+            const { defaultColor } = this.options;
+            this.hasColor = !!defaultColor;
+            this.box.replaceChildren(r.createByTemplate(getChildren(this.hasColor, this.options)));
+        }
+    }
+    destroy() {
+        if (this.box) {
+            r.removeElement(this.box);
+        }
+    }
+    update() {
+        if (!this.box) {
+            this.render();
+        }
+        else {
+            const { defaultColor } = this.options;
+            this.updateChildren();
+            this.setBoxSize();
+            this.setBoxBgColor(defaultColor);
         }
     }
     render() {
         const { container, defaultColor } = this.options;
-        const temp = BOX_TEMPLATE(this.getChildren());
-        container?.appendChild(r.createByTemplate(temp));
+        this.cacheBoxTemp = BOX_TEMPLATE(getChildren(this.hasColor, this.options));
+        container?.appendChild(r.createByTemplate(this.cacheBoxTemp));
         this.box = r.$(".ew-color-picker-box", container);
         this.setBoxSize();
         this.setBoxBgColor(defaultColor);
@@ -118,20 +150,14 @@ class Box {
             });
         }
     }
-    normalizeSize(v) {
-        if (r.isNumber(v)) {
-            return v;
-        }
-        return parseInt(`${v}`);
-    }
     setBoxSize() {
         const { width = "", height = "" } = this.options;
         if (this.box) {
             if (width) {
-                r.setStyle(this.box, { width: `${this.normalizeSize(width)}px` });
+                r.setStyle(this.box, { width: `${normalizeSize(width)}px` });
             }
             if (height) {
-                r.setStyle(this.box, { height: `${this.normalizeSize(height)}px` });
+                r.setStyle(this.box, { height: `${normalizeSize(height)}px` });
             }
         }
     }
@@ -141,6 +167,14 @@ class Box {
                 const { defaultColor } = this.options;
                 r.setStyle(this.box, { backgroundColor: color ?? defaultColor });
             }
+            else {
+                this.clearBoxBgColor();
+            }
+        }
+    }
+    clearBoxBgColor() {
+        if (this.box) {
+            r.removeStyle(this.box, ["background-color"]);
         }
     }
 }
@@ -200,7 +234,7 @@ const normalizeBox = (config) => {
         b_height = height;
     }
     else {
-        if (__DEV__) {
+        {
             r.ewError(ERROR_VARIABLE.CONFIG_SIZE_ERROR);
         }
     }
@@ -213,7 +247,7 @@ class ewColorPicker {
     config;
     container;
     constructor(options) {
-        if (r.isUndefined(new.target) && __DEV__) {
+        if (r.isUndefined(new.target) && true) {
             r.ewError(ERROR_VARIABLE.CONSTRUCTOR_ERROR);
             return;
         }
@@ -227,6 +261,14 @@ class ewColorPicker {
     }
     onBoxClickHandler(v) {
         console.log(v);
+        const { defaultColor } = v.options;
+        if (defaultColor) {
+            v.options.defaultColor = "";
+        }
+        else {
+            v.options.defaultColor = "#2396ef";
+        }
+        v.update();
     }
     render() {
         const { el, hasBox, boxHasColorIcon, boxNoColorIcon, defaultColor } = this.config;

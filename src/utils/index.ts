@@ -1,3 +1,4 @@
+import { UtilType } from ".";
 import {
   basicDataTypeList,
   objDataTypeList,
@@ -12,20 +13,20 @@ const util: UtilType = Object.create(null);
  * 基本数据类型判断
  */
 basicDataTypeList.forEach((type) => {
-  util["is" + type] = (value) => typeof value === type.toLowerCase();
+  util["is" + type] = <T>(value: T) => typeof value === type.toLowerCase();
 });
 /**
  * 对象数据类型判断
  */
 objDataTypeList.forEach((type) => {
-  util["isDeep" + type] = (value) =>
+  util["isDeep" + type] = <T>(value: T) =>
     _toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase();
 });
 /**
  * 控制台打印方法
  */
 consoleList.forEach((c) => {
-  util["ew" + c.slice(0, 1).toUpperCase() + c.slice(1)] = (...v) =>
+  util["ew" + c.slice(0, 1).toUpperCase() + c.slice(1)] = (...v: string[]) =>
     console[c](...v);
 });
 /**
@@ -112,6 +113,16 @@ util.removeClass = (el, className) => el.classList.remove(className);
  * @returns
  */
 util.setStyle = (el, style = {}) => util.ewAssign(el.style, style);
+/**
+ * 移除属性
+ * @param el
+ * @param props
+ */
+util.removeStyle = (el: HTMLElement, props: string[]) => {
+  for (const item of props) {
+    el.style.removeProperty(item);
+  }
+};
 /**
  * 设置属性
  * @param el
@@ -237,4 +248,12 @@ util.checkContainer = (el) => {
   }
   return document.body;
 };
+/**
+ * 移除节点
+ * @param el
+ */
+util.removeElement = (el: HTMLElement) => {
+  el?.parentElement?.removeChild(el);
+};
+
 export default util;
