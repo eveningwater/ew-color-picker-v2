@@ -1,6 +1,6 @@
 /*!
  * ew-color-picker.js v2.0.0
- * (c) 2024-2024 eveningwater 
+ * (c) 2019-2024 eveningwater 
  * Released under the MIT License.
  */
 (function (global, factory) {
@@ -25,231 +25,55 @@
         DEFAULT_COLOR_ERROR: 'the "defaultColor" is not a invalid color,make sure to use the correct color!'
     };
 
-    const basicDataTypeList = ["Number", "String", "Function", "Undefined"];
-    const objDataTypeList = ["Object", "Array", "RegExp"];
-    const _toString = Object.prototype.toString;
-    const _arrSlice = Array.prototype.slice;
-    const _hasOwn = Object.prototype.hasOwnProperty;
-    const consoleList = ["warn", "error", "log"];
+    /*!
+     * ew-color-picker-util.js v0.0.1
+     * (c) 2019-2024 eveningwater 
+     * Released under the MIT License.
+     */
+    const e = Object.prototype.toString,
+      t = Array.prototype.slice,
+      o = Object.prototype.hasOwnProperty;
     navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i);
-
-    const util = Object.create(null);
-    /**
-     * 基本数据类型判断
-     */
-    basicDataTypeList.forEach(type => {
-      util["is" + type] = value => typeof value === type.toLowerCase();
-    });
-    /**
-     * 对象数据类型判断
-     */
-    objDataTypeList.forEach(type => {
-      util["isDeep" + type] = value => _toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase();
-    });
-    /**
-     * 控制台打印方法
-     */
-    consoleList.forEach(c => {
-      util["ew" + c.slice(0, 1).toUpperCase() + c.slice(1)] = (...v) => console[c](...v);
-    });
-    /**
-     * 判断是null
-     * @param value
-     * @returns
-     */
-    util.isNull = value => value === null;
-    /**
-     * 判断是否是一个对象
-     * @param value
-     * @returns
-     */
-    util.isShallowObject = value => typeof value === "object" && !util.isNull(value);
-    /**
-     * 伪数组转数组
-     * @param value
-     * @returns
-     */
-    util["ewObjToArray"] = value => util.isShallowObject(value) ? _arrSlice.call(value) : value;
-    /**
-     * 合并对象
-     * @param target
-     * @param args
-     * @returns
-     */
-    util.ewAssign = function (target, args) {
-      if (util.isNull(target)) {
-        return;
-      }
-      if (Object.assign) {
-        return Object.assign(target, args);
-      } else {
-        const _ = Object(target);
-        for (let j = 1, len = arguments.length; j < len; j++) {
-          const source = arguments[j];
-          if (source) {
-            for (let key in source) {
-              if (_hasOwn.call(source, key)) {
-                _[key] = source[key];
-              }
-            }
+    const r = Object.create(null);
+    ["Number", "String", "Function", "Undefined"].forEach(e => {
+      r["is" + e] = t => typeof t === e.toLowerCase();
+    }), ["Object", "Array", "RegExp"].forEach(t => {
+      r["isDeep" + t] = o => e.call(o).slice(8, -1).toLowerCase() === t.toLowerCase();
+    }), ["warn", "error", "log"].forEach(e => {
+      r["ew" + e.slice(0, 1).toUpperCase() + e.slice(1)] = (...t) => console[e](...t);
+    }), r.isNull = e => null === e, r.isShallowObject = e => "object" == typeof e && !r.isNull(e), r.ewObjToArray = e => r.isShallowObject(e) ? t.call(e) : e, r.ewAssign = function (e, t) {
+      if (!r.isNull(e)) {
+        if (Object.assign) return Object.assign(e, t);
+        {
+          const t = Object(e);
+          for (let e = 1, r = arguments.length; e < r; e++) {
+            const r = arguments[e];
+            if (r) for (let e in r) o.call(r, e) && (t[e] = r[e]);
           }
+          return t;
         }
-        return _;
       }
-    };
-    /**
-     * 创建节点
-     * @param tag
-     * @returns
-     */
-    util.create = tag => document.createElement(tag);
-    /**
-     * 根据字符串模板创建节点
-     * @param temp
-     * @returns
-     */
-    util.createByTemplate = temp => {
-      const element = util.create("div");
-      element.innerHTML = temp;
-      return element.firstElementChild;
-    };
-    /**
-     * 添加类名
-     * @param el
-     * @param className
-     * @returns
-     */
-    util.addClass = (el, className) => el.classList.add(className);
-    /**
-     * 移除类名
-     * @param el
-     * @param className
-     * @returns
-     */
-    util.removeClass = (el, className) => el.classList.remove(className);
-    /**
-     * 设置样式
-     * @param el
-     * @param style
-     * @returns
-     */
-    util.setStyle = (el, style = {}) => util.ewAssign(el.style, style);
-    /**
-     * 设置属性
-     * @param el
-     * @param values
-     * @returns
-     */
-    util.setAttr = (el, values) => {
-      if (!util.isShallowObject(values)) {
-        return;
-      }
-      for (const [key, value] of Object.entries(values)) {
-        el.setAttribute(key, `${value}`);
-      }
-    };
-    /**
-     * 设置单个属性
-     * @param el
-     * @param key
-     * @param value
-     * @returns
-     */
-    util.setSingleAttr = (el, key, value) => util.setAttr(el, {
-      [key]: value
-    });
-    /**
-     * 获取属性
-     * @param el
-     * @param key
-     * @returns
-     */
-    util.getAttr = (el, key) => el.getAttribute(key);
-    /**
-     * 判断是否是DOM元素
-     * @param el
-     * @returns
-     */
-    util.isDom = el => util.isShallowObject(HTMLElement) ? el instanceof HTMLElement : el && util.isShallowObject(el) && el.nodeType === 1 && util.isString(el.nodeName) || el instanceof HTMLCollection || el instanceof NodeList;
-    /**
-     * 深度克隆对象(JSON)
-     * @param obj
-     * @returns
-     */
-    util.deepCloneObjByJSON = obj => JSON.parse(JSON.stringify(obj));
-    /**
-     * 深度克隆对象(递归)
-     * @param obj
-     * @returns
-     */
-    util.deepCloneObjByRecursion = function f(obj) {
-      if (!util.isShallowObject(obj)) {
-        return;
-      }
-      let cloneObj = util.isDeepArray(obj) ? [] : {};
-      for (let k in obj) {
-        cloneObj[k] = util.isShallowObject(obj[k]) ? f(obj[k]) : obj[k];
-      }
-      return cloneObj;
-    };
-    /**
-     * 获取样式
-     * @param el
-     * @param prop
-     * @returns
-     */
-    util.getStyle = (el, prop) => window.getComputedStyle(el, null)[prop];
-    /**
-     * 获取dom元素
-     * @param selector
-     * @param el
-     * @returns
-     */
-    util.$ = (selector, el = document) => el.querySelector(selector);
-    /**
-     * 获取DOMList
-     * @param selector
-     * @param el
-     * @returns
-     */
-    util.$$ = (selector, el = document) => el.querySelectorAll(selector);
-    /**
-     * 添加事件
-     * @param element
-     * @param type
-     * @param handler
-     * @param useCapture
-     */
-    util["on"] = (element, type, handler, useCapture = false) => {
-      if (element && type && handler) {
-        element.addEventListener(type, handler, useCapture);
-      }
-    };
-    /**
-     * 移除事件
-     * @param element
-     * @param type
-     * @param handler
-     * @param useCapture
-     */
-    util["off"] = (element, type, handler, useCapture = false) => {
-      if (element && type && handler) {
-        element.removeEventListener(type, handler, useCapture);
-      }
-    };
-    /**
-     *
-     * @param el
-     * @returns
-     */
-    util.checkContainer = el => {
-      if (util.isDom(el)) {
-        return el;
-      } else if (util.isString(el)) {
-        const ele = util.$(el);
-        if (ele) {
-          return ele;
-        }
+    }, r.create = e => document.createElement(e), r.createByTemplate = e => {
+      const t = r.create("div");
+      return t.innerHTML = e, t.firstElementChild;
+    }, r.addClass = (e, t) => e.classList.add(t), r.removeClass = (e, t) => e.classList.remove(t), r.setStyle = (e, t = {}) => r.ewAssign(e.style, t), r.setAttr = (e, t) => {
+      if (r.isShallowObject(t)) for (const [o, r] of Object.entries(t)) e.setAttribute(o, `${r}`);
+    }, r.setSingleAttr = (e, t, o) => r.setAttr(e, {
+      [t]: o
+    }), r.getAttr = (e, t) => e.getAttribute(t), r.isDom = e => r.isShallowObject(HTMLElement) ? e instanceof HTMLElement : e && r.isShallowObject(e) && 1 === e.nodeType && r.isString(e.nodeName) || e instanceof HTMLCollection || e instanceof NodeList, r.deepCloneObjByJSON = e => JSON.parse(JSON.stringify(e)), r.deepCloneObjByRecursion = function e(t) {
+      if (!r.isShallowObject(t)) return;
+      let o = r.isDeepArray(t) ? [] : {};
+      for (let n in t) o[n] = r.isShallowObject(t[n]) ? e(t[n]) : t[n];
+      return o;
+    }, r.getStyle = (e, t) => window.getComputedStyle(e, null)[t], r.$ = (e, t = document) => t.querySelector(e), r.$$ = (e, t = document) => t.querySelectorAll(e), r.on = (e, t, o, r = !1) => {
+      e && t && o && e.addEventListener(t, o, r);
+    }, r.off = (e, t, o, r = !1) => {
+      e && t && o && e.removeEventListener(t, o, r);
+    }, r.checkContainer = e => {
+      if (r.isDom(e)) return e;
+      if (r.isString(e)) {
+        const t = r.$(e);
+        if (t) return t;
       }
       return document.body;
     };
@@ -267,7 +91,7 @@
         constructor(options = {}) {
             const { defaultColor = "" } = options;
             this.hasColor = !!defaultColor;
-            this.options = util.ewAssign({}, options);
+            this.options = r.ewAssign({}, options);
             this.box = null;
             this.render();
         }
@@ -286,8 +110,8 @@
         render() {
             const { container, defaultColor } = this.options;
             const temp = BOX_TEMPLATE(this.getChildren());
-            container?.appendChild(util.createByTemplate(temp));
-            this.box = util.$(".ew-color-picker-box", container);
+            container?.appendChild(r.createByTemplate(temp));
+            this.box = r.$(".ew-color-picker-box", container);
             this.setBoxSize();
             this.setBoxBgColor(defaultColor);
             this.bindHandler();
@@ -295,13 +119,13 @@
         bindHandler() {
             if (this.box) {
                 const { onClick } = this.options;
-                util.on(this.box, "click", () => {
+                r.on(this.box, "click", () => {
                     onClick?.(this);
                 });
             }
         }
         normalizeSize(v) {
-            if (util.isNumber(v)) {
+            if (r.isNumber(v)) {
                 return v;
             }
             return parseInt(`${v}`);
@@ -310,10 +134,10 @@
             const { width = "", height = "" } = this.options;
             if (this.box) {
                 if (width) {
-                    util.setStyle(this.box, { width: `${this.normalizeSize(width)}px` });
+                    r.setStyle(this.box, { width: `${this.normalizeSize(width)}px` });
                 }
                 if (height) {
-                    util.setStyle(this.box, { height: `${this.normalizeSize(height)}px` });
+                    r.setStyle(this.box, { height: `${this.normalizeSize(height)}px` });
                 }
             }
         }
@@ -321,7 +145,7 @@
             if (this.box) {
                 if (color) {
                     const { defaultColor } = this.options;
-                    util.setStyle(this.box, { backgroundColor: color ?? defaultColor });
+                    r.setStyle(this.box, { backgroundColor: color ?? defaultColor });
                 }
             }
         }
@@ -341,23 +165,23 @@
     };
 
     const initConfig = (options) => {
-        if (util.isShallowObject(options)) {
+        if (r.isShallowObject(options)) {
             const { el, ...other } = options;
-            return util.ewAssign(defaultConfig, {
-                el: util.checkContainer(el),
+            return r.ewAssign(defaultConfig, {
+                el: r.checkContainer(el),
                 ...other,
             });
         }
         else {
-            return util.ewAssign(defaultConfig, {
-                el: util.checkContainer(options),
+            return r.ewAssign(defaultConfig, {
+                el: r.checkContainer(options),
             });
         }
     };
     const normalizeBox = (config) => {
         const { size } = config;
         let b_width = "", b_height = "";
-        if (util.isString(size)) {
+        if (r.isString(size)) {
             switch (size) {
                 case "normal":
                     b_width = b_height = "40px";
@@ -376,27 +200,27 @@
                     break;
             }
         }
-        else if (util.isDeepObject(size)) {
+        else if (r.isDeepObject(size)) {
             const { width, height } = size;
             b_width = width;
             b_height = height;
         }
         else {
             if (__DEV__) {
-                util.ewError(ERROR_VARIABLE.CONFIG_SIZE_ERROR);
+                r.ewError(ERROR_VARIABLE.CONFIG_SIZE_ERROR);
             }
         }
         return { b_width, b_height };
     };
 
-    const consoleColorPickerInfo = () => util.ewLog(`%c ew-color-picker@2.0.0%c 联系QQ：854806732 %c 联系微信：eveningwater %c github:https://github.com/eveningwater/ew-color-picker %c `, "background:#0ca6dc ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff", "background:#ff7878 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff", "background:#ff7878 ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff", "background:#ff7878 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff", "background:transparent");
+    const consoleColorPickerInfo = () => r.ewLog(`%c ew-color-picker@2.0.0%c 联系QQ：854806732 %c 联系微信：eveningwater %c github:https://github.com/eveningwater/ew-color-picker %c `, "background:#0ca6dc ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff", "background:#ff7878 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff", "background:#ff7878 ; padding: 1px; border-radius: 3px 0 0 3px;  color: #fff", "background:#ff7878 ; padding: 1px; border-radius: 0 3px 3px 0;  color: #fff", "background:transparent");
 
     class ewColorPicker {
         config;
         container;
         constructor(options) {
-            if (util.isUndefined(new.target) && __DEV__) {
-                util.ewError(ERROR_VARIABLE.CONSTRUCTOR_ERROR);
+            if (r.isUndefined(new.target) && __DEV__) {
+                r.ewError(ERROR_VARIABLE.CONSTRUCTOR_ERROR);
                 return;
             }
             this.container = null;
@@ -412,8 +236,8 @@
         }
         render() {
             const { el, hasBox, boxHasColorIcon, boxNoColorIcon, defaultColor } = this.config;
-            el?.appendChild(util.createByTemplate(CORE_TEMPLATE));
-            this.container = util.checkContainer(util.$(".ew-color-picker", el));
+            el?.appendChild(r.createByTemplate(CORE_TEMPLATE));
+            this.container = r.checkContainer(r.$(".ew-color-picker", el));
             if (hasBox) {
                 const { b_width: width, b_height: height } = normalizeBox(this.config);
                 new Box({
