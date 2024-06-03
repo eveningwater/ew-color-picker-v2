@@ -9,7 +9,7 @@ const babel = require('rollup-plugin-babel');
 const banner =
   '/*!\n' +
   ` * ew-color-picker.js v${version.version}\n` +
-  ` * (c) 2023-${new Date().getFullYear()} eveningwater \n` +
+  ` * (c) 2019-${new Date().getFullYear()} eveningwater \n` +
   ' * Released under the MIT License.\n' +
   ' */';
 

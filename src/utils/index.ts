@@ -7,13 +7,12 @@ import {
   consoleList,
   isMobile,
 } from "./const";
-const util = Object.create(null);
+const util: UtilType = Object.create(null);
 /**
  * 基本数据类型判断
  */
 basicDataTypeList.forEach((type) => {
-  util["is" + type] = (value) =>
-    typeof value === type.toLowerCase();
+  util["is" + type] = (value) => typeof value === type.toLowerCase();
 });
 /**
  * 对象数据类型判断
@@ -47,7 +46,7 @@ util.isShallowObject = (value) =>
  * @param value
  * @returns
  */
-util["ewObjToArray"] = value =>
+util["ewObjToArray"] = (value) =>
   util.isShallowObject(value) ? _arrSlice.call(value) : value;
 /**
  * 合并对象
@@ -90,7 +89,7 @@ util.create = (tag) => document.createElement(tag);
 util.createByTemplate = (temp) => {
   const element = util.create("div");
   element.innerHTML = temp;
-  return element.firstElementChild;
+  return element.firstElementChild as HTMLElement;
 };
 /**
  * 添加类名
@@ -228,10 +227,10 @@ util["off"] = (element, type, handler, useCapture = false) => {
  * @returns
  */
 util.checkContainer = (el) => {
-  if (util.isDom(el)) {
-    return el;
+  if (util.isDom(el as HTMLElement)) {
+    return el as HTMLElement;
   } else if (util.isString(el)) {
-    const ele = util.$(el);
+    const ele = util.$(el as string);
     if (ele) {
       return ele;
     }
