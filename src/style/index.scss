@@ -1,4 +1,23 @@
 @import "./variable.scss";
+@import "./extend.scss";
 .#{$baseSelector}color-picker {
     position: absolute;
+    &-box {
+        color: $boxColor;
+        border: {
+            radius: 4px;
+            color: $boxBorderColor;
+            style: solid;
+            width: 1px;
+        }
+        padding: 4px 7px;
+        line-height: 1.5;
+        font-size: 14px;
+        transition: border-color .2s cubic-bezier(.175,.885,.32,1.275);
+        @extend .flex-center;
+    }
+    &-icon {
+        width: 20px;
+        height: 20px;
+    }
 }

@@ -113,7 +113,7 @@ util.removeClass = (el, className) => el.classList.remove(className);
  * @param style
  * @returns
  */
-util.setStyle = (el, style) => util.ewAssign(el.style, style);
+util.setStyle = (el, style = {}) => util.ewAssign(el.style, style);
 /**
  * 设置属性
  * @param el
@@ -191,14 +191,14 @@ util.getStyle = (el, prop) => window.getComputedStyle(el, null)[prop];
  * @param el
  * @returns
  */
-util.$ = (selector, el) => el.querySelector(selector);
+util.$ = (selector, el = document) => el.querySelector(selector);
 /**
  * 获取DOMList
  * @param selector
  * @param el
  * @returns
  */
-util.$$ = (selector, el) => el.querySelectorAll(selector);
+util.$$ = (selector, el = document) => el.querySelectorAll(selector);
 /**
  * 添加事件
  * @param element
@@ -222,5 +222,21 @@ util["off"] = (element, type, handler, useCapture = false) => {
   if (element && type && handler) {
     element.removeEventListener(type, handler, useCapture);
   }
+};
+/**
+ *
+ * @param el
+ * @returns
+ */
+util.checkContainer = (el) => {
+  if (util.isDom(el as HTMLElement)) {
+    return el as HTMLElement;
+  } else if (util.isString(el)) {
+    const ele = util.$(el as string);
+    if (ele) {
+      return ele as HTMLElement;
+    }
+  }
+  return document.body;
 };
 export default util;

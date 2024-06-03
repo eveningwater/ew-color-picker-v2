@@ -18,6 +18,7 @@ export type OptionType = {
   clear?: Function;
   isLog?: boolean;
   togglePicker?: Function;
+  hasBox?: boolean;
 };
 export interface HsbType {
   a?: number;
@@ -27,13 +28,17 @@ export interface HsbType {
 }
 
 export interface UtilType {
-  $$: (selector: string, el: QueryElement) => NodeList;
-  $: (selector: string, el: QueryElement) => HTMLElement | null;
-  getStyle: (el: HTMLElement | Element, prop: string) => CSSStyleDeclaration;
+  checkContainer: (el?: string | HTMLElement | undefined) => HTMLElement;
+  $$: (selector: string, el?: QueryElement) => NodeList;
+  $: (selector: string, el?: QueryElement) => HTMLElement | null;
+  getStyle: (
+    el: HTMLElement | Element,
+    prop: string
+  ) => CSSStyleDeclaration[keyof CSSStyleDeclaration];
   deepCloneObjByRecursion: <T>(obj: object | T[]) => {} | undefined;
   deepCloneObjByJSON: <T extends {}>(obj: T) => T;
   ewObjToArray: <T extends {}>(v: T) => any[] | T;
-  isDom: (el: HTMLElement | Element) => boolean;
+  isDom: <T extends HTMLElement>(el?: T) => boolean;
   getAttr: (el: HTMLElement, key: string) => string | null;
   setSingleAttr: (el: HTMLElement, key: string, value: string) => void;
   setAttr: <T extends string>(
@@ -42,7 +47,7 @@ export interface UtilType {
   ) => void;
   setStyle: (
     el: HTMLElement,
-    style: CSSStyleDeclaration
+    style: Partial<CSSStyleDeclaration>
   ) => CSSStyleDeclaration;
   removeClass: (el: HTMLElement | Element, className: string) => void;
   addClass: (el: HTMLElement | Element, className: string) => void;
@@ -70,7 +75,7 @@ export interface UtilType {
     handler: EventListenerOrEventListenerObject,
     useCapture: boolean
   ) => void;
-  ewWarn: (v: string) => void;
-  ewError: (v: string) => void;
-  ewLog: (v: string) => void;
+  ewWarn: (...v: string[]) => void;
+  ewError: (...v: string[]) => void;
+  ewLog: (...v: string[]) => void;
 }

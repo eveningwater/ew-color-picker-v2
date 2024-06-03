@@ -1,10 +1,13 @@
 import { arrowIcon, closeIcon } from "../icons/const";
+import { SizeType } from "../type/type";
 import util from "../utils/util";
 import { BOX_TEMPLATE } from "./template";
 
-export interface BoxProps {
+export interface BoxProps extends Partial<SizeType> {
   defaultColor?: string;
   container?: HTMLElement;
+  boxNoColorIcon?: string;
+  boxHasColorIcon?: string;
 }
 export default class Box {
   hasColor: boolean;
@@ -18,7 +21,10 @@ export default class Box {
     this.render();
   }
   getChildren() {
-    return this.hasColor ? arrowIcon() : closeIcon();
+    const { boxNoColorIcon = "", boxHasColorIcon = "" } = this.options;
+    return this.hasColor
+      ? boxHasColorIcon || arrowIcon()
+      : boxNoColorIcon || closeIcon();
   }
   updateChildren() {
     if (this.box) {
@@ -31,5 +37,22 @@ export default class Box {
     const temp = BOX_TEMPLATE(this.getChildren());
     container?.appendChild(util.createByTemplate(temp));
     this.box = util.$(".ew-color-picker-box", container);
+  }
+  normalizeSize(v: string | number) {
+    if (util.isNumber(v)) {
+      return v;
+    }
+    return parseInt(`${v}`);
+  }
+  setBoxSize() {
+    const { width = "", height = "" } = this.options;
+    if (this.box) {
+      if (width) {
+        util.setStyle(this.box, { width: `${this.normalizeSize(width)}px` });
+      }
+      if (height) {
+        util.setStyle(this.box, { height: `${this.normalizeSize(height)}px` });
+      }
+    }
   }
 }
