@@ -17,28 +17,28 @@ const resolve = p => path.resolve(__dirname, '../', p);
 const builds = {
   'ew-color-picker-umd-dev': {
     entry: resolve('src/index.ts'),
-    dest: resolve('dist/ew-message.js'),
+    dest: resolve('dist/ew-color-picker.js'),
     format: 'umd',
     env: 'development',
     banner
   },
   'ew-color-picker-umd-build': {
     entry: resolve('src/index.ts'),
-    dest: resolve('dist/ew-message.min.js'),
+    dest: resolve('dist/ew-color-picker.min.js'),
     format: 'umd',
     env: 'production',
     banner
   },
   'ew-color-picker-esm-dev': {
     entry: resolve('src/index.ts'),
-    dest: resolve('dist/ew-message.esm.js'),
+    dest: resolve('dist/ew-color-picker.esm.js'),
     format: 'esm',
     env: 'development',
     banner
   },
   'ew-color-picker-esm-build': {
     entry: resolve('src/index.ts'),
-    dest: resolve('dist/ew-message.esm.min.js'),
+    dest: resolve('dist/ew-color-picker.esm.min.js'),
     format: 'esm',
     env: 'production',
     banner
@@ -55,7 +55,7 @@ function genConfig(name) {
       ts(),
       scss({
         include: ['/**/*.css', '/**/*.scss', '/**/*.sass'],
-        output: 'dist/ew-message.min.css',
+        output: 'dist/ew-color-picker.min.css',
         failOnError: true,
         outputStyle: 'compressed' //压缩
       }),
@@ -65,7 +65,7 @@ function genConfig(name) {
       file: opts.dest,
       format: opts.format,
       banner: opts.banner,
-      name: opts.moduleName || 'ew-color-picker',
+      name: opts.moduleName || 'ewColorPicker',
       exports: 'auto'
     }
   };

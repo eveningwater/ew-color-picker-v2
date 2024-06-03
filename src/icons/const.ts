@@ -1,4 +1,4 @@
-export const handleClassName = (c?: string) => (c ? ` ${c}` : c);
+export const handleClassName = (c?: string) => (c ? ` ${c}` : "");
 export const closeIcon = (className?: string) =>
   `<svg t="1690189203554" class="ew-color-picker-icon${handleClassName(
     className

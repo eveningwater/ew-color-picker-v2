@@ -1,4 +1,3 @@
-import { UtilType } from "../type/type";
 import {
   basicDataTypeList,
   objDataTypeList,
@@ -27,8 +26,8 @@ objDataTypeList.forEach((type) => {
  * 控制台打印方法
  */
 consoleList.forEach((c) => {
-  util["ew" + c.slice(0, 1).toUpperCase() + c.slice(1)] = (v: string) =>
-    console[c](`[ewColorPicker ${c}]\n` + v);
+  util["ew" + c.slice(0, 1).toUpperCase() + c.slice(1)] = (...v: string[]) =>
+    console[c](...v);
 });
 /**
  * 判断是null

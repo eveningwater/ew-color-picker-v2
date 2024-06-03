@@ -1,5 +1,4 @@
 import { arrowIcon, closeIcon } from "../icons/const";
-import { SizeType } from "../type/type";
 import util from "../utils/util";
 import { BOX_TEMPLATE } from "./template";
 
@@ -8,6 +7,7 @@ export interface BoxProps extends Partial<SizeType> {
   container?: HTMLElement;
   boxNoColorIcon?: string;
   boxHasColorIcon?: string;
+  onClick?: (v: InstanceType<typeof Box>) => void;
 }
 export default class Box {
   hasColor: boolean;
@@ -33,10 +33,21 @@ export default class Box {
     }
   }
   render() {
-    const { container = document.body } = this.options;
+    const { container, defaultColor } = this.options;
     const temp = BOX_TEMPLATE(this.getChildren());
     container?.appendChild(util.createByTemplate(temp));
     this.box = util.$(".ew-color-picker-box", container);
+    this.setBoxSize();
+    this.setBoxBgColor(defaultColor);
+    this.bindHandler();
+  }
+  bindHandler() {
+    if (this.box) {
+      const { onClick } = this.options;
+      util.on(this.box, "click", () => {
+        onClick?.(this);
+      });
+    }
   }
   normalizeSize(v: string | number) {
     if (util.isNumber(v)) {
@@ -52,6 +63,14 @@ export default class Box {
       }
       if (height) {
         util.setStyle(this.box, { height: `${this.normalizeSize(height)}px` });
+      }
+    }
+  }
+  setBoxBgColor(color?: string) {
+    if (this.box) {
+      if (color) {
+        const { defaultColor } = this.options;
+        util.setStyle(this.box, { backgroundColor: color ?? defaultColor });
       }
     }
   }

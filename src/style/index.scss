@@ -1,5 +1,6 @@
 @import "./variable.scss";
 @import "./extend.scss";
+@import "./color.scss";
 .#{$baseSelector}color-picker {
     position: absolute;
     &-box {
@@ -14,7 +15,20 @@
         line-height: 1.5;
         font-size: 14px;
         transition: border-color .2s cubic-bezier(.175,.885,.32,1.275);
+        box-sizing: border-box;
         @extend .flex-center;
+        cursor: pointer;
+    }
+    &-panel {
+        min-width: 320px;
+        box-sizing: content-box;
+        border: 1px solid #ebeeff;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, .2);
+        border-radius: 5px;
+        z-index: 10;
+        padding: 7px;
+        text-align: left;
+        display: none;
     }
     &-icon {
         width: 20px;
