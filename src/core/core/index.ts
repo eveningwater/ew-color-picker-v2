@@ -30,7 +30,7 @@ export default class ewColorPicker {
     } else {
       v.options.defaultColor = "#2396ef";
     }
-    v.update();
+    v.update(["defaultColor"]);
   }
   render() {
     const { el, hasBox, boxHasColorIcon, boxNoColorIcon, defaultColor } =

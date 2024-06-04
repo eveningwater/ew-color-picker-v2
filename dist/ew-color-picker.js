@@ -128,20 +128,27 @@
                 r.removeElement(this.box);
             }
         }
-        update() {
+        update(keys = ["defaultColor", "size"]) {
             if (!this.box) {
                 this.render();
             }
             else {
-                const { defaultColor } = this.options;
-                this.updateChildren();
-                this.setBoxSize();
-                this.setBoxBgColor(defaultColor);
+                if (keys.includes("defaultColor")) {
+                    const { defaultColor } = this.options;
+                    this.updateChildren();
+                    this.setBoxBgColor(defaultColor);
+                }
+                console.log(keys);
+                if (keys.includes("size")) {
+                    this.setBoxSize();
+                }
             }
         }
         render() {
             const { container, defaultColor } = this.options;
-            this.cacheBoxTemp = BOX_TEMPLATE(getChildren(this.hasColor, this.options));
+            if (!this.cacheBoxTemp) {
+                this.cacheBoxTemp = BOX_TEMPLATE(getChildren(this.hasColor, this.options));
+            }
             container?.appendChild(r.createByTemplate(this.cacheBoxTemp));
             this.box = r.$(".ew-color-picker-box", container);
             this.setBoxSize();
@@ -274,7 +281,7 @@
             else {
                 v.options.defaultColor = "#2396ef";
             }
-            v.update();
+            v.update(["defaultColor"]);
         }
         render() {
             const { el, hasBox, boxHasColorIcon, boxNoColorIcon, defaultColor } = this.config;
