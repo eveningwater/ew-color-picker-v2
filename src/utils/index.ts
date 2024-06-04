@@ -253,7 +253,23 @@ util.checkContainer = (el) => {
  * @param el
  */
 util.removeElement = (el: HTMLElement) => {
-  el?.parentElement?.removeChild(el);
+  if (el?.parentElement) {
+    el?.parentElement?.removeChild(el);
+  } else {
+    el?.remove();
+  }
+};
+/**
+ * 插入节点
+ * @param el
+ * @param node
+ */
+util.insertNode = (el: HTMLElement, node: Node, oldNode: Node) => {
+  if (oldNode && el?.contains(oldNode)) {
+    el.replaceChild(node, oldNode);
+  } else {
+    el?.appendChild(node);
+  }
 };
 
 export default util;

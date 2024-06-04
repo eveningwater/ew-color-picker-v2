@@ -39,7 +39,7 @@ export default class ewColorPicker {
     this.container = util.checkContainer(util.$(".ew-color-picker", el)!);
     if (hasBox) {
       const { b_width: width, b_height: height } = normalizeBox(this.config);
-      new Box({
+      const box = new Box({
         container: this.container,
         width,
         height,

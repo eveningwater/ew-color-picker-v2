@@ -59,7 +59,10 @@ export default class Box {
         getChildren(this.hasColor, this.options)
       );
     }
-    container?.appendChild(util.createByTemplate(this.cacheBoxTemp));
+    const node = util.createByTemplate(this.cacheBoxTemp);
+    if (container) {
+      util.insertNode(container, node, this.box!);
+    }
     this.box = util.$(".ew-color-picker-box", container);
     this.setBoxSize();
     this.setBoxBgColor(defaultColor);

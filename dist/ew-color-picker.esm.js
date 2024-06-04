@@ -73,7 +73,9 @@ const r = Object.create(null);
   }
   return document.body;
 }, r.removeElement = e => {
-  e?.parentElement?.removeChild(e);
+  e?.parentElement ? e?.parentElement?.removeChild(e) : e?.remove();
+}, r.insertNode = (e, t, o) => {
+  o && e?.contains(o) ? e.replaceChild(t, o) : e?.appendChild(t);
 };
 
 const BOX_TEMPLATE = (children, style) => `<div class="ew-color-picker-box" ${style ? `style="${style}"` : ""}>${children}</div>`;
@@ -132,7 +134,6 @@ class Box {
                 this.updateChildren();
                 this.setBoxBgColor(defaultColor);
             }
-            console.log(keys);
             if (keys.includes("size")) {
                 this.setBoxSize();
             }
@@ -143,7 +144,10 @@ class Box {
         if (!this.cacheBoxTemp) {
             this.cacheBoxTemp = BOX_TEMPLATE(getChildren(this.hasColor, this.options));
         }
-        container?.appendChild(r.createByTemplate(this.cacheBoxTemp));
+        const node = r.createByTemplate(this.cacheBoxTemp);
+        if (container) {
+            r.insertNode(container, node, this.box);
+        }
         this.box = r.$(".ew-color-picker-box", container);
         this.setBoxSize();
         this.setBoxBgColor(defaultColor);

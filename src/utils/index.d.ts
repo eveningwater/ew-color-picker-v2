@@ -2,6 +2,7 @@ type QueryElement = HTMLElement | Document;
 type EventElement = QueryElement | Element | Window;
 type WrapperType = string | HTMLElement;
 export interface UtilType {
+  insertNode: (el: HTMLElement, node: Node, oldNode: Node) => void;
   removeStyle: (el: HTMLElement, props: string[]) => void;
   removeElement: (el: HTMLElement) => void;
   checkContainer: (el?: WrapperType) => HTMLElement;
