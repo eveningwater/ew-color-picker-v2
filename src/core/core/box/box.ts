@@ -1,6 +1,6 @@
 import util from "@ew-color-picker/utils";
-import { BOX_TEMPLATE } from "./template";
 import { getChildren, normalizeSize } from "./box-method";
+import { BOX_TEMPLATE } from "../../template";
 
 export interface BoxProps extends Partial<SizeType> {
   defaultColor?: string;
