@@ -47,7 +47,7 @@ util.isShallowObject = (value) =>
  * @param value
  * @returns
  */
-util["ewObjToArray"] = (value) =>
+util.ewToArray = (value) =>
   util.isShallowObject(value) ? _arrSlice.call(value) : value;
 /**
  * 合并对象

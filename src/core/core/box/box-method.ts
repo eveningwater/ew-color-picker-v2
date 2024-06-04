@@ -1,5 +1,5 @@
 import util from "@ew-color-picker/utils";
-import { arrowIcon, closeIcon } from "../icons/const";
+import { arrowIcon, closeIcon } from "../../icons/const";
 import { BoxProps } from "./box";
 
 export const getChildren = (hasColor: boolean, options: BoxProps) => {

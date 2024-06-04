@@ -14,7 +14,7 @@ export interface UtilType {
   ) => CSSStyleDeclaration[keyof CSSStyleDeclaration];
   deepCloneObjByRecursion: <T>(obj: object | T[]) => {} | undefined;
   deepCloneObjByJSON: <T extends {}>(obj: T) => T;
-  ewObjToArray: <T extends {}>(v: T) => any[] | T;
+  ewToArray: <T extends {}>(v: T) => any[] | T;
   isDom: <T extends HTMLElement>(el?: T) => boolean;
   getAttr: (el: HTMLElement, key: string) => string | null;
   setSingleAttr: (el: HTMLElement, key: string, value: string) => void;

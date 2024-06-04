@@ -20,15 +20,37 @@
         cursor: pointer;
     }
     &-panel {
-        min-width: 320px;
+        min-width: 280px;
         box-sizing: content-box;
-        border: 1px solid #ebeeff;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, .2);
+        border: 1px solid $panelBorderColor;
+        box-shadow: 0 4px 15px $panelBoxShadowColor;
         border-radius: 5px;
         z-index: 10;
         padding: 7px;
         text-align: left;
         display: none;
+        &-content {
+            margin-bottom: 6px;
+        }
+        .#{$baseSelector}-inner-panel {
+            width: 280px;
+            height: 180px;
+            cursor: pointer;
+            position: relative;
+            .#{$baseSelector}-white-panel,.#{$baseSelector}-black-panel {
+                position: absolute;
+                left: 0;
+                top: 0;
+                right: 0;
+                bottom: 0;
+            }
+            .#{$baseSelector}-white-panel {
+                background: $whitePanel;
+            }
+            .#{$baseSelector}-black-panel {
+                background: $blackPanel;
+            }
+        }
     }
     &-icon {
         width: 20px;

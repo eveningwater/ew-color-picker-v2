@@ -1,7 +1,7 @@
 import ERROR_VARIABLE from "../utils/error";
 import util from "@ew-color-picker/utils";
 import "../style/index.scss";
-import Box from "../box/box";
+import Box from "./box/box";
 import { CORE_TEMPLATE } from "./template";
 import { initConfig, normalizeBox } from "./core-method";
 import { consoleColorPickerInfo } from "../utils/console";
@@ -35,12 +35,15 @@ export default class ewColorPicker {
   render() {
     const { el, hasBox, boxHasColorIcon, boxNoColorIcon, defaultColor } =
       this.config;
-    el?.appendChild(util.createByTemplate(CORE_TEMPLATE));
-    this.container = util.checkContainer(util.$(".ew-color-picker", el)!);
+    const node = util.createByTemplate(CORE_TEMPLATE);
+    if (el) {
+      util.insertNode(el, node, this.container!);
+    }
+    this.container = util.$(".ew-color-picker", el);
     if (hasBox) {
       const { b_width: width, b_height: height } = normalizeBox(this.config);
       const box = new Box({
-        container: this.container,
+        container: this.container!,
         width,
         height,
         boxNoColorIcon,
