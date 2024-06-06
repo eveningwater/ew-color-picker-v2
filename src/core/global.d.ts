@@ -21,9 +21,17 @@ type OptionType = {
   boxNoColorIcon?: string;
   boxHasColorIcon?: string;
 };
+
+type ColorPickerOptions = WrapperType | OptionType;
 interface HsbType {
   a?: number;
   h: number;
   s: number;
   b: number;
+}
+
+interface ewColorPickerStaticMethod<T = {}, U> {
+  util: Partial<T>;
+  createColorPicker: (v?: ColorPickerOptions) => InstanceType<U>;
+  destroy: (v?: InstanceType<U> | InstanceType<U>[]) => void;
 }

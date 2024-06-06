@@ -34,6 +34,7 @@ export interface UtilType {
   isShallowObject: <T>(value: T) => boolean;
   isNull: <T>(value: T) => boolean;
   isNumber: <T>(v: T) => boolean;
+  isBoolean: <T>(v: T) => boolean;
   isString: <T>(v: T) => boolean;
   isFunction: <T>(v: T) => boolean;
   isUndefined: <T>(v: T) => boolean;
@@ -61,4 +62,4 @@ declare const util: UtilType;
 
 export default util;
 
-export {};
+export { };

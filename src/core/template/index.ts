@@ -1,6 +1,5 @@
 export const BOX_TEMPLATE = (children: string, style?: string) =>
-  `<div class="ew-color-picker-box" ${
-    style ? `style="${style}"` : ""
+  `<div class="ew-color-picker-box" ${style ? `style="${style}"` : ""
   }>${children}</div>`;
 export const PANEL_TEMPLATE = `<div class="ew-color-picker-panel">
   <div class="ew-color-picker-panel-content">
@@ -11,3 +10,4 @@ export const PANEL_TEMPLATE = `<div class="ew-color-picker-panel">
       </div>
   </div>
 </div>`;
+export const CORE_TEMPLATE = `<div class="ew-color-picker"></div>`;
