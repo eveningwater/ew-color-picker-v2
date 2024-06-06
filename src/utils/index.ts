@@ -161,11 +161,11 @@ util.isDom = (el) =>
   util.isShallowObject(HTMLElement)
     ? el instanceof HTMLElement
     : (el &&
-        util.isShallowObject(el) &&
-        el.nodeType === 1 &&
-        util.isString(el.nodeName)) ||
-      el instanceof HTMLCollection ||
-      el instanceof NodeList;
+      util.isShallowObject(el) &&
+      el.nodeType === 1 &&
+      util.isString(el.nodeName)) ||
+    el instanceof HTMLCollection ||
+    el instanceof NodeList;
 /**
  * 深度克隆对象(JSON)
  * @param obj

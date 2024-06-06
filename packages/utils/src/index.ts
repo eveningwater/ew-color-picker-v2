@@ -1,10 +1,15 @@
 import { assert } from "./assert";
 import { isTypeRes } from './is-type';
+import * as dom from './dom';
+export * from './env';
+import * as base from './base';
 
-const util = {
+const ewColorPickerUtils = {
     ...assert,
-    ...isTypeRes
-}
+    ...isTypeRes,
+    ...dom,
+    ...base,
+};
 
 
-export default util;
+export default ewColorPickerUtils as Required<typeof ewColorPickerUtils>;
