@@ -1,4 +1,4 @@
-import util from ".";
+import isTypeUtil from "./is-type";
 import { _arrSlice, _hasOwn } from "./const";
 /**
  * 对象合并
@@ -7,7 +7,7 @@ import { _arrSlice, _hasOwn } from "./const";
  * @returns 
  */
 export const extend = <T extends {}, U extends T>(t: T, ...o: U[]): T & U => {
-    if (util.isNull(t)) {
+    if (isTypeUtil.isNull(t)) {
         return {} as T & U;
     }
     if (Object.assign) {
@@ -34,7 +34,7 @@ export const extend = <T extends {}, U extends T>(t: T, ...o: U[]): T & U => {
  * @returns 
  */
 export const toArray = <T>(v: Iterable<T> | ArrayLike<T>) => {
-    if (!util.isShallowObject(v)) {
+    if (!isTypeUtil.isShallowObject(v)) {
         return v;
     }
     if (Array.from) {
@@ -55,12 +55,12 @@ export const JSONClone = <T>(v: T) => JSON.parse(JSON.stringify(v));
  * @returns 
  */
 export const clone = function f<T>(obj: T) {
-    if (!util.isShallowObject(obj)) {
+    if (!isTypeUtil.isShallowObject(obj)) {
         return obj;
     }
-    const res = (util.isArray(obj) ? [] : {}) as T;
+    const res = (isTypeUtil.isArray(obj) ? [] : {}) as T;
     for (const k in obj) {
-        res[k] = util.isShallowObject(obj[k]) ? f(obj[k]) : obj[k];
+        res[k] = isTypeUtil.isShallowObject(obj[k]) ? f(obj[k]) : obj[k];
     }
     return res;
 }
@@ -72,7 +72,7 @@ export const clone = function f<T>(obj: T) {
 export const removeAllSpace = (value: string) => value.replace(/\s+/g, "");
 /**
  * 是否是promise
- * @param value 
- * @returns 
+ * @param value
+ * @returns
  */
-export const isPromise = <T extends Promise<any>>(value: T) => !util.isUndefined(value) && !util.isNull(value) && util.isFunction(value.then) && util.isFunction(value.catch)
+export const isPromise = <T extends Promise<unknown>>(value: T) => !isTypeUtil.isUndefined(value) && !isTypeUtil.isNull(value) && isTypeUtil.isFunction(value.then) && isTypeUtil.isFunction(value.catch);

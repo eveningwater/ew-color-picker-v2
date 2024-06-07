@@ -1,4 +1,5 @@
-import util, { supportsPassive } from ".";
+import util from "./is-type";
+import { supportsPassive } from "./env";
 import { extend } from "./base";
 import { eventType } from "./const";
 
@@ -166,7 +167,7 @@ export const clickOutSide = (element: HTMLElement, isUnbind = true, callback: (r
         if (isUnbind) {
             // 延迟解除绑定
             setTimeout(() => {
-                util.off(document, eventType[0], mouseHandler);
+                off(document, eventType[0], mouseHandler);
             }, 0);
         }
     }

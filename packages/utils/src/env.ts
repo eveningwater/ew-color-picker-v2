@@ -1,6 +1,6 @@
-import util from './index';
+import util from './is-type';
 
-export const isBrowser = !util.isUndefined!(window);
+export const isBrowser = !util.isUndefined(window);
 
 export const ua = isBrowser && navigator.userAgent.toLowerCase();
 

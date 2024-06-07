@@ -5,3 +5,4 @@ type AssertRes = {
 };
 export const assert: Partial<AssertRes> = {};
 assertLists.forEach(key => assert[key] = <T>(...v: T[]) => console[key](...v))
+export default assert as Required<typeof assert>;

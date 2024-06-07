@@ -1,17 +1,8 @@
-import { assert } from "./assert";
-import { isTypeRes } from './is-type';
-import * as dom from './dom';
+import assert from "./assert";
+import isTypeRes from "./is-type";
+// export * from './dom';
 export * from './env';
-import * as base from './base';
-import * as classnames from './classnames';
+export * from './base';
+export * from './classnames';
 
-const ewColorPickerUtils = {
-    ...assert,
-    ...isTypeRes,
-    ...dom,
-    ...base,
-    ...classnames
-};
-
-
-export default ewColorPickerUtils as Required<typeof ewColorPickerUtils>;
+export default { ...assert, ...isTypeRes };
