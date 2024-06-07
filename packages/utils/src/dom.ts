@@ -1,4 +1,4 @@
-import util from "./is-type";
+import util from "./type";
 import { supportsPassive } from "./env";
 import { extend } from "./base";
 import { eventType } from "./const";

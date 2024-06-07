@@ -1,8 +1,8 @@
 import assert from "./assert";
-import isTypeRes from "./is-type";
+import util from "./type";
 // export * from './dom';
 export * from './env';
 export * from './base';
 export * from './classnames';
 
-export default { ...assert, ...isTypeRes };
+export default { ...assert, ...util };
