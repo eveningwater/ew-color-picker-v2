@@ -1,7 +1,8 @@
-import util from ".";
+import util, { supportsPassive } from ".";
 import { extend } from "./base";
+import { eventType } from "./const";
 
-export type safeCSSStyleDeclaration = {
+export type SafeCSSStyleDeclaration = {
     [key: string]: string
 } & CSSStyleDeclaration
 
@@ -45,13 +46,27 @@ export const isDom = <T extends HTMLElement>(el: T) =>
         el instanceof HTMLCollection ||
         el instanceof NodeList;
 
-export const setStyle = (el: HTMLElement, style: Partial<safeCSSStyleDeclaration> = {}) => extend(el.style, style as safeCSSStyleDeclaration);
+export const setStyle = (el: HTMLElement, style: Partial<SafeCSSStyleDeclaration> = {}) => extend(el.style, style as SafeCSSStyleDeclaration);
 export const removeStyle = (el: HTMLElement, props: string[] = []) => {
     for (const item of props) {
         el.style.removeProperty(item);
     }
 };
-export const getStyle = (el: HTMLElement, prop: keyof CSSStyleDeclaration, pseudoElt?: string) => window.getComputedStyle(el, pseudoElt)[prop];
+export const camelCase = <T extends string>(name: T) => name.replace(/([\:\_\-]+(.))/g, (_, separator, letter, offset) => offset ? letter.toUpperCase() : letter).replace(/^moz([A-Z])/, "Moz$1");
+export const getStyle = (el: HTMLElement, styleName: keyof CSSStyleDeclaration, pseudoElt?: string) => {
+    if (!el || !styleName) return null;
+    styleName = camelCase(styleName as string) as keyof CSSStyleDeclaration;
+    if (styleName === 'float') {
+        styleName = 'cssFloat';
+    }
+    try {
+        const computed = document.defaultView ? document.defaultView.getComputedStyle(el, pseudoElt) : window.getComputedStyle(el, pseudoElt);
+        return el.style[styleName] || computed ? computed[styleName] : null;
+    } catch (e) {
+        return el.style[styleName];
+    }
+}
+// export const getStyle = (el: HTMLElement, prop: keyof CSSStyleDeclaration, pseudoElt?: string) => window.getComputedStyle(el, pseudoElt)[prop];
 export const setAttr = <T extends string>(el: HTMLElement, values: Record<string, T>) => {
     if (!util.isShallowObject(values)) {
         return;
@@ -88,3 +103,80 @@ export const checkContainer = (el: HTMLElement | string) => {
     }
     return document.body;
 }
+
+export function getClientSize(el: HTMLElement) {
+    return {
+        width: el.clientWidth,
+        height: el.clientHeight,
+    }
+}
+
+export const getRect = (el: HTMLElement) => el.getBoundingClientRect();
+
+export const getOffset = (el: HTMLElement | null) => {
+    let left = 0
+    let top = 0
+
+    while (el) {
+        left -= el.offsetLeft
+        top -= el.offsetTop
+        el = el.offsetParent as HTMLElement
+    }
+
+    return {
+        left,
+        top,
+    }
+}
+
+export const on = (
+    el: HTMLElement | Document | Window,
+    type: string,
+    fn: EventListenerOrEventListenerObject,
+    capture?: AddEventListenerOptions
+) => {
+    const useCapture = supportsPassive
+        ? {
+            passive: false,
+            capture: !!capture,
+        }
+        : !!capture
+    el.addEventListener(type, fn, useCapture)
+}
+
+export const off = (
+    el: HTMLElement | Document | Window,
+    type: string,
+    fn: EventListenerOrEventListenerObject,
+    capture?: EventListenerOptions
+) => {
+    el.removeEventListener(type, fn, {
+        capture: !!capture,
+    })
+}
+
+export const clickOutSide = (element: HTMLElement, isUnbind = true, callback: (r: DOMRect) => void) => {
+    const mouseHandler = (event: Event) => {
+        const rect = getRect(element);
+        const target = event.target as HTMLElement;
+        if (!target) return;
+        const targetRect = getRect(target);
+        if (targetRect.x >= rect.x && targetRect.y >= rect.y && targetRect.width <= rect.width && targetRect.height <= rect.height) return;
+        if (util.isFunction(callback)) callback(targetRect);
+        if (isUnbind) {
+            // 延迟解除绑定
+            setTimeout(() => {
+                util.off(document, eventType[0], mouseHandler);
+            }, 0);
+        }
+    }
+    on(document, eventType[0], mouseHandler);
+}
+
+declare global {
+    interface Window {
+        // jQuery对象
+        jQuery: any;
+    }
+}
+export const isJQDom = <T>(dom: T) => !util.isUndefined(window.jQuery) && dom instanceof window.jQuery;

@@ -15,3 +15,4 @@ export const isTypeRes: Partial<AllTypeRes> = {
 basicDataTypeList.forEach(type => isTypeRes[`is${type}`] = (value) => typeof value === type.toLowerCase());
 objDataTypeList.forEach(type => isTypeRes[`is${type}`] = (value) => _toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase());
 
+
