@@ -50,7 +50,7 @@ function resolve(p) {
 
 function PascalCase(str){
   const re=/-(\w)/g;
-  const newStr = str.replace(re, function (match, group1){
+  const newStr = str.replace(re, function (_, group1){
       return group1.toUpperCase();
   })
   return newStr.charAt(0).toUpperCase() + newStr.slice(1);
@@ -79,6 +79,10 @@ const buildType = [
   {
     format: 'es',
     ext: '.esm.js'
+  },
+  {
+    format: 'es',
+    ext: '.esm.min.js'
   }
 ]
 
@@ -98,12 +102,12 @@ function generateBuildConfigs(packagesName) {
       }
       // rename
       if (name === 'core' && config.output.format !== 'es') {
-        config.output.name = 'BScroll'
+        config.output.name = 'ewColorPicker'
         /** Disable warning for default imports */
         config.output.exports = 'named'
         // it seems the umd bundle can not satisfies our demand
-        config.output.footer = 'if(typeof window !== "undefined" && window.BScroll) { \n' +
-                              '  window.BScroll = window.BScroll.default;\n}'
+        config.output.footer = 'if(typeof window !== "undefined" && window.ewColorPicker) { \n' +
+                              '  window.ewColorPicker = window.ewColorPicker.default;\n}'
       }
       // rollup will valiate config properties of config own and output a warning.
       // put packageName in prototype to ignore warning.
