@@ -33,4 +33,3 @@ export const isBoolean = res.isBoolean;
 export const isObject = res.isObject;
 export const isRegExp = res.isRegExp;
 export const isArray = res.isArray;
-export default res;

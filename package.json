@@ -2,8 +2,9 @@
   "name": "ew-color-picker",
   "version": "2.0.0",
   "description": "一个基于typescript封装的颜色选择器",
+  "type": "module",
   "scripts": {
-    "build": "node scripts/new-build.js",
+    "build": "node scripts/build.js",
     "tsc": "tsc",
     "build:build": "rollup -c",
     "build:docs": "node scripts/build-docs.js & cd docs && npm run build",
@@ -36,14 +37,15 @@
     "@ew-color-picker/utils": "workspace:*"
   },
   "dependencies": {
-    "chalk": "4.1.2",
-    "execa": "4.0.3",
-    "inquirer": "7.3.3",
-    "ora": "5.0.0",
-    "rimraf": "^3.0.2",
-    "rollup": "2.23.0",
-    "rollup-plugin-typescript2": "^0.27.3",
-    "rollup-plugin-uglify": "^6.0.4",
-    "zlib": "^1.0.5"
+    "chalk": "5.3.0",
+    "execa": "9.1.0",
+    "inquirer": "9.2.23",
+    "ora": "8.0.1",
+    "rimraf": "5.0.7",
+    "rollup": "4.18.0",
+    "rollup-plugin-typescript2": "0.36.0",
+    "rollup-plugin-uglify": "6.0.4",
+    "typescript": "5.4.5",
+    "zlib": "1.0.5"
   }
 }

@@ -1,18 +1,25 @@
-import { isNull, ApplyOrder } from '@ew-color-picker/utils';
-export interface ewColorPickerPlugin {
+import { isNull, ApplyOrder, warn, isUndefined } from '@ew-color-picker/utils';
+export interface ewColorPickerPluginCtor {
     pluginName: string;
-    applyOrder?: ApplyOrder
+    applyOrder?: ApplyOrder;
     new(instance: ewColorPicker): any
+}
+
+export interface ewColorPickerPlugin {
+    ctor: ewColorPickerPluginCtor;
+    name: string;
+    applyOrder?: ApplyOrder.Post | ApplyOrder.Pre;
 }
 export class ewColorPicker {
     static plugins: ewColorPickerPlugin[];
-    static use(ctor: ewColorPickerPlugin) {
+    static pluginsMap: Record<string, boolean> = {};
+    static use(ctor: ewColorPickerPluginCtor) {
         const name = ctor.pluginName
         const installed = ewColorPicker.plugins.some(
             plugin => ctor === plugin.ctor
         )
         if (installed) return ewColorPicker
-        if (util.isUndefined(name) || util.isNull(name)) {
+        if (isUndefined(name) || isNull(name)) {
             warn(
                 `Plugin Class must specify plugin's name in static property by 'pluginName' field.`
             )

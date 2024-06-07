@@ -1,4 +1,4 @@
-import util from "./type";
+import { isShallowObject, isString, isFunction, isUndefined } from "./type";
 import { supportsPassive } from "./env";
 import { extend } from "./base";
 import { eventType } from "./const";
@@ -38,12 +38,12 @@ export const removeClass = (el: HTMLElement, className: string) => {
 }
 
 export const isDom = <T extends HTMLElement>(el: T) =>
-    util.isShallowObject(HTMLElement)
+    isShallowObject(HTMLElement)
         ? el instanceof HTMLElement
         : (el &&
-            util.isShallowObject(el) &&
+            isShallowObject(el) &&
             el.nodeType === 1 &&
-            util.isString(el.nodeName)) ||
+            isString(el.nodeName)) ||
         el instanceof HTMLCollection ||
         el instanceof NodeList;
 
@@ -69,7 +69,7 @@ export const getStyle = (el: HTMLElement, styleName: keyof CSSStyleDeclaration, 
 }
 // export const getStyle = (el: HTMLElement, prop: keyof CSSStyleDeclaration, pseudoElt?: string) => window.getComputedStyle(el, pseudoElt)[prop];
 export const setAttr = <T extends string>(el: HTMLElement, values: Record<string, T>) => {
-    if (!util.isShallowObject(values)) {
+    if (!isShallowObject(values)) {
         return;
     }
     for (const [key, value] of Object.entries(values)) {
@@ -96,7 +96,7 @@ export const insertNode = (el: HTMLElement, node: Node, oldNode: Node) => {
 export const checkContainer = (el: HTMLElement | string) => {
     if (isDom<HTMLElement>(el as HTMLElement)) {
         return el as HTMLElement;
-    } else if (util.isString(el)) {
+    } else if (isString(el)) {
         const ele = $(el as string);
         if (ele) {
             return ele as HTMLElement;
@@ -163,7 +163,7 @@ export const clickOutSide = (element: HTMLElement, isUnbind = true, callback: (r
         if (!target) return;
         const targetRect = getRect(target);
         if (targetRect.x >= rect.x && targetRect.y >= rect.y && targetRect.width <= rect.width && targetRect.height <= rect.height) return;
-        if (util.isFunction(callback)) callback(targetRect);
+        if (isFunction(callback)) callback(targetRect);
         if (isUnbind) {
             // 延迟解除绑定
             setTimeout(() => {
@@ -180,4 +180,4 @@ declare global {
         jQuery: any;
     }
 }
-export const isJQDom = <T>(dom: T) => !util.isUndefined(window.jQuery) && dom instanceof window.jQuery;
+export const isJQDom = <T>(dom: T) => !isUndefined(window.jQuery) && dom instanceof window.jQuery;
