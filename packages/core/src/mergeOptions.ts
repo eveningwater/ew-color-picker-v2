@@ -27,6 +27,10 @@ export interface ewColorPickerMergeOptionsData
     ewColorPickerCustomOptions {
   [key: string]: any;
 }
+
+export interface ewColorPickerBindPluginOptions {
+  [k: string]: any;
+}
 export default class ewColorPickerMergeOptions
   extends CustomOptions
   implements ewColorPickerMergeOptionsData
@@ -37,25 +41,30 @@ export default class ewColorPickerMergeOptions
   constructor() {
     super();
   }
-  merge(options?: ewColorPickerConstructorOptions): ewColorPickerOptions {
+  merge(
+    options?: ewColorPickerConstructorOptions,
+    pluginNameProp?: ewColorPickerBindPluginOptions
+  ): ewColorPickerOptions {
     if (isShallowObject(options)) {
       const { el, ...other } = options as ewColorPickerOptions;
       return extend(defaultConfig, {
         el: checkContainer(el),
         ...other,
+        ...pluginNameProp,
       });
     } else {
       return extend({
         ...defaultConfig,
         el: checkContainer(options as WrapperElement),
+        ...pluginNameProp,
       });
     }
   }
-  bindOptions(options: ewColorPickerConstructorOptions) {
-    if (!isShallowObject(options)) {
-      return this;
-    }
-    const mergeOptions = this.merge(options);
+  bindOptions(
+    options: ewColorPickerConstructorOptions,
+    pluginNameProp: ewColorPickerBindPluginOptions = {}
+  ) {
+    const mergeOptions = this.merge(options, pluginNameProp);
     for (const k in mergeOptions) {
       const value = mergeOptions[k as keyof ewColorPickerOptions];
       this[k] = value;

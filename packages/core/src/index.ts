@@ -5,6 +5,8 @@ import {
   isUndefined,
   isFunction,
   isBoolean,
+  isString,
+  extend,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -78,7 +80,9 @@ export default class ewColorPicker {
     return ewColorPicker;
   }
   constructor(options: ewColorPickerConstructorOptions) {
-    this.options = new ewColorPickerMergeOptions().bindOptions(options);
+    this.options = new ewColorPickerMergeOptions().bindOptions(options, {
+      ewColorPickerConsole: true,
+    });
     this.init();
   }
   private init() {
