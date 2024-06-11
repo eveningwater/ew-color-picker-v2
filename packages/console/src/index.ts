@@ -7,14 +7,25 @@ export const tips = [`%c ew-color-picker@2.0.0%c 联系QQ：854806732 %c 联系�
     "background:transparent"];
 
 export default class ewColorPickerConsolePlugin {
-    isLog: boolean;
-    constructor(isLog: boolean) {
-        this.isLog = isBoolean(isLog) ? isLog : true;
+    static pluginName: 'ew-color-picker-console';
+    options: ewColorPickerConsolePluginOptions;
+    constructor() {
         this.run();
     }
     run() {
-        if (this.isLog) {
+        const { isLog } = this.options;
+        if (isLog) {
             log(...tips);
         }
+    }
+}
+
+export type ewColorPickerConsolePluginOptions = {
+    isLog: boolean;
+}
+
+declare module '@ew-color-picker/core' {
+    interface CustomOptions {
+        myPlugin?: ewColorPickerConsolePluginOptions
     }
 }

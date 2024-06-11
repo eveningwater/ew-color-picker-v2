@@ -20,6 +20,6 @@
     "emitDecoratorMetadata": false,
     "typeRoots": ["node_modules/@types"]
   },
-  "include": ["packages/*/src"],
+  "include": ["packages/*/src","./global.d.ts"],
   "exclude": ["packages/*/src/**/__tests__", "packages/*/src/**/__mocks__"]
 }

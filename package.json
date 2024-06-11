@@ -34,6 +34,7 @@
     "@ew-color-picker/utils": "workspace:*"
   },
   "dependencies": {
+    "@rollup/plugin-replace": "^5.0.7",
     "chalk": "5.3.0",
     "execa": "9.1.0",
     "inquirer": "9.2.23",

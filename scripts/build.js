@@ -7,6 +7,7 @@ import zlib from 'zlib';
 import { rimraf } from 'rimraf';
 import typescript from 'rollup-plugin-typescript2';
 import { uglify } from 'rollup-plugin-uglify';
+import { replace } from '@rollup/plugin-replace';
 import { execaCommandSync } from 'execa';
 import ora from 'ora';
 import { createRequire } from 'module';
@@ -74,15 +75,18 @@ const generateBanner = (name) => {
 const buildType = [
   {
     format: 'umd',
-    ext: '.js'
+    ext: '.js',
+    env: 'development'
   },
   {
     format: 'umd',
-    ext: '.min.js'
+    ext: '.min.js',
+    env: 'production'
   },
   {
     format: 'es',
-    ext: '.esm.js'
+    ext: '.esm.js',
+    env: 'development'
   }
 ]
 
@@ -98,7 +102,8 @@ function generateBuildConfigs(packagesName) {
           format: type.format,
           banner: generateBanner(name)
         },
-        plugins: generateBuildPluginsConfigs(type.ext.indexOf('min')>-1, name)
+        plugins: generateBuildPluginsConfigs(type.ext.indexOf('min')>-1, name),
+        
       }
       // rename
       if (name === 'core' && config.output.format !== 'es') {
@@ -125,6 +130,9 @@ function generateBuildConfigs(packagesName) {
   return result
 }
 function generateBuildPluginsConfigs(isMin) {
+  const vars = {
+    __DEV__: `process.env.NODE_ENV !== 'production'`
+  };
   const tsConfig = {
     verbosity: -1,
     tsconfig: path.resolve(__dirname, '../tsconfig.json'),
@@ -133,7 +141,15 @@ function generateBuildPluginsConfigs(isMin) {
     if (isMin) {
       plugins.push(uglify())
     }
-  plugins.push(typescript(tsConfig))
+  plugins.push(typescript(tsConfig));
+  // build-specific env
+  if (isMin) {
+    vars['process.env.NODE_ENV'] = JSON.stringify(isMin);
+    vars.__DEV__ = isMin !== 'production';
+  }
+
+  vars.preventAssignment = true;
+  plugins.push(replace(vars));
   return plugins
 }
 
