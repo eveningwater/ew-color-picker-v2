@@ -106,7 +106,8 @@ function generateBuildConfigs(packagesName) {
         
       }
       // rename
-      if (name === 'core' && config.output.format !== 'es') {
+      const globalNameList = ['core','ewColorPicker']
+      if (globalNameList.indexOf(name) > -1 && config.output.format !== 'es') {
         config.output.name = 'ewColorPicker'
         /** Disable warning for default imports */
         config.output.exports = 'named'
@@ -143,11 +144,8 @@ function generateBuildPluginsConfigs(isMin) {
     }
   plugins.push(typescript(tsConfig));
   // build-specific env
-  if (isMin) {
-    vars['process.env.NODE_ENV'] = JSON.stringify(isMin);
-    vars.__DEV__ = isMin !== 'production';
-  }
-
+  vars['process.env.NODE_ENV'] = isMin ? 'production' : 'development';
+  vars.__DEV__ = !isMin;
   vars.preventAssignment = true;
   plugins.push(replace(vars));
   return plugins

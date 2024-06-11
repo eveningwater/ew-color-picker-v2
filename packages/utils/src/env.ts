@@ -1,6 +1,6 @@
 import { isUndefined } from './type';
 
-export const isBrowser = !isUndefined(window);
+export const isBrowser = isUndefined && !isUndefined(window);
 
 export const ua = isBrowser && navigator.userAgent.toLowerCase();
 
