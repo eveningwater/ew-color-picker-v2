@@ -7,7 +7,7 @@ import zlib from 'zlib';
 import { rimraf } from 'rimraf';
 import typescript from 'rollup-plugin-typescript2';
 import { uglify } from 'rollup-plugin-uglify';
-import { replace } from '@rollup/plugin-replace';
+import replace from '@rollup/plugin-replace';
 import { execaCommandSync } from 'execa';
 import ora from 'ora';
 import { createRequire } from 'module';
