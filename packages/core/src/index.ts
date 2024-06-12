@@ -4,12 +4,12 @@ import {
   warn,
   isUndefined,
   isFunction,
-  isBoolean,
-  isString,
-  extend,
+  EventEmitter,
+  setAttr,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
+  ewColorPickerMountedElement,
 } from "./mergeOptions";
 export interface ewColorPickerPluginCtor {
   pluginName: string;
@@ -53,12 +53,12 @@ export type ewColorPickerConstructorOptions =
 export interface ewColorPickerPluginItem {
   [name: string]: ewColorPicker;
 }
-export default class ewColorPicker {
+export default class ewColorPicker extends EventEmitter {
   static plugins: ewColorPickerPlugin[] = [];
   plugins: ewColorPickerPluginItem;
   options: ewColorPickerMergeOptionsData;
   static pluginsMap: Record<string, boolean> = {};
-  wrapper: WrapperElement | undefined;
+  wrapper: ewColorPickerMountedElement;
   static use(ctor: ewColorPickerPluginCtor) {
     const name = ctor.pluginName;
     const installed = ewColorPicker.plugins.some(
@@ -80,6 +80,7 @@ export default class ewColorPicker {
     return ewColorPicker;
   }
   constructor(options: ewColorPickerConstructorOptions) {
+    super(["destroy"]);
     this.options = new ewColorPickerMergeOptions().bindOptions(options, {
       ewColorPickerConsole: true,
     });
@@ -87,6 +88,8 @@ export default class ewColorPicker {
   }
   private init() {
     this.wrapper = this.options.el;
+    // mark wrapper to recognize ewColorPicker instance by DOM attribute
+    this.wrapper.isEwColorPickerContainer = true;
     this.plugins = {};
     this.applyPlugins();
   }

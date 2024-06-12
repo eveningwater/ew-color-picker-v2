@@ -22,9 +22,13 @@ export const defaultConfig: Omit<ewColorPickerOptions, "el"> = {
 };
 export interface ewColorPickerCustomOptions {}
 export class CustomOptions {}
+export interface ewColorPickerMountedElement extends HTMLElement {
+  isEwColorPickerContainer?: boolean;
+}
 export interface ewColorPickerMergeOptionsData
-  extends Partial<ewColorPickerOptions>,
+  extends Omit<ewColorPickerOptions, "el">,
     ewColorPickerCustomOptions {
+  el: ewColorPickerMountedElement;
   [key: string]: any;
 }
 
@@ -38,6 +42,7 @@ export default class ewColorPickerMergeOptions
   [
     k: string
   ]: ewColorPickerMergeOptionsData[keyof ewColorPickerMergeOptionsData];
+  el = document.body;
   constructor() {
     super();
   }
