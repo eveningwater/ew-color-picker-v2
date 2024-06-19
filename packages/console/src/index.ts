@@ -37,6 +37,6 @@ export type ewColorPickerConsolePluginOptions = {
 
 declare module "@ew-color-picker/core" {
   interface CustomOptions {
-    myPlugin?: ewColorPickerConsolePluginOptions;
+    ewColorPickerConsolePlugin?: ewColorPickerConsolePluginOptions;
   }
 }

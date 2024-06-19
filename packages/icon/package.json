@@ -1,0 +1,32 @@
+{
+  "name": "@ew-color-picker/icon",
+  "version": "2.0.0",
+  "description": "icon for ew-color-picker",
+  "main": "dist/icon.min.js",
+  "module": "dist/icon.esm.js",
+  "typings": "dist/types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/eveningwater/ew-color-picker/issues"
+  },
+  "homepage": "https://github.com/eveningwater/ew-color-picker",
+  "keywords": [
+    "ew-color-picker",
+    "icon"
+  ],
+  "author": "eveningwater",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/eveningwater/ew-color-picker.git",
+    "directory": "packages/icon"
+  },
+  "dependencies": {
+    "@ew-color-picker/utils": "workspace:^2.0.0"
+  }
+}
