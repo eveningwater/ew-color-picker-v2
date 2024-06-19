@@ -19,7 +19,7 @@ const spinner = ora({
 })
 
 function getPackagesName () {
-  let ret
+  let ret;
   let all = fs.readdirSync(resolve('packages'))
   // drop hidden file whose name is startWidth '.'
   // drop packages which would not be published(eg: examples and docs)
