@@ -4,7 +4,7 @@ import { ewColorPickerMergeOptionsData } from "packages/core/src/mergeOptions";
 import { PartialBoxProps } from "./type";
 
 export default class ewColorPickerBoxPlugin {
-  static pluginName = "ewColorPickerConsole";
+  static pluginName = "ewColorPickerBox";
   options: ewColorPickerBoxPluginOptions &
     Omit<ewColorPickerMergeOptionsData, "el"> = {};
   constructor(public ewColorPicker: ewColorPicker) {
