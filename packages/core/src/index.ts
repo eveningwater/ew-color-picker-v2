@@ -59,6 +59,7 @@ export default class ewColorPicker extends EventEmitter {
   options: ewColorPickerMergeOptionsData;
   static pluginsMap: Record<string, boolean> = {};
   wrapper: ewColorPickerMountedElement;
+  hooks: EventEmitter;
   static use(ctor: ewColorPickerPluginCtor) {
     const name = ctor.pluginName;
     const installed = ewColorPicker.plugins.some(
@@ -91,6 +92,7 @@ export default class ewColorPicker extends EventEmitter {
     // mark wrapper to recognize ewColorPicker instance by DOM attribute
     this.wrapper.isEwColorPickerContainer = true;
     this.plugins = {};
+    this.hooks = new EventEmitter([''])
     this.applyPlugins();
   }
   private applyPlugins() {

@@ -1,19 +1,20 @@
 # ew-color-picker
 
-一个基于typescript而封装的颜色选择器插件。
+一个基于 typescript 而封装的颜色选择器插件。
 
 ## 安装与使用
 
 ### 安装
+
 ```
   npm install ew-color-picker --save-dev
 
 ```
+
 ### 引入
 
 ```js
-  <script src="./dist/ew-color-picker.min.js"></script>
-  
+<script src="./dist/ew-color-picker.min.js"></script>
 ```
 
 颜色选择器插件如下:
@@ -61,17 +62,15 @@
 
 ```
 
-## cdn引入
+## cdn 引入
 
 CDN:https://www.unpkg.com/ew-color-picker@1.5.3/dist/ew-color-picker.min.js
 
 ## 在组件中使用
 
-
 ```js
-   import ewColorPicker from 'ewColorPicker'
-   var pluginName = new ewColorPicker(option);//option为配置对象，详情见前述
-
+import ewColorPicker from "ewColorPicker";
+var pluginName = new ewColorPicker(option); //option为配置对象，详情见前述
 ```
 
 更多详情参阅文档官网介绍[ewColorPicker](https://eveningwater.github.io/ew-color-picker/);
