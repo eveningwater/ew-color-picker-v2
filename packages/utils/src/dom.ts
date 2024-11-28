@@ -8,11 +8,12 @@ export type SafeCSSStyleDeclaration = {
 } & CSSStyleDeclaration;
 
 export const create = (tag: string) => document.createElement(tag);
-export const createByTemplate = (temp: string) => {
-  const element = create("div");
-  element.innerHTML = temp;
-  return element.firstElementChild as HTMLElement;
-};
+export const createByTemplate = (temp: string) =>
+  document
+    .createRange()
+    .createContextualFragment(
+      temp
+    );
 export const hasClass = (el: HTMLElement, className: string) => {
   let reg = new RegExp("(^|\\s)" + className + "(\\s|$)");
   return reg.test(el.className);
@@ -41,11 +42,11 @@ export const isDom = <T extends HTMLElement>(el: T) =>
   isShallowObject(HTMLElement)
     ? el instanceof HTMLElement
     : (el &&
-        isShallowObject(el) &&
-        el.nodeType === 1 &&
-        isString(el.nodeName)) ||
-      el instanceof HTMLCollection ||
-      el instanceof NodeList;
+      isShallowObject(el) &&
+      el.nodeType === 1 &&
+      isString(el.nodeName)) ||
+    el instanceof HTMLCollection ||
+    el instanceof NodeList;
 
 export const setStyle = (
   el: HTMLElement,
@@ -91,10 +92,10 @@ export const setAttr = <T>(el: HTMLElement, values: Record<string, T>) => {
   }
 };
 export const getAttr = (el: HTMLElement, key: string) => el.getAttribute(key);
-export const $ = (selector: string, el: HTMLElement | Document = document) =>
-  el.querySelector(selector);
-export const $$ = (selector: string, el: HTMLElement | Document = document) =>
-  el.querySelectorAll(selector);
+export const $ = <T extends HTMLElement>(selector: string, el: HTMLElement | Document = document) =>
+  el.querySelector<T>(selector);
+export const $$ = <T extends HTMLElement>(selector: string, el: HTMLElement | Document = document) =>
+  el.querySelectorAll<T>(selector);
 export const removeElement = (el: HTMLElement) => {
   if (el?.parentElement) {
     el?.parentElement?.removeChild(el);
@@ -111,11 +112,11 @@ export const insertNode = (el: HTMLElement, node: Node, oldNode: Node) => {
 };
 export const checkContainer = (el: HTMLElement | string) => {
   if (isDom<HTMLElement>(el as HTMLElement)) {
-    return el as HTMLElement;
+    return el;
   } else if (isString(el)) {
     const ele = $(el as string);
     if (ele) {
-      return ele as HTMLElement;
+      return ele;
     }
   }
   return document.body;
@@ -154,9 +155,9 @@ export const on = (
 ) => {
   const useCapture = supportsPassive
     ? {
-        passive: false,
-        capture: !!capture,
-      }
+      passive: false,
+      capture: !!capture,
+    }
     : !!capture;
   el.addEventListener(type, fn, useCapture);
 };
