@@ -1,6 +1,6 @@
-@import "./variable.scss";
-@import "./extend.scss";
-@import "./color.scss";
+@use "variable" as *;
+@use "extend" as *;
+@use "color" as *;
 .#{$baseSelector}color-picker {
     position: absolute;
     &-box {
