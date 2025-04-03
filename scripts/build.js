@@ -124,8 +124,15 @@ function generateBuildConfigs(packagesName) {
       if (name === "style") {
         config.input = resolve(`packages/${name}/src/index.scss`);
         config.output = {
-          file: resolve(`packages/${name}/dist/${name}.css`),
+          file: resolve(`packages/style/dist/style.min.css`),
         };
+        config.plugins = [
+          scss({
+            failOnError: true,
+            outputStyle: "compressed",
+            sourceMap: false,
+          }),
+        ];
       }
       // rename
       const globalNameList = ["core", "ewColorPicker"];
@@ -153,19 +160,8 @@ function generateBuildConfigs(packagesName) {
   });
   return result;
 }
-function generateBuildPluginsConfigs(isMin, packageName) {
+function generateBuildPluginsConfigs(isMin) {
   const plugins = [];
-  plugins.push(
-    scss({
-      output: resolve(`packages/${packageName}/dist/${packageName}.css`),
-      sourceMap: false, // 只在开发环境生成 source map
-    })
-  );
-
-  if (packageName === "style") {
-    return plugins;
-  }
-
   const vars = {
     __DEV__: `process.env.NODE_ENV !== 'production'`,
   };
@@ -217,9 +213,6 @@ function buildEntry(config, curIndex, next) {
           `${config.packageName}${config.ext} building has ended.`
         );
 
-        if (config.packageName === "style") {
-          return;
-        }
         function report(extra) {
           console.log(
             chalk.magenta(path.relative(process.cwd(), config.output.file)) +
