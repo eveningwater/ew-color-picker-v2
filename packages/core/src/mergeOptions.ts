@@ -7,7 +7,6 @@ import {
   checkContainer,
   extend,
   isShallowObject,
-  warn,
 } from "@ew-color-picker/utils";
 
 export const defaultConfig: Omit<ewColorPickerOptions, "el"> = {

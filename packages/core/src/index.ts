@@ -5,7 +5,6 @@ import {
   isUndefined,
   isFunction,
   EventEmitter,
-  setAttr,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -92,7 +91,7 @@ export default class ewColorPicker extends EventEmitter {
     // mark wrapper to recognize ewColorPicker instance by DOM attribute
     this.wrapper.isEwColorPickerContainer = true;
     this.plugins = {};
-    this.hooks = new EventEmitter([''])
+    this.hooks = new EventEmitter([""]);
     this.applyPlugins();
   }
   private applyPlugins() {

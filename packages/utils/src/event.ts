@@ -116,7 +116,7 @@ export class EventEmitter {
     const isType = types[type] === type;
     if (!isType) {
       warn(
-        `[ewColorPicker waning]: EventEmitter has used unknown event type: "${type}", should be oneof [` +
+        `[ewColorPicker warning]: EventEmitter has used unknown event type: "${type}", should be oneof [` +
           `${Object.keys(types).map((_) => JSON.stringify(_))}` +
           `]`
       );
