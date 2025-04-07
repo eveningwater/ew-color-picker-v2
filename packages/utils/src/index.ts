@@ -6,3 +6,4 @@ export * from "./base";
 export * from "./classnames";
 export * from "./enum";
 export * from "./event";
+export * from "./color";

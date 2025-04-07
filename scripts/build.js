@@ -123,14 +123,17 @@ function generateBuildConfigs(packagesName) {
       };
       if (name === "style") {
         config.input = resolve(`packages/${name}/src/index.scss`);
-        config.output = {
-          file: resolve(`packages/style/dist/style.min.css`),
-        };
         config.plugins = [
           scss({
             failOnError: true,
             outputStyle: "compressed",
             sourceMap: false,
+            output: function (styles) {
+              fs.writeFileSync(
+                resolve(`packages/style/dist/style.min.css`),
+                styles
+              );
+            },
           }),
         ];
       }
@@ -204,6 +207,10 @@ function buildEntry(config, curIndex, next) {
 
   spinner.start(`${config.packageName}${config.ext} is buiding now. \n`);
 
+  const isStyle = config.name?.toLowerCase() === "style";
+  if (isStyle) {
+    return rollup(config);
+  }
   rollup(config)
     .then((bundle) => {
       bundle.write(config.output).then(({ output }) => {

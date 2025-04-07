@@ -30,3 +30,16 @@ interface HsbType {
   s: number;
   b: number;
 }
+
+interface HSVAColor {
+  h: number;
+  s: number;
+  v: number;
+  a: number;
+}
+interface HSLAColor {
+  h: number;
+  s: number;
+  l: number;
+  a: number;
+}
