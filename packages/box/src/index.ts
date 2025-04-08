@@ -31,7 +31,9 @@ export default class ewColorPickerBoxPlugin {
   handleOptions() {
     this.options = extend(this.options, this.ewColorPicker.options);
   }
-  run() {}
+  run() {
+    this.render();
+  }
   updateChildren() {
     if (this.box) {
       const { defaultColor } = this.options;

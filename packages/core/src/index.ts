@@ -83,6 +83,7 @@ export default class ewColorPicker extends EventEmitter {
     super(["destroy"]);
     this.options = new ewColorPickerMergeOptions().bindOptions(options, {
       ewColorPickerConsole: true,
+      ewColorPickerBox: true,
     });
     this.init();
   }
