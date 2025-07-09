@@ -2,10 +2,13 @@
   "name": "@ew-color-picker/core",
   "version": "2.0.0",
   "description": "core for ew-color-picker",
-  "main": "dist/core.min.js",
-  "module": "dist/core.esm.js",
-  "typings": "dist/types/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "clean": "rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "publishConfig": {
@@ -19,7 +22,7 @@
     "ew-color-picker",
     "core"
   ],
-  "author": "eveningwater",
+  "author": "eveningwater(854806732@qq.com)",
   "license": "ISC",
   "repository": {
     "type": "git",
@@ -27,6 +30,13 @@
     "directory": "packages/core"
   },
   "dependencies": {
-    "@ew-color-picker/utils": "workspace:^2.0.0"
+    "@ew-color-picker/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "rollup": "^3.29.5",
+    "rollup-plugin-typescript2": "^0.35.0",
+    "typescript": "^5.0.0",
+    "tslib": "^2.6.0",
+    "@types/node": "^20.0.0"
   }
 }

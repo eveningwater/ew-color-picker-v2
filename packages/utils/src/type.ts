@@ -33,3 +33,15 @@ export const isBoolean = res.isBoolean;
 export const isObject = res.isObject;
 export const isRegExp = res.isRegExp;
 export const isArray = res.isArray;
+
+// 添加缺失的函数
+export const isDeepArray = (value: any): value is any[] => Array.isArray(value);
+
+export const isDeepObject = (value: any): value is object => 
+  value !== null && typeof value === 'object' && !Array.isArray(value);
+
+export const ewAssign = (target: any, source: any): any => Object.assign(target, source);
+
+export const ewError = (message: string): never => {
+  throw new Error(`[ewColorPicker error]: ${message}`);
+};

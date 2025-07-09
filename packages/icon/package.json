@@ -6,6 +6,7 @@
   "module": "dist/icon.esm.js",
   "typings": "dist/types/index.d.ts",
   "scripts": {
+    "build": "rollup -c rollup.config.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "publishConfig": {
@@ -19,7 +20,7 @@
     "ew-color-picker",
     "icon"
   ],
-  "author": "eveningwater",
+  "author": "eveningwater(854806732@qq.com)",
   "license": "ISC",
   "repository": {
     "type": "git",

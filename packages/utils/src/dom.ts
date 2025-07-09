@@ -2,6 +2,7 @@ import { isShallowObject, isString, isFunction, isUndefined } from "./type";
 import { supportsPassive } from "./env";
 import { extend } from "./base";
 import { eventType } from "./const";
+import { warn } from "./assert";
 
 export type SafeCSSStyleDeclaration = {
   [key: string]: string;
@@ -103,23 +104,23 @@ export const removeElement = (el: HTMLElement) => {
     el?.remove();
   }
 };
-export const insertNode = (el: HTMLElement, node: Node, oldNode: Node) => {
+export const insertNode = (el: HTMLElement, node: Node, oldNode?: Node | null) => {
   if (oldNode && el?.contains(oldNode)) {
     el.replaceChild(node, oldNode);
   } else {
     el?.appendChild(node);
   }
 };
-export const checkContainer = (el: HTMLElement | string) => {
-  if (isDom<HTMLElement>(el as HTMLElement)) {
-    return el;
-  } else if (isString(el)) {
-    const ele = $(el as string);
-    if (ele) {
-      return ele;
+export const checkContainer = (el: string | HTMLElement): HTMLElement => {
+  if (typeof el === 'string') {
+    const element = document.querySelector(el);
+    if (!element) {
+      warn(`[ewColorPicker warning]: Cannot find element with selector: ${el}`);
+      return document.body;
     }
+    return element as HTMLElement;
   }
-  return document.body;
+  return el;
 };
 
 export function getClientSize(el: HTMLElement) {
@@ -209,3 +210,52 @@ declare global {
 }
 export const isJQDom = <T>(dom: T) =>
   !isUndefined(window.jQuery) && dom instanceof window.jQuery;
+
+export function getELByClass(element: HTMLElement, className: string, all?: boolean): HTMLElement | HTMLElement[] | null {
+  if (all) {
+    return Array.from(element.getElementsByClassName(className)) as HTMLElement[];
+  }
+  return element.querySelector(`.${className}`) as HTMLElement;
+}
+
+export function setCss(element: HTMLElement, property: string, value: string | number): void {
+  element.style[property as any] = typeof value === 'number' ? `${value}px` : value;
+}
+
+export function setSomeCss(element: HTMLElement, styles: Array<{ prop: string; value: string }>): void {
+  styles.forEach(({ prop, value }) => {
+    element.style[prop as any] = value;
+  });
+}
+
+export function getCss(element: HTMLElement, property: string): string {
+  return window.getComputedStyle(element).getPropertyValue(property);
+}
+
+export function classnames(classObject: Record<string, boolean>): string {
+  return Object.keys(classObject)
+    .filter(key => classObject[key])
+    .join(' ');
+}
+
+
+
+export function removeClickOutSide(context: any): void {
+  if (context._clickOutsideHandler) {
+    document.removeEventListener('click', context._clickOutsideHandler);
+    context._clickOutsideHandler = null;
+  }
+}
+
+export function ewObjToArray(obj: any): any[] {
+  if (Array.isArray(obj)) {
+    return obj;
+  }
+  if (obj && typeof obj === 'object') {
+    return Array.from(obj);
+  }
+  return [];
+}
+
+// 这些函数已经在base.ts中定义，这里只是重新导出
+export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, isPromise, ewAssign, removeAllSpace, ewError } from './base';

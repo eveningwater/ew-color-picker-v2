@@ -16,16 +16,42 @@ export const colorRegHSL =
 // HSLA color
 export const colorRegHSLA =
   /^[hH][Ss][Ll][Aa][\(]([\\s]*(2[0-9][0-9]|360｜3[0-5][0-9]|[01]?[0-9][0-9]?)[\\s]*,)([\\s]*((100|[0-9][0-9]?)%|0)[\\s]*,){2}([\\s]*(1|1.0|0|0?.[0-9]{1,2})[\\s]*)[\)]$/;
+
+// 颜色接口定义
+export interface HsvaColor {
+  h: number;
+  s: number;
+  v: number;
+  a: number;
+}
+
+export interface HslaColor {
+  h: number;
+  s: number;
+  l: number;
+  a: number;
+}
+
+export interface RgbaColor {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
 /**
  * hex to rgba
  * @param {*} hex
  * @param {*} alpha
  */
-export function colorHexToRgba(hex: string, alpha: number) {
-  const a = alpha || 1,
-    hLen = hex.length,
-    rgbaColor = [];
+export function colorHexToRgba(hex: string, alpha: number = 1): string {
+  let a = alpha || 1;
+  // 将透明度限制为1位小数
+  a = Math.round(a * 10) / 10;
   let hColor = hex.toLowerCase();
+  let hLen = hex.length;
+  let rgbaColor: number[] = [];
+  
   if (hex && colorRegExp.test(hColor)) {
     //the hex length may be 4 or 7,contained the symbol of #
     if (hLen === 4) {
@@ -48,7 +74,7 @@ export function colorHexToRgba(hex: string, alpha: number) {
  * rgba to hex
  * @param {*} rgba
  */
-export function colorRgbaToHex(rgba: string) {
+export function colorRgbaToHex(rgba: string): string {
   const hexObject: Record<number, string> = {
       10: "A",
       11: "B",
@@ -78,13 +104,14 @@ export function colorRgbaToHex(rgba: string) {
     });
     return removeAllSpace(value + color);
   }
+  return rgba;
 }
 /**
  * hsva to rgba
  * @param {*} hsva
  * @param {*} alpha
  */
-export function colorHsvaToRgba(hsva: HSVAColor, alpha: number) {
+export function colorHsvaToRgba(hsva: HsvaColor, alpha?: number): string {
   let r,
     g,
     b,
@@ -129,7 +156,9 @@ export function colorHsvaToRgba(hsva: HSVAColor, alpha: number) {
       r = g = b = 0;
     }
   }
-  if (alpha >= 0 || alpha <= 1) a = alpha;
+  if (alpha !== undefined && alpha >= 0 && alpha <= 1) a = alpha;
+  // 将透明度限制为1位小数
+  a = Math.round(a * 10) / 10;
   return removeAllSpace(
     "rgba(" +
       Math.ceil(r) +
@@ -147,7 +176,7 @@ export function colorHsvaToRgba(hsva: HSVAColor, alpha: number) {
  * 换算公式:https://zh.wikipedia.org/wiki/HSL%E5%92%8CHSV%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4#%E4%BB%8EHSL%E5%88%B0RGB%E7%9A%84%E8%BD%AC%E6%8D%A2
  * @param {*} hsla
  */
-export function colorHslaToRgba(hsla: HSLAColor) {
+export function colorHslaToRgba(hsla: HslaColor): string {
   let h = hsla.h,
     s = hsla.s / 100,
     l = hsla.l / 100,
@@ -171,6 +200,8 @@ export function colorHslaToRgba(hsla: HSLAColor) {
     g = compareRGB(p, q, k);
     b = compareRGB(p, q, k - 1 / 3);
   }
+  // 将透明度限制为1位小数
+  a = Math.round(a * 10) / 10;
   return removeAllSpace(
     `rgba(${Math.ceil(r * 255)},${Math.ceil(g * 255)},${Math.ceil(
       b * 255
@@ -182,11 +213,13 @@ export function colorHslaToRgba(hsla: HSLAColor) {
  * 换算公式:https://zh.wikipedia.org/wiki/HSL%E5%92%8CHSV%E8%89%B2%E5%BD%A9%E7%A9%BA%E9%97%B4#%E4%BB%8EHSL%E5%88%B0RGB%E7%9A%84%E8%BD%AC%E6%8D%A2
  * @param {*} rgba
  */
-export function colorRgbaToHsla(rgba: string) {
+export function colorRgbaToHsla(rgba: string): { colorStr: string; colorObj: HslaColor } {
   const rgbaArr = rgba
     .slice(rgba.indexOf("(") + 1, rgba.lastIndexOf(")"))
     .split(",");
   let a = rgbaArr.length < 4 ? 1 : Number(rgbaArr[3]);
+  // 将透明度限制为1位小数
+  a = Math.round(a * 10) / 10;
   let r = parseInt(rgbaArr[0]) / 255,
     g = parseInt(rgbaArr[1]) / 255,
     b = parseInt(rgbaArr[2]) / 255;
@@ -237,11 +270,13 @@ export function colorRgbaToHsla(rgba: string) {
  * rgba to hsva
  * @param {*} rgba
  */
-export function colorRgbaToHsva(rgba: string) {
+export function colorRgbaToHsva(rgba: string): HsvaColor {
   const rgbaArr = rgba
     .slice(rgba.indexOf("(") + 1, rgba.lastIndexOf(")"))
     .split(",");
   let a = rgbaArr.length < 4 ? 1 : Number(rgbaArr[3]);
+  // 将透明度限制为1位小数
+  a = Math.round(a * 10) / 10;
   let r = parseInt(rgbaArr[0]) / 255,
     g = parseInt(rgbaArr[1]) / 255,
     b = parseInt(rgbaArr[2]) / 255;
@@ -285,7 +320,7 @@ export function colorRgbaToHsva(rgba: string) {
  * 此方法IE9+浏览器支持，基于DOM特性实现
  * @param {*} color
  */
-export function colorToRgba(color: string) {
+export function colorToRgba(color: string): string {
   const div = document.createElement("div");
   setStyle(div, { "background-color": color });
   document.body.appendChild(div);
@@ -301,7 +336,7 @@ export function colorToRgba(color: string) {
  * 判断是否是合格的颜色值
  * @param {*} color
  */
-export function isValidColor(color: string) {
+export function isValidColor(color: string): boolean {
   // https://developer.mozilla.org/zh-CN/docs/Web/CSS/color_value#%E8%89%B2%E5%BD%A9%E5%85%B3%E9%94%AE%E5%AD%97
   const isTransparent = color === "transparent";
   return (
@@ -319,11 +354,37 @@ export function isValidColor(color: string) {
  * @param {*} color
  * @returns
  */
-export function isAlphaColor(color: string) {
+export function isAlphaColor(color: string): boolean {
   return (
     colorRegRGB.test(color) ||
     colorRegRGBA.test(color) ||
     colorRegHSL.test(color) ||
     colorRegHSLA.test(color)
   );
+}
+
+/**
+ * 克隆颜色对象
+ */
+export function cloneColor(color: HsvaColor): HsvaColor {
+  return { ...color };
+}
+
+/**
+ * 获取颜色亮度
+ */
+export function getColorBrightness(color: string): number {
+  const rgba = colorToRgba(color);
+  const rgbaArr = rgba.slice(rgba.indexOf('(') + 1, rgba.lastIndexOf(')')).split(',');
+  const r = parseInt(rgbaArr[0]);
+  const g = parseInt(rgbaArr[1]);
+  const b = parseInt(rgbaArr[2]);
+  return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
+/**
+ * 判断颜色是否为深色
+ */
+export function isDarkColor(color: string): boolean {
+  return getColorBrightness(color) < 128;
 }

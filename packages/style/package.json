@@ -1,30 +1,31 @@
 {
   "name": "@ew-color-picker/style",
-  "version": "2.0.0",
-  "description": "style for ew-color-picker",
-  "main": "dist/style.min.js",
-  "module": "dist/style.esm.js",
-  "typings": "dist/types/index.d.ts",
+  "version": "1.0.0",
+  "description": "EW Color Picker Styles",
+  "main": "dist/index.css",
+  "style": "dist/index.css",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup"
+    "build": "rollup -c rollup.config.mjs",
+    "dev": "sass src/index.scss dist/index.css --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "color-picker",
+    "styles",
+    "scss",
+    "css"
+  ],
+  "author": "eveningwater(854806732@qq.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "sass": "^1.60.0",
+    "rimraf": "^3.0.2"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "bugs": {
-    "url": "https://github.com/eveningwater/ew-color-picker/issues"
-  },
-  "homepage": "https://github.com/eveningwater/ew-color-picker",
-  "keywords": [
-    "ew-color-picker",
-    "style"
-  ],
-  "author": "eveningwater",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/eveningwater/ew-color-picker.git",
-    "directory": "packages/style"
   }
 }

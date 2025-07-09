@@ -6,6 +6,7 @@
   "module": "dist/utils.esm.js",
   "typings": "dist/types/index.d.ts",
   "scripts": {
+    "build": "rimraf dist && rollup -c rollup.config.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "publishConfig": {
@@ -20,7 +21,7 @@
     "utils",
     "ew-color-picker-utils"
   ],
-  "author": "eveningwater",
+  "author": "eveningwater(854806732@qq.com)",
   "license": "ISC",
   "repository": {
     "type": "git",

@@ -5,18 +5,19 @@
   "description": "一个基于typescript封装的颜色选择器",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.js",
-    "tsc": "tsc",
+    "build": "pnpm -r build",
+    "dev": "pnpm -r dev",
+    "clean": "pnpm -r clean",
     "build:docs": "node scripts/build-docs.js & cd docs && npm run build",
     "start:docs": "cd docs && npm run start",
-    "publish": "npm publish .",
-    "publicPublish": "npm publish . --access public",
+    "publish": "pnpm -r publish",
+    "publicPublish": "pnpm -r publish --access public",
     "deploy": "npm run build:docs & gh-pages -d gh-pages",
     "release-docs": "gh-pages -d gh-pages"
   },
-  "main": "dist/ew-color-picker.min.js",
-  "module": "dist/ew-color-picker.esm.min.js",
-  "typings": "./typings/index.d.ts",
+  "main": "packages/ewColorPicker/dist/index.js",
+  "module": "packages/ewColorPicker/dist/index.esm.js",
+  "types": "packages/ewColorPicker/dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eveningwater/ew-color-picker.git"
@@ -24,16 +25,14 @@
   "keywords": [
     "ew-color-picker"
   ],
-  "author": "eveningwater",
+  "author": "eveningwater(854806732@qq.com)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/eveningwater/ew-color-picker/issues"
   },
   "homepage": "https://github.com/eveningwater/ew-color-picker#readme",
   "devDependencies": {
-    "@ew-color-picker/utils": "workspace:*"
-  },
-  "dependencies": {
+    "@ew-color-picker/utils": "workspace:*",
     "@rollup/plugin-replace": "^5.0.7",
     "chalk": "5.3.0",
     "execa": "9.1.0",
