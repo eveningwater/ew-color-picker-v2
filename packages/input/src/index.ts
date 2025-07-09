@@ -7,6 +7,8 @@ import {
   removeClass,
   hasClass,
   isFunction,
+  insertNode,
+  ApplyOrder,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorToRgba, isValidColor } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -19,6 +21,7 @@ export interface InputOptions {
 
 export default class ewColorPickerInputPlugin {
   static pluginName = "ewColorPickerInput";
+  static applyOrder = ApplyOrder.Post;
   options: InputOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
   input: HTMLInputElement | null = null;
 
@@ -32,7 +35,11 @@ export default class ewColorPickerInputPlugin {
   }
 
   run() {
-    if (this.options.hasInput) {
+    // 优先读取插件专属配置，否则读取全局
+    const hasInput = (this.ewColorPicker.options.ewColorPickerInput && typeof this.ewColorPicker.options.ewColorPickerInput.hasInput !== 'undefined')
+      ? this.ewColorPicker.options.ewColorPickerInput.hasInput
+      : this.ewColorPicker.options.hasInput;
+    if (hasInput) {
       this.render();
       this.bindEvents();
     }
@@ -45,13 +52,14 @@ export default class ewColorPickerInputPlugin {
       console.warn('[ewColorPicker] Panel container not found');
       return;
     }
-    // 查找或创建底部一行容器
-    let bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row') as HTMLElement;
+    
+    // 查找底部行容器
+    const bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row') as HTMLElement;
     if (!bottomRow) {
-      bottomRow = document.createElement('div');
-      bottomRow.className = 'ew-color-picker-bottom-row';
-      panelContainer.appendChild(bottomRow);
+      console.warn('[ewColorPicker] Bottom row container not found');
+      return;
     }
+    
     // 查找已存在的 input 元素，避免重复插入
     this.input = bottomRow.querySelector('input.ew-color-input') as HTMLInputElement;
     if (!this.input) {
@@ -60,8 +68,9 @@ export default class ewColorPickerInputPlugin {
       this.input.type = 'text';
       this.input.placeholder = '请输入颜色值';
       // 直接插入到 bottomRow
-      bottomRow.appendChild(this.input);
+      insertNode(bottomRow, this.input);
     }
+    
     // 设置当前值
     let currentColor = this.ewColorPicker.getColor();
     const hasAlpha = !!this.ewColorPicker.options.alpha;
@@ -71,6 +80,7 @@ export default class ewColorPickerInputPlugin {
       this.ewColorPicker.setColor(currentColor);
     }
     this.input.value = currentColor;
+    
     // 如果禁用，添加禁用样式
     if (this.options.disabled) {
       this.setDisabled(true);

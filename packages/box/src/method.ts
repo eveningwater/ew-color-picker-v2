@@ -62,7 +62,7 @@ export const calculateIconSize = (size?: any): number => {
 };
 
 // 处理尺寸配置，返回样式对象
-export const processSizeConfig = (size?: any): { width?: string; height?: string } => {
+export const processSizeConfig = (size?: any): { width?: string; height?: string; lineHeight?: string } => {
   if (!size) {
     return {}; // 无尺寸配置，使用默认样式
   }
@@ -71,7 +71,7 @@ export const processSizeConfig = (size?: any): { width?: string; height?: string
     // 对象形式：{ width: '50px', height: '30px' }
     const width = size.width ? (isNumber(size.width) ? `${size.width}px` : size.width) : undefined;
     const height = size.height ? (isNumber(size.height) ? `${size.height}px` : size.height) : undefined;
-    return { width, height };
+    return { width, height, lineHeight: height };
   } else if (size) {
     // 字符串或数字形式
     let val: string;
@@ -82,7 +82,7 @@ export const processSizeConfig = (size?: any): { width?: string; height?: string
     } else {
       val = '32px'; // 默认尺寸
     }
-    return { width: val, height: val };
+    return { width: val, height: val, lineHeight: val };
   }
   
   return {};

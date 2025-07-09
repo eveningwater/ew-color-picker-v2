@@ -11,9 +11,6 @@ import {
   toStyleStr,
   addClass,
   removeClass,
-  hasClass,
-  isShallowObject,
-  isNumber,
   warn
 } from "@ew-color-picker/utils";
 import { ewColorPickerMergeOptionsData } from "packages/core/src/mergeOptions";
@@ -25,13 +22,11 @@ export default class ewColorPickerBoxPlugin {
   options: ewColorPickerBoxPluginOptions & Omit<ewColorPickerMergeOptionsData, "el"> = {};
   box: HTMLElement | null;
   hasColor: boolean;
-  cacheBoxTemp: string;
   _handlers: Array<() => void> = [];
   
   constructor(public ewColorPicker: ewColorPicker) {
     this.box = null;
     this.hasColor = false;
-    this.cacheBoxTemp = "";
     this.handleOptions();
     this.run();
   }
@@ -79,7 +74,7 @@ export default class ewColorPickerBoxPlugin {
   }
   
   render() {
-    const { defaultColor, className, style, size } = this.options;
+    const { defaultColor, className, style } = this.options;
     
     // 直接使用主容器
     const rootElement = this.ewColorPicker.getMountPoint("root");

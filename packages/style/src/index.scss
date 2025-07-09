@@ -6,7 +6,6 @@
 .ew-alpha-slider-wrapper,
 .ew-color-black-panel,
 .ew-color-cursor,
-.ew-color-drop-btn-group,
 .ew-color-picker-panel-container,
 .ew-color-picker-arrow,
 .ew-color-picker-no,
@@ -20,7 +19,7 @@
 .ew-color-drop-container,
 .ew-color-mode-container .ew-color-mode-down,
 .ew-color-mode-container .ew-color-mode-up,
-.ew-color-panel,
+.ew-color-picker-panel,
 .ew-color-picker-arrow-left,
 .ew-color-picker-arrow-right,
 .ew-color-picker-box,
@@ -43,7 +42,7 @@
 .ew-alpha-slider-bar,
 .ew-alpha-slider-thumb,
 .ew-color-drop-btn,
-.ew-color-panel,
+.ew-color-picker-panel,
 .ew-color-picker-box,
 .ew-color-slider-bar,
 .ew-color-slider-thumb,
@@ -112,7 +111,7 @@
   left: 0;
   top: 100%;
   margin-top: 8px;
-  padding: 16px 20px 16px 20px;
+  padding: 10px;
   background: #fff;
   border-radius: 10px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
@@ -141,7 +140,7 @@
 }
 
 // 颜色面板
-.ew-color-panel {
+.ew-color-picker-panel {
   width: 280px;
   height: 180px;
   border-radius: 8px;
@@ -176,7 +175,7 @@
 
 // 垂直色相条紧贴面板
 .ew-color-slider.ew-is-vertical {
-  margin-left: 8px;
+  margin-left: 4px;
   margin-top: 0;
   height: 180px;
   display: inline-block;
@@ -284,8 +283,22 @@
 .ew-color-picker-bottom-row {
   display: flex;
   align-items: center;
-  margin-top: 12px;
+  justify-content: space-between;
   gap: 8px;
+  margin-top: 8px;
+}
+.ew-color-picker-bottom-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.ew-color-drop-btn-group {
+  display: flex;
+  gap: 2px;
+}
+.ew-color-drop-btn-group button {
+  min-width: 60px;
+  box-sizing: border-box;
 }
 
 // 输入框样式
@@ -304,11 +317,6 @@
   border-color: #4096ef;
 }
 
-// 按钮组
-.ew-color-drop-btn-group {
-  display: flex;
-  gap: 8px;
-}
 
 // 按钮
 .ew-color-drop-btn {
@@ -339,10 +347,6 @@
   color: #66b1ff;
 }
 
-// 确定按钮
-.ew-color-sure {
-  margin-left: 10px;
-}
 
 // 确定按钮悬停
 .ew-color-sure:active,
@@ -406,13 +410,12 @@
   border: 1.5px solid #dcdfe6;
   border-radius: 6px;
   background: #fff;
-  min-width: 32px;
-  min-height: 20px;
   box-sizing: border-box;
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
   position: relative;
   vertical-align: middle;
+  text-align: center;
 }
 .ew-color-picker-box:hover {
   border-color: #4096ef;
@@ -529,7 +532,7 @@
     min-width: 240px;
     padding: 10px 8px 10px 8px;
   }
-  .ew-color-panel {
+  .ew-color-picker-panel {
     width: 200px;
     height: 120px;
   }

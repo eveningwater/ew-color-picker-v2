@@ -75,22 +75,21 @@ export default class ewColorPickerPanelPlugin {
       return;
     }
     
-    // 移除旧的 ew-color-panel、色相条、透明度条（只移除自己负责的部分）
-    const oldPanel = panelContainer.querySelector('.ew-color-panel');
+    // 移除旧的 ew-color-picker-panel、色相条、透明度条（只移除自己负责的部分）
+    const oldPanel = panelContainer.querySelector('.ew-color-picker-panel');
     if (oldPanel) panelContainer.removeChild(oldPanel);
     const oldHue = panelContainer.querySelector('.ew-color-slider.ew-is-vertical, .ew-color-slider.ew-is-horizontal');
     if (oldHue) panelContainer.removeChild(oldHue);
     const oldAlpha = panelContainer.querySelector('.ew-color-slider.ew-alpha');
     if (oldAlpha) panelContainer.removeChild(oldAlpha);
+    const oldBottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row');
+    if (oldBottomRow) panelContainer.removeChild(oldBottomRow);
 
     // 创建面板
     this.panel = document.createElement('div');
-    this.panel.className = 'ew-color-panel';
-    this.panel.style.width = this.options.width ? this.options.width + 'px' : '280px';
+    this.panel.className = 'ew-color-picker-panel';
+    this.panel.style.width = this.options.width ? this.options.width + 5 + 'px' : '285px';
     this.panel.style.height = this.options.height ? this.options.height + 'px' : '180px';
-    // 设置面板底色为当前hue色
-    const hsva = this.ewColorPicker.getHsvaColor ? this.ewColorPicker.getHsvaColor() : { h: 0, s: 100, v: 100, a: 1 };
-    this.panel.style.background = `linear-gradient(90deg, #fff, rgba(255,255,255,0)), linear-gradient(0deg, #000, transparent), hsl(${hsva.h || 0}, 100%, 50%)`;
     panelContainer.appendChild(this.panel);
 
     // 渲染白色和黑色渐变层
@@ -140,11 +139,16 @@ export default class ewColorPickerPanelPlugin {
       panelContainer.appendChild(alphaSlider);
     }
 
+    // 创建底部行容器，用于放置输入框和按钮
+    const bottomRow = document.createElement('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
+
     // 初始化面板尺寸
     this.panelWidth = parseInt(getComputedStyle(this.panel).width) || 280;
     this.panelHeight = parseInt(getComputedStyle(this.panel).height) || 180;
 
-    // 设置初始色相底色 - 修复：使用渐变而不是纯色
+    // 设置初始色相底色
     this.updateHueBg();
     // 设置初始光标位置 - 修复：使用正确的初始位置
     this.updateCursorPosition(100, 100);
@@ -343,8 +347,6 @@ export default class ewColorPickerPanelPlugin {
     
     const newColor = colorHsvaToRgba(hsva);
     this.ewColorPicker.setColor(newColor);
-    // 更新面板背景色
-    this.updateHueBg();
     // 触发change事件
     if (isFunction(this.ewColorPicker.options.changeColor)) {
       this.ewColorPicker.options.changeColor(newColor);
@@ -377,14 +379,17 @@ export default class ewColorPickerPanelPlugin {
 
   updateHueBg() {
     if (this.panel) {
-      // 获取当前色相
-      const currentColor = this.ewColorPicker.getColor() || '#ff0000';
-      const hsva = colorRgbaToHsva(currentColor);
-      // 修复：面板背景应该是渐变，不是纯色
-      // 面板本身不需要设置背景色，由白色和黑色渐变层组成
-      // 移除错误的背景色设置
-      this.panel.style.background = '';
-      console.log('[Panel Plugin] 面板背景已重置为渐变');
+      let hsva;
+      const currentColor = this.ewColorPicker.getColor();
+      if (!currentColor || currentColor.indexOf('NaN') !== -1) {
+        // 默认红色
+        hsva = { h: 0, s: 100, v: 100, a: 1 };
+      } else {
+        const temp = colorRgbaToHsva(currentColor);
+        hsva = { h: temp.h, s: 100, v: 100, a: 1 };
+      }
+      const hueColor = colorHsvaToRgba(hsva);
+      this.panel.style.background = hueColor;
     }
   }
 
@@ -401,8 +406,6 @@ export default class ewColorPickerPanelPlugin {
       const y = Math.max(0, Math.min(rect.height, (1 - hue / 360) * rect.height));
       setSomeCss(this.hueThumb, [{ prop: 'top', value: `${y}px` }]);
     }
-    
-    console.log('[Panel Plugin] 色相thumb位置更新:', { hue, isVertical, x: !isVertical ? (hue / 360) * rect.width : undefined, y: isVertical ? (1 - hue / 360) * rect.height : undefined });
   }
 
   updateAlpha(alpha: number) {

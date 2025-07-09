@@ -2,7 +2,13 @@ import ewColorPicker from "@ew-color-picker/core";
 import {
   getELByClass,
   on,
+  setCss,
+  addClass,
+  removeClass,
+  hasClass,
   isFunction,
+  insertNode,
+  ApplyOrder,
 } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -17,9 +23,10 @@ export interface ButtonOptions {
 
 export default class ewColorPickerButtonPlugin {
   static pluginName = "ewColorPickerButton";
+  static applyOrder = ApplyOrder.Post;
   options: ButtonOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
-  clearButton: HTMLElement | null = null;
-  sureButton: HTMLElement | null = null;
+  clearButton: HTMLButtonElement | null = null;
+  sureButton: HTMLButtonElement | null = null;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
@@ -31,6 +38,15 @@ export default class ewColorPickerButtonPlugin {
   }
 
   run() {
+    // 优先读取插件专属配置，否则读取全局
+    const hasClear = (this.ewColorPicker.options.ewColorPickerButton && typeof this.ewColorPicker.options.ewColorPickerButton.hasClear !== 'undefined')
+      ? this.ewColorPicker.options.ewColorPickerButton.hasClear
+      : this.ewColorPicker.options.hasClear;
+    const hasSure = (this.ewColorPicker.options.ewColorPickerButton && typeof this.ewColorPicker.options.ewColorPickerButton.hasSure !== 'undefined')
+      ? this.ewColorPicker.options.ewColorPickerButton.hasSure
+      : this.ewColorPicker.options.hasSure;
+    this.options.hasClear = hasClear;
+    this.options.hasSure = hasSure;
     this.render();
     this.bindEvents();
   }
@@ -42,32 +58,36 @@ export default class ewColorPickerButtonPlugin {
       console.warn('[ewColorPicker] Panel container not found');
       return;
     }
-    // 查找或创建底部一行容器
-    let bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row') as HTMLElement;
+    
+    // 查找底部行容器
+    const bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row') as HTMLElement;
     if (!bottomRow) {
-      bottomRow = document.createElement('div');
-      bottomRow.className = 'ew-color-picker-bottom-row';
-      panelContainer.appendChild(bottomRow);
+      console.warn('[ewColorPicker] Bottom row container not found');
+      return;
     }
+    
     // 查找或创建按钮容器
     let btnGroup = bottomRow.querySelector('.ew-color-drop-btn-group') as HTMLElement;
     if (!btnGroup) {
       btnGroup = document.createElement('div');
       btnGroup.className = 'ew-color-drop-btn-group';
       // 直接插入到 bottomRow
-      bottomRow.appendChild(btnGroup);
+      insertNode(bottomRow, btnGroup);
     }
+    
     // 清空旧内容
     btnGroup.innerHTML = '';
+    
     // 渲染清空按钮
-    if (this.options.hasClear) {
+    if (this.options.hasClear !== false) {
       this.clearButton = document.createElement('button');
       this.clearButton.className = 'ew-color-clear ew-color-drop-btn';
       this.clearButton.textContent = this.options.clearText || '清空';
       btnGroup.appendChild(this.clearButton);
     }
+    
     // 渲染确定按钮
-    if (this.options.hasSure) {
+    if (this.options.hasSure !== false) {
       this.sureButton = document.createElement('button');
       this.sureButton.className = 'ew-color-sure ew-color-drop-btn';
       this.sureButton.textContent = this.options.sureText || '确定';

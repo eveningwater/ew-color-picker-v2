@@ -102,11 +102,11 @@ const DEFAULT_PLUGINS = {
 
 // 挂载点名称映射
 const MOUNT_ORDER_MAP: Record<string, number> = {
-  'box': PluginMountOrder.BOX,
-  'panel': PluginMountOrder.PANEL,
-  'input': PluginMountOrder.INPUT,
-  'button': PluginMountOrder.BUTTON,
-  'predefine': PluginMountOrder.PREDEFINE,
+  'ewColorPickerBox': PluginMountOrder.BOX,
+  'ewColorPickerPanel': PluginMountOrder.PANEL,
+  'ewColorPickerInput': PluginMountOrder.INPUT,
+  'ewColorPickerButton': PluginMountOrder.BUTTON,
+  'ewColorPickerPredefine': PluginMountOrder.PREDEFINE,
 };
 
 // 应用顺序映射
@@ -203,7 +203,6 @@ export default class ewColorPicker extends EventEmitter {
       this.applyPlugins();
     } catch (error) {
       warn(`[ewColorPicker error]: Failed to initialize color picker: ${error}`);
-      throw error;
     }
   }
 
@@ -259,16 +258,12 @@ export default class ewColorPicker extends EventEmitter {
     const time = duration || this.options.pickerAnimationTime || DEFAULT_ANIMATION_TIME;
     
     open(type, panelContainer, time).then(() => {
-      if (this.isDestroyed) return;
-      
       this.pickerFlag = true;
       this.trigger('toggle', true);
       
       // 延迟绑定外部点击事件，避免立即触发
       setTimeout(() => {
-        if (!this.isDestroyed) {
           on(document, 'mousedown', this._onDocumentClick, { capture: true });
-        }
       }, 0);
     }).catch(error => {
       warn(`[ewColorPicker error]: Failed to show panel: ${error}`);

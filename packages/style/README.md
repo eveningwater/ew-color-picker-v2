@@ -49,7 +49,7 @@ import '@ew-color-picker/style';
 ├── .ew-color-picker-box
 ├── .ew-color-picker
 │   ├── .ew-color-picker-content
-│   │   ├── .ew-color-panel
+│   │   ├── .ew-color-picker-panel
 │   │   └── .ew-color-slider
 │   ├── .ew-color-drop-container
 │   └── .ew-pre-define-color-container
