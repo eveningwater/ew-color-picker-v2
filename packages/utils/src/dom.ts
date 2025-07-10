@@ -123,6 +123,14 @@ export const checkContainer = (el: string | HTMLElement): HTMLElement => {
   return el;
 };
 
+export const removeNode = (el: HTMLElement) => {
+  if (el?.parentElement) {
+    el?.parentElement?.removeChild(el);
+  } else {
+    el?.remove();
+  }
+};
+
 export function getClientSize(el: HTMLElement) {
   return {
     width: el.clientWidth,

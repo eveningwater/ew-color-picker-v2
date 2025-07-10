@@ -41,11 +41,11 @@ export default class ewColorPickerHuePlugin {
       return;
     }
     // 移除旧的 hue 条
-    const oldHue = panelContainer.querySelector('.ew-color-picker-slider.ew-color-picker-is-vertical, .ew-color-picker-slider.ew-is-horizontal');
+    const oldHue = panelContainer.querySelector('.ew-color-picker-slider.ew-color-picker-is-vertical, .ew-color-picker-slider.ew-color-picker-is-horizontal');
     if (oldHue) panelContainer.removeChild(oldHue);
     // 创建 hue 条
     const hueSlider = document.createElement('div');
-    hueSlider.className = 'ew-color-picker-slider ' + (this.isHorizontal ? 'ew-is-horizontal' : 'ew-color-picker-is-vertical');
+    hueSlider.className = 'ew-color-picker-slider ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical');
     this.hueBar = document.createElement('div');
     this.hueBar.className = 'ew-color-picker-slider-bar';
     this.hueThumb = document.createElement('div');

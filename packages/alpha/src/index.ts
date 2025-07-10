@@ -43,7 +43,7 @@ export default class ewColorPickerAlphaPlugin {
     if (oldAlpha) panelContainer.removeChild(oldAlpha);
     // 创建 alpha 条
     const alphaSlider = create('div');
-    alphaSlider.className = 'ew-color-picker-slider ew-alpha ' + (this.isHorizontal ? 'ew-is-horizontal' : 'ew-color-picker-is-vertical');
+    alphaSlider.className = 'ew-color-picker-slider ew-alpha ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical');
     this.alphaBar = create('div');
     this.alphaBar.className = 'ew-color-picker-alpha-slider-bar';
     // 背景层

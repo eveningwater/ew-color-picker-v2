@@ -182,7 +182,7 @@
 }
 
 // 水平色相条
-.ew-color-picker-slider.ew-is-horizontal {
+.ew-color-picker-slider.ew-color-picker-is-horizontal {
   margin-top: 8px;
   margin-bottom: 0;
 }
@@ -194,7 +194,7 @@
 }
 
 // 水平色相滑块背景
-.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-slider-bar {
+.ew-color-picker-slider.ew-color-picker-is-horizontal .ew-color-picker-slider-bar {
   background: linear-gradient(90deg, red, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, red);
 }
 
@@ -206,14 +206,14 @@
 }
 
 // 水平滑块尺寸
-.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-alpha-slider-bar,
-.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-slider-bar {
+.ew-color-picker-slider.ew-color-picker-is-horizontal .ew-color-picker-alpha-slider-bar,
+.ew-color-picker-slider.ew-color-picker-is-horizontal .ew-color-picker-slider-bar {
   width: 100%;
   height: 12px;
 }
 
 // 水平透明度滑块间距
-.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-alpha-slider-bar {
+.ew-color-picker-slider.ew-color-picker-is-horizontal .ew-color-picker-alpha-slider-bar {
   margin-top: 3px;
 }
 
@@ -235,8 +235,8 @@
 }
 
 // 水平滑块拇指尺寸
-.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-alpha-slider-thumb,
-.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-slider-thumb {
+.ew-color-picker-slider.ew-color-picker-is-horizontal .ew-color-picker-alpha-slider-thumb,
+.ew-color-picker-slider.ew-color-picker-is-horizontal .ew-color-picker-slider-thumb {
   width: 4px;
   height: 100%;
 }

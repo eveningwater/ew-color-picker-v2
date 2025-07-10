@@ -8,13 +8,17 @@ import {
   ewObjToArray,
   isFunction,
   ApplyOrder,
+  extend,
+  warn,
+  off,
+  setStyle,
+  $,
+  removeNode,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba, colorRgbaToHex } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 
 export interface PanelOptions {
-  width?: number;
-  height?: number;
   hue?: boolean;
   alpha?: boolean;
   hueDirection?: 'horizontal' | 'vertical';
@@ -26,7 +30,6 @@ export default class ewColorPickerPanelPlugin {
   static applyOrder = ApplyOrder.Post;
 
   options: PanelOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
-  ewColorPicker: any;
 
   // DOM 元素
   panel: HTMLElement | null = null;
@@ -40,21 +43,20 @@ export default class ewColorPickerPanelPlugin {
   hueBg: HTMLElement | null = null;
 
   // 面板尺寸
-  panelWidth: number = 280;
-  panelHeight: number = 180;
+  panelWidth: number;
+  panelHeight: number;
 
   // 方向标志
   isHueHorizontal: boolean = false;
   isAlphaHorizontal: boolean = false;
 
-  constructor(ewColorPicker: any) {
-    this.ewColorPicker = ewColorPicker;
+  constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
     this.run();
   }
 
   handleOptions() {
-    this.options = Object.assign({}, this.options, this.ewColorPicker.options);
+    this.options = extend({}, this.options, this.ewColorPicker.options);
     this.isHueHorizontal = this.options.hueDirection === 'horizontal';
     this.isAlphaHorizontal = this.options.alphaDirection === 'horizontal';
   }
@@ -71,18 +73,29 @@ export default class ewColorPickerPanelPlugin {
     // 直接使用面板容器
     const panelContainer = this.ewColorPicker.getMountPoint('panelContainer');
     if (!panelContainer) {
-      console.warn('[ewColorPicker] Panel container not found');
+      warn('[ewColorPicker] Panel container not found');
       return;
     }
     // 只移除自己负责的 DOM
-    const oldPanel = panelContainer.querySelector('.ew-color-picker-panel');
-    if (oldPanel) panelContainer.removeChild(oldPanel);
+    const oldPanel = $('.ew-color-picker-panel', panelContainer);
+    if (oldPanel) removeNode(oldPanel);
 
-    // 创建面板
+    // 动态计算面板宽度
+    let panelWidth = 285;
+    if (this.isAlphaHorizontal && this.isHueHorizontal) {
+      panelWidth = 300;
+    }
+    if((this.isAlphaHorizontal && !this.isHueHorizontal) || (!this.isAlphaHorizontal && this.isHueHorizontal)){
+      panelWidth = 285 + 12;
+    }
     this.panel = document.createElement('div');
     this.panel.className = 'ew-color-picker-panel';
-    this.panel.style.width = this.options.width ? this.options.width + 5 + 'px' : '285px';
-    this.panel.style.height = this.options.height ? this.options.height + 'px' : '180px';
+    this.panel.style.width = panelWidth + 'px';
+    this.panel.style.height = '180px';
+
+    this.panelWidth = panelWidth;
+    this.panelHeight = 180;
+    
     panelContainer.appendChild(this.panel);
 
     // 渲染白色和黑色渐变层
@@ -107,10 +120,6 @@ export default class ewColorPickerPanelPlugin {
       panelContainer.appendChild(bottomRow);
     }
 
-    // 初始化面板尺寸
-    this.panelWidth = parseInt(getComputedStyle(this.panel).width) || 280;
-    this.panelHeight = parseInt(getComputedStyle(this.panel).height) || 180;
-
     // 设置初始色相底色
     this.updateHueBg();
     // 设置初始光标位置
@@ -119,20 +128,18 @@ export default class ewColorPickerPanelPlugin {
 
   bindEvents() {
     if (!this.panel) {
-      console.log('[Panel Plugin] No panel found, skipping event binding');
+      warn('[ewColorPicker panel plugin] No panel container elementfound, skipping event binding');
       return;
     }
-    console.log('[Panel Plugin] Binding events...');
     // 面板点击事件
-    this.panel.addEventListener('click', this.handlePanelClick.bind(this));
-    this.panel.addEventListener('mousedown', this.handlePanelMouseDown.bind(this));
-    console.log('[Panel Plugin] Panel events bound');
+    on(this.panel, 'click', (event) => this.handlePanelClick(event as MouseEvent));
+    on(this.panel, 'mousedown', () => this.handlePanelMouseDown());
   }
 
   handlePanelClick(event: MouseEvent) {
     if (!this.panel || !this.cursor) return;
 
-    const rect = this.panel.getBoundingClientRect();
+    const rect = getRect(this.panel);
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
@@ -140,14 +147,12 @@ export default class ewColorPickerPanelPlugin {
     const saturation = Math.max(0, Math.min(100, (x / this.panelWidth) * 100));
     const value = Math.max(0, Math.min(100, (1 - y / this.panelHeight) * 100));
 
-    console.log('[Panel Plugin] Panel click - saturation:', saturation, 'value:', value);
-    
     // 更新光标位置和颜色
     this.updateCursorPosition(saturation, value);
     this.updateColor(saturation, value);
   }
 
-  handlePanelMouseDown(event: MouseEvent) {
+  handlePanelMouseDown() {
     if (!this.panel) return;
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -155,12 +160,12 @@ export default class ewColorPickerPanelPlugin {
     };
 
     const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      off(document, 'mousemove', handleMouseMove as EventListener);
+      off(document, 'mouseup', handleMouseUp as EventListener);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    on(document, 'mousemove', handleMouseMove as EventListener);
+    on(document, 'mouseup', handleMouseUp as EventListener);
   }
 
   updateCursorPosition(saturation: number, value: number) {
@@ -170,18 +175,15 @@ export default class ewColorPickerPanelPlugin {
     const left = Math.max(0, Math.min((saturation / 100) * this.panelWidth, this.panelWidth));
     const top = Math.max(0, Math.min((1 - value / 100) * this.panelHeight, this.panelHeight));
 
-    // 按原版加4px偏移
-    setSomeCss(this.cursor, [
-      { prop: 'left', value: `${left + 4}px` },
-      { prop: 'top', value: `${top + 4}px` }
-    ]);
-    console.log('[Panel Plugin] 光标位置更新:', { left, top, saturation, value });
+    setStyle(this.cursor, {
+      left: `${left + 4}px`,
+      top: `${top + 4}px`
+    });
   }
 
   updateColor(saturation: number, value: number) {
-    // 兜底：根据是否有透明度柱选择默认色
-    const hasAlpha = !!this.ewColorPicker.options.alpha;
-    const defaultColor = hasAlpha ? 'rgba(255,0,0,1)' : '#ff0000';
+    const { alpha } = this.options;
+    const defaultColor = alpha ? 'rgba(255,0,0,1)' : '#ff0000';
     let currentColor = this.ewColorPicker.getColor();
     if (!currentColor || currentColor.indexOf('NaN') !== -1) {
       currentColor = defaultColor;
@@ -197,6 +199,7 @@ export default class ewColorPickerPanelPlugin {
     if (isFunction(this.ewColorPicker.options.changeColor)) {
       this.ewColorPicker.options.changeColor(newColor);
     }
+    this.ewColorPicker.trigger('change', newColor);
   }
 
   updateHueBg() {
@@ -211,15 +214,17 @@ export default class ewColorPickerPanelPlugin {
         hsva = { h: temp.h, s: 100, v: 100, a: 1 };
       }
       const hueColor = colorHsvaToRgba(hsva);
-      this.panel.style.background = hueColor;
+      setStyle(this.panel, {
+        background: hueColor
+      });
     }
   }
 
   destroy() {
     // 清理事件监听器
     if (this.panel) {
-      this.panel.removeEventListener('click', this.handlePanelClick.bind(this));
-      this.panel.removeEventListener('mousedown', this.handlePanelMouseDown.bind(this));
+      off(this.panel, 'click', this.handlePanelClick as EventListener);
+      off(this.panel, 'mousedown', this.handlePanelMouseDown as EventListener);
     }
   }
 }
