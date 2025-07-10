@@ -1,21 +1,21 @@
 // 基础样式 - 基于原版 ew-color-picker.min.css
 
 // 绝对定位元素
-.ew-alpha-slider-bg,
-.ew-alpha-slider-thumb,
-.ew-alpha-slider-wrapper,
-.ew-color-black-panel,
-.ew-color-cursor,
+.ew-color-picker-alpha-slider-bg,
+.ew-color-picker-alpha-slider-thumb,
+.ew-color-picker-alpha-slider-wrapper,
+.ew-color-picker-black-panel,
+.ew-color-picker-panel-cursor,
 .ew-color-picker-panel-container,
 .ew-color-picker-arrow,
 .ew-color-picker-no,
-.ew-color-slider-thumb,
-.ew-color-white-panel {
+.ew-color-picker-slider-thumb,
+.ew-color-picker-white-panel {
   position: absolute;
 }
 
 // 相对定位元素
-.ew-alpha-slider-bar,
+.ew-color-picker-alpha-slider-bar,
 .ew-color-drop-container,
 .ew-color-mode-container .ew-color-mode-down,
 .ew-color-mode-container .ew-color-mode-up,
@@ -23,29 +23,29 @@
 .ew-color-picker-arrow-left,
 .ew-color-picker-arrow-right,
 .ew-color-picker-box,
-.ew-color-slider,
-.ew-color-slider-bar {
+.ew-color-picker-slider,
+.ew-color-picker-slider-bar {
   position: relative;
 }
 
 // 盒模型
-.ew-alpha-slider-thumb,
+.ew-color-picker-alpha-slider-thumb,
 .ew-color-drop-btn,
 .ew-color-input,
 .ew-color-picker-no,
-.ew-color-slider,
-.ew-color-slider-thumb {
+.ew-color-picker-slider,
+.ew-color-picker-slider-thumb {
   box-sizing: border-box;
 }
 
 // 鼠标指针
-.ew-alpha-slider-bar,
-.ew-alpha-slider-thumb,
+.ew-color-picker-alpha-slider-bar,
+.ew-color-picker-alpha-slider-thumb,
 .ew-color-drop-btn,
 .ew-color-picker-panel,
 .ew-color-picker-box,
-.ew-color-slider-bar,
-.ew-color-slider-thumb,
+.ew-color-picker-slider-bar,
+.ew-color-picker-slider-thumb,
 .ew-pre-define-color {
   cursor: pointer;
 }
@@ -86,8 +86,8 @@
 }
 
 // 浮动
-.ew-color-slider.ew-is-vertical .ew-alpha-slider-bar,
-.ew-color-slider.ew-is-vertical .ew-color-slider-bar,
+.ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-alpha-slider-bar,
+.ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-slider-bar,
 .ew-pre-define-color {
   float: left;
 }
@@ -144,19 +144,18 @@
   width: 280px;
   height: 180px;
   border-radius: 8px;
-  overflow: hidden;
   margin-bottom: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   display: inline-block;
 }
 
 // 面板背景
-.ew-alpha-slider-bg,
-.ew-alpha-slider-wrapper,
-.ew-color-black-panel,
+.ew-color-picker-alpha-slider-bg,
+.ew-color-picker-alpha-slider-wrapper,
+.ew-color-picker-black-panel,
 .ew-color-picker-arrow,
 .ew-color-picker-no,
-.ew-color-white-panel {
+.ew-color-picker-white-panel {
   left: 0;
   right: 0;
   top: 0;
@@ -164,17 +163,17 @@
 }
 
 // 白色面板渐变
-.ew-color-white-panel {
+.ew-color-picker-white-panel {
   background: linear-gradient(90deg, #fff, hsla(0, 0%, 100%, 0));
 }
 
 // 黑色面板渐变
-.ew-color-black-panel {
+.ew-color-picker-black-panel {
   background: linear-gradient(0deg, #000, transparent);
 }
 
 // 垂直色相条紧贴面板
-.ew-color-slider.ew-is-vertical {
+.ew-color-picker-slider.ew-color-picker-is-vertical {
   margin-left: 4px;
   margin-top: 0;
   height: 180px;
@@ -183,50 +182,50 @@
 }
 
 // 水平色相条
-.ew-color-slider.ew-is-horizontal {
+.ew-color-picker-slider.ew-is-horizontal {
   margin-top: 8px;
   margin-bottom: 0;
 }
 
 // 垂直色相滑块背景
-.ew-color-slider.ew-is-vertical .ew-color-slider-bar {
+.ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-slider-bar {
   background: linear-gradient(180deg, red, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, red);
   margin-left: 3px;
 }
 
 // 水平色相滑块背景
-.ew-color-slider.ew-is-horizontal .ew-color-slider-bar {
+.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-slider-bar {
   background: linear-gradient(90deg, red, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, red);
 }
 
 // 垂直滑块尺寸
-.ew-color-slider.ew-is-vertical .ew-alpha-slider-bar,
-.ew-color-slider.ew-is-vertical .ew-color-slider-bar {
+.ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-alpha-slider-bar,
+.ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-slider-bar {
   width: 12px;
   height: 100%;
 }
 
 // 水平滑块尺寸
-.ew-color-slider.ew-is-horizontal .ew-alpha-slider-bar,
-.ew-color-slider.ew-is-horizontal .ew-color-slider-bar {
+.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-alpha-slider-bar,
+.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-slider-bar {
   width: 100%;
   height: 12px;
 }
 
 // 水平透明度滑块间距
-.ew-color-slider.ew-is-horizontal .ew-alpha-slider-bar {
+.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-alpha-slider-bar {
   margin-top: 3px;
 }
 
 // 透明度背景
-.ew-alpha-slider-wrapper,
+.ew-color-picker-alpha-slider-wrapper,
 .ew-pre-define-color.ew-has-alpha {
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==");
 }
 
 // 滑块拇指
-.ew-alpha-slider-thumb,
-.ew-color-slider-thumb {
+.ew-color-picker-alpha-slider-thumb,
+.ew-color-picker-slider-thumb {
   left: 0;
   top: 0;
   border-radius: 1px;
@@ -236,21 +235,21 @@
 }
 
 // 水平滑块拇指尺寸
-.ew-color-slider.ew-is-horizontal .ew-alpha-slider-thumb,
-.ew-color-slider.ew-is-horizontal .ew-color-slider-thumb {
+.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-alpha-slider-thumb,
+.ew-color-picker-slider.ew-is-horizontal .ew-color-picker-slider-thumb {
   width: 4px;
   height: 100%;
 }
 
 // 垂直滑块拇指尺寸
-.ew-color-slider.ew-is-vertical .ew-alpha-slider-thumb,
-.ew-color-slider.ew-is-vertical .ew-color-slider-thumb {
+.ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-alpha-slider-thumb,
+.ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-slider-thumb {
   width: 12px;
   height: 4px;
 }
 
 // 颜色光标
-.ew-color-cursor {
+.ew-color-picker-panel-cursor {
   left: 100%;
   top: 0;
   cursor: default;

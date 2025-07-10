@@ -1,0 +1,135 @@
+import { getELByClass, on, setCss, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder } from "@ew-color-picker/utils";
+import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
+import ewColorPicker, { ewColorPickerOptions } from "@ew-color-picker/core";
+
+export interface HueOptions {
+  direction?: 'horizontal' | 'vertical';
+}
+
+export default class ewColorPickerHuePlugin {
+  static pluginName = "ewColorPickerHue";
+  static applyOrder = ApplyOrder.Post;
+  options: HueOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
+  hueBar: HTMLElement | null = null;
+  hueThumb: HTMLElement | null = null;
+  isHorizontal: boolean = false;
+
+  constructor(public ewColorPicker: ewColorPicker) {
+    console.log('[hue plugin] 构造', this.ewColorPicker);
+    this.handleOptions();
+    this.run();
+  }
+
+  handleOptions() {
+    this.options = Object.assign({}, this.options, this.ewColorPicker.options);
+    this.isHorizontal = this.options.hueDirection === 'horizontal';
+  }
+
+  run() {
+    console.log('[hue plugin] run');
+    this.render();
+    setTimeout(() => {
+      this.bindEvents();
+    }, 10);
+  }
+
+  render() {
+    console.log('[hue plugin] render');
+    const panelContainer = this.ewColorPicker.getMountPoint('panelContainer');
+    if (!panelContainer) {
+      console.warn('[ewColorPicker] Panel container not found');
+      return;
+    }
+    // 移除旧的 hue 条
+    const oldHue = panelContainer.querySelector('.ew-color-picker-slider.ew-color-picker-is-vertical, .ew-color-picker-slider.ew-is-horizontal');
+    if (oldHue) panelContainer.removeChild(oldHue);
+    // 创建 hue 条
+    const hueSlider = document.createElement('div');
+    hueSlider.className = 'ew-color-picker-slider ' + (this.isHorizontal ? 'ew-is-horizontal' : 'ew-color-picker-is-vertical');
+    this.hueBar = document.createElement('div');
+    this.hueBar.className = 'ew-color-picker-slider-bar';
+    this.hueThumb = document.createElement('div');
+    this.hueThumb.className = 'ew-color-picker-slider-thumb';
+    this.hueBar.appendChild(this.hueThumb);
+    hueSlider.appendChild(this.hueBar);
+    // 插入到 bottom-row 之前
+    const bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row');
+    if (bottomRow && bottomRow.parentNode) {
+      bottomRow.parentNode.insertBefore(hueSlider, bottomRow);
+    } else {
+      panelContainer.appendChild(hueSlider);
+    }
+    // 设置初始 thumb 位置
+    const currentColor = this.ewColorPicker.getColor() || '#ff0000';
+    const hsva = colorRgbaToHsva(currentColor);
+    this.updateHueThumbPosition(hsva.h);
+  }
+
+  bindEvents() {
+    if (!this.hueBar) return;
+    this.hueBar.addEventListener('click', this.handleHueSliderClick.bind(this));
+    this.hueBar.addEventListener('mousedown', this.handleHueSliderMouseDown.bind(this));
+  }
+
+  handleHueSliderClick(event: MouseEvent) {
+    if (!this.hueBar) return;
+    const rect = this.hueBar.getBoundingClientRect();
+    const isVertical = this.hueBar.parentElement?.classList.contains('ew-color-picker-is-vertical');
+    let hue: number;
+    if (isVertical) {
+      const y = event.clientY - rect.top;
+      hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
+    } else {
+      const x = event.clientX - rect.left;
+      hue = Math.max(0, Math.min(360, (x / rect.width) * 360));
+    }
+    this.updateHue(hue);
+  }
+
+  handleHueSliderMouseDown(event: MouseEvent) {
+    if (!this.hueBar) return;
+    const slider = this.hueBar;
+    const moveHandler = (e: MouseEvent) => {
+      const rect = slider.getBoundingClientRect();
+      const isVertical = slider.parentElement?.classList.contains('ew-color-picker-is-vertical');
+      let hue: number;
+      if (isVertical) {
+        const y = e.clientY - rect.top;
+        hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
+      } else {
+        const x = e.clientX - rect.left;
+        hue = Math.max(0, Math.min(360, (x / rect.width) * 360));
+      }
+      this.updateHue(hue);
+    };
+    const upHandler = () => {
+      document.removeEventListener('mousemove', moveHandler);
+      document.removeEventListener('mouseup', upHandler);
+    };
+    document.addEventListener('mousemove', moveHandler);
+    document.addEventListener('mouseup', upHandler);
+  }
+
+  updateHue(hue: number) {
+    // 只更新 hue，保持 s/v/a 不变
+    let currentColor = this.ewColorPicker.getColor() || '#ff0000';
+    const hsva = colorRgbaToHsva(currentColor);
+    hsva.h = hue;
+    const newColor = colorHsvaToRgba(hsva);
+    this.ewColorPicker.setColor(newColor);
+    this.updateHueThumbPosition(hue);
+  }
+
+  updateHueThumbPosition(hue: number) {
+    if (!this.hueThumb || !this.hueBar) return;
+    const isVertical = this.hueBar.parentElement?.classList.contains('ew-color-picker-is-vertical');
+    const rect = this.hueBar.getBoundingClientRect();
+    if (!isVertical) {
+      const x = Math.max(0, Math.min(rect.width, (hue / 360) * rect.width));
+      setCss(this.hueThumb, 'left', `${x}px`);
+    } else {
+      const y = Math.max(0, Math.min(rect.height, (1 - hue / 360) * rect.height));
+      setCss(this.hueThumb, 'top', `${y}px`);
+    }
+  }
+} 

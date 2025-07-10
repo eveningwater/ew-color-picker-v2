@@ -74,16 +74,9 @@ export default class ewColorPickerPanelPlugin {
       console.warn('[ewColorPicker] Panel container not found');
       return;
     }
-    
-    // 移除旧的 ew-color-picker-panel、色相条、透明度条（只移除自己负责的部分）
+    // 只移除自己负责的 DOM
     const oldPanel = panelContainer.querySelector('.ew-color-picker-panel');
     if (oldPanel) panelContainer.removeChild(oldPanel);
-    const oldHue = panelContainer.querySelector('.ew-color-slider.ew-is-vertical, .ew-color-slider.ew-is-horizontal');
-    if (oldHue) panelContainer.removeChild(oldHue);
-    const oldAlpha = panelContainer.querySelector('.ew-color-slider.ew-alpha');
-    if (oldAlpha) panelContainer.removeChild(oldAlpha);
-    const oldBottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row');
-    if (oldBottomRow) panelContainer.removeChild(oldBottomRow);
 
     // 创建面板
     this.panel = document.createElement('div');
@@ -94,55 +87,25 @@ export default class ewColorPickerPanelPlugin {
 
     // 渲染白色和黑色渐变层
     this.whitePanel = document.createElement('div');
-    this.whitePanel.className = 'ew-color-white-panel';
+    this.whitePanel.className = 'ew-color-picker-white-panel';
     this.panel.appendChild(this.whitePanel);
     
     this.blackPanel = document.createElement('div');
-    this.blackPanel.className = 'ew-color-black-panel';
+    this.blackPanel.className = 'ew-color-picker-black-panel';
     this.panel.appendChild(this.blackPanel);
     
     // 渲染光标
     this.cursor = document.createElement('div');
-    this.cursor.className = 'ew-color-cursor';
+    this.cursor.className = 'ew-color-picker-panel-cursor';
     this.panel.appendChild(this.cursor);
 
-    // 色相滑块
-    if (this.options.hue !== false) {
-      const hueSlider = document.createElement('div');
-      hueSlider.className = 'ew-color-slider ' + (this.isHueHorizontal ? 'ew-is-horizontal' : 'ew-is-vertical');
-      this.hueBar = document.createElement('div');
-      this.hueBar.className = 'ew-color-slider-bar';
-      this.hueThumb = document.createElement('div');
-      this.hueThumb.className = 'ew-color-slider-thumb';
-      this.hueBar.appendChild(this.hueThumb);
-      hueSlider.appendChild(this.hueBar);
-      panelContainer.appendChild(hueSlider);
+    // 创建底部行容器（只插入一次）
+    let bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row');
+    if (!bottomRow) {
+      bottomRow = document.createElement('div');
+      bottomRow.className = 'ew-color-picker-bottom-row';
+      panelContainer.appendChild(bottomRow);
     }
-    
-    // 透明度滑块
-    if (this.options.alpha !== false) {
-      const alphaSlider = document.createElement('div');
-      alphaSlider.className = 'ew-color-slider ' + (this.isAlphaHorizontal ? 'ew-is-horizontal' : 'ew-is-vertical');
-      this.alphaBar = document.createElement('div');
-      this.alphaBar.className = 'ew-alpha-slider-bar';
-      // 背景层
-      const alphaWrapper = document.createElement('div');
-      alphaWrapper.className = 'ew-alpha-slider-wrapper';
-      this.alphaBar.appendChild(alphaWrapper);
-      const alphaBg = document.createElement('div');
-      alphaBg.className = 'ew-alpha-slider-bg';
-      this.alphaBar.appendChild(alphaBg);
-      this.alphaThumb = document.createElement('div');
-      this.alphaThumb.className = 'ew-alpha-slider-thumb';
-      this.alphaBar.appendChild(this.alphaThumb);
-      alphaSlider.appendChild(this.alphaBar);
-      panelContainer.appendChild(alphaSlider);
-    }
-
-    // 创建底部行容器，用于放置输入框和按钮
-    const bottomRow = document.createElement('div');
-    bottomRow.className = 'ew-color-picker-bottom-row';
-    panelContainer.appendChild(bottomRow);
 
     // 初始化面板尺寸
     this.panelWidth = parseInt(getComputedStyle(this.panel).width) || 280;
@@ -150,14 +113,8 @@ export default class ewColorPickerPanelPlugin {
 
     // 设置初始色相底色
     this.updateHueBg();
-    // 设置初始光标位置 - 修复：使用正确的初始位置
+    // 设置初始光标位置
     this.updateCursorPosition(100, 100);
-    // 设置初始透明度thumb位置
-    const currentColor = this.ewColorPicker.getColor() || '#ff0000';
-    const hsva2 = colorRgbaToHsva(currentColor);
-    this.updateAlphaThumbPosition(hsva2.a);
-    // 设置初始色相thumb位置
-    this.updateHueThumbPosition(hsva2.h);
   }
 
   bindEvents() {
@@ -165,31 +122,11 @@ export default class ewColorPickerPanelPlugin {
       console.log('[Panel Plugin] No panel found, skipping event binding');
       return;
     }
-
     console.log('[Panel Plugin] Binding events...');
-
     // 面板点击事件
     this.panel.addEventListener('click', this.handlePanelClick.bind(this));
     this.panel.addEventListener('mousedown', this.handlePanelMouseDown.bind(this));
     console.log('[Panel Plugin] Panel events bound');
-
-    // 色相滑块事件
-    if (this.hueBar) {
-      this.hueBar.addEventListener('click', this.handleHueSliderClick.bind(this));
-      this.hueBar.addEventListener('mousedown', this.handleHueSliderMouseDown.bind(this));
-      console.log('[Panel Plugin] Hue slider events bound');
-    } else {
-      console.log('[Panel Plugin] No hue bar found for event binding');
-    }
-
-    // 透明度滑块事件
-    if (this.alphaBar) {
-      this.alphaBar.addEventListener('click', this.handleAlphaSliderClick.bind(this));
-      this.alphaBar.addEventListener('mousedown', this.handleAlphaSliderMouseDown.bind(this));
-      console.log('[Panel Plugin] Alpha slider events bound');
-    } else {
-      console.log('[Panel Plugin] No alpha bar found for event binding');
-    }
   }
 
   handlePanelClick(event: MouseEvent) {
@@ -226,110 +163,19 @@ export default class ewColorPickerPanelPlugin {
     document.addEventListener('mouseup', handleMouseUp);
   }
 
-  handleHueSliderClick(event: MouseEvent) {
-    console.log('[Panel Plugin] Hue slider clicked');
-    if (!this.hueBar) return;
-
-    const rect = this.hueBar.getBoundingClientRect();
-    const isVertical = this.hueBar.parentElement?.classList.contains('ew-is-vertical');
-    
-    let hue: number;
-    if (isVertical) {
-      const y = event.clientY - rect.top;
-      hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
-    } else {
-      const x = event.clientX - rect.left;
-      hue = Math.max(0, Math.min(360, (x / rect.width) * 360));
-    }
-
-    console.log('[Panel Plugin] Hue slider click - hue:', hue);
-    this.updateHue(hue);
-  }
-
-  handleHueSliderMouseDown(event: MouseEvent) {
-    if (!this.hueBar) return;
-    const slider = this.hueBar;
-    const moveHandler = (e: MouseEvent) => {
-      const rect = slider.getBoundingClientRect();
-      const isVertical = slider.parentElement?.classList.contains('ew-is-vertical');
-      let hue: number;
-      if (isVertical) {
-        const y = e.clientY - rect.top;
-        hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
-      } else {
-        const x = e.clientX - rect.left;
-        hue = Math.max(0, Math.min(360, (x / rect.width) * 360));
-      }
-      this.updateHue(hue);
-    };
-    const upHandler = () => {
-      document.removeEventListener('mousemove', moveHandler);
-      document.removeEventListener('mouseup', upHandler);
-    };
-    document.addEventListener('mousemove', moveHandler);
-    document.addEventListener('mouseup', upHandler);
-  }
-
-  handleAlphaSliderClick(event: MouseEvent) {
-    console.log('[Panel Plugin] Alpha slider clicked');
-    if (!this.alphaBar) return;
-
-    const rect = this.alphaBar.getBoundingClientRect();
-    const isVertical = this.alphaBar.parentElement?.classList.contains('ew-is-vertical');
-    
-    let alpha: number;
-    if (isVertical) {
-      const y = event.clientY - rect.top;
-      alpha = Math.max(0, Math.min(1, (1 - y / rect.height)));
-    } else {
-      const x = event.clientX - rect.left;
-      alpha = Math.max(0, Math.min(1, x / rect.width));
-    }
-
-    console.log('[Panel Plugin] Alpha slider click - alpha:', alpha);
-    this.updateAlpha(alpha);
-    this.updateAlphaThumbPosition(alpha);
-  }
-
-  handleAlphaSliderMouseDown(event: MouseEvent) {
-    console.log('[Panel Plugin] Alpha slider mousedown');
-    if (!this.alphaBar) return;
-    const slider = this.alphaBar;
-    const moveHandler = (e: MouseEvent) => {
-      const rect = slider.getBoundingClientRect();
-      const isVertical = slider.parentElement?.classList.contains('ew-is-vertical');
-      let alpha: number;
-      if (isVertical) {
-        const y = e.clientY - rect.top;
-        alpha = Math.max(0, Math.min(1, (1 - y / rect.height)));
-      } else {
-        const x = e.clientX - rect.left;
-        alpha = Math.max(0, Math.min(1, x / rect.width));
-      }
-      this.updateAlpha(alpha);
-      this.updateAlphaThumbPosition(alpha);
-    };
-    const upHandler = () => {
-      document.removeEventListener('mousemove', moveHandler);
-      document.removeEventListener('mouseup', upHandler);
-    };
-    document.addEventListener('mousemove', moveHandler);
-    document.addEventListener('mouseup', upHandler);
-  }
-
   updateCursorPosition(saturation: number, value: number) {
-    if (!this.cursor) return;
+    if (!this.cursor || !this.panel) return;
 
-    // 修复：确保光标位置在面板内部
-    const x = Math.max(0, Math.min(this.panelWidth, (saturation / 100) * this.panelWidth));
-    const y = Math.max(0, Math.min(this.panelHeight, (1 - value / 100) * this.panelHeight));
+    // 计算相对面板的坐标
+    const left = Math.max(0, Math.min((saturation / 100) * this.panelWidth, this.panelWidth));
+    const top = Math.max(0, Math.min((1 - value / 100) * this.panelHeight, this.panelHeight));
 
+    // 按原版加4px偏移
     setSomeCss(this.cursor, [
-      { prop: 'left', value: `${x}px` },
-      { prop: 'top', value: `${y}px` }
+      { prop: 'left', value: `${left + 4}px` },
+      { prop: 'top', value: `${top + 4}px` }
     ]);
-    
-    console.log('[Panel Plugin] 光标位置更新:', { x, y, saturation, value });
+    console.log('[Panel Plugin] 光标位置更新:', { left, top, saturation, value });
   }
 
   updateColor(saturation: number, value: number) {
@@ -353,30 +199,6 @@ export default class ewColorPickerPanelPlugin {
     }
   }
 
-  updateHue(hue: number) {
-    // 兜底：根据是否有透明度柱选择默认色
-    const hasAlpha = !!this.ewColorPicker.options.alpha;
-    const defaultColor = hasAlpha ? 'rgba(255,0,0,1)' : '#ff0000';
-    let currentColor = this.ewColorPicker.getColor();
-    if (!currentColor || currentColor.indexOf('NaN') !== -1) {
-      currentColor = defaultColor;
-      this.ewColorPicker.setColor(currentColor);
-    }
-    const hsva = colorRgbaToHsva(currentColor);
-    hsva.h = hue;
-    
-    const newColor = colorHsvaToRgba(hsva);
-    this.ewColorPicker.setColor(newColor);
-    // 立即更新面板背景色
-    this.updateHueBg();
-    // 触发change事件
-    if (isFunction(this.ewColorPicker.options.changeColor)) {
-      this.ewColorPicker.options.changeColor(newColor);
-    }
-    // 同步更新thumb位置
-    this.updateHueThumbPosition(hue);
-  }
-
   updateHueBg() {
     if (this.panel) {
       let hsva;
@@ -393,70 +215,11 @@ export default class ewColorPickerPanelPlugin {
     }
   }
 
-  updateHueThumbPosition(hue: number) {
-    if (!this.hueThumb || !this.hueBar) return;
-
-    const isVertical = this.hueBar.parentElement?.classList.contains('ew-is-vertical');
-    const rect = this.hueBar.getBoundingClientRect();
-    
-    if (!isVertical) {
-      const x = Math.max(0, Math.min(rect.width, (hue / 360) * rect.width));
-      setSomeCss(this.hueThumb, [{ prop: 'left', value: `${x}px` }]);
-    } else {
-      const y = Math.max(0, Math.min(rect.height, (1 - hue / 360) * rect.height));
-      setSomeCss(this.hueThumb, [{ prop: 'top', value: `${y}px` }]);
-    }
-  }
-
-  updateAlpha(alpha: number) {
-    // 更新透明度值
-    const currentColor = this.ewColorPicker.getColor() || '#ff0000';
-    const hsva = colorRgbaToHsva(currentColor);
-    hsva.a = alpha;
-    
-    const newColor = colorHsvaToRgba(hsva);
-    this.ewColorPicker.setColor(newColor);
-    
-    // 触发change事件
-    if (isFunction(this.ewColorPicker.options.changeColor)) {
-      this.ewColorPicker.options.changeColor(newColor);
-    }
-    // 新增：同步更新thumb位置
-    this.updateAlphaThumbPosition(alpha);
-  }
-
-  updateAlphaThumbPosition(alpha: number) {
-    if (!this.alphaThumb || !this.alphaBar) return;
-
-    const isVertical = this.alphaBar.parentElement?.classList.contains('ew-is-vertical');
-    const rect = this.alphaBar.getBoundingClientRect();
-    
-    if (!isVertical) {
-      const x = Math.max(0, Math.min(rect.width, (1 - alpha) * rect.width));
-      setSomeCss(this.alphaThumb, [{ prop: 'left', value: `${x}px` }]);
-    } else {
-      const y = Math.max(0, Math.min(rect.height, (1 - alpha) * rect.height));
-      setSomeCss(this.alphaThumb, [{ prop: 'top', value: `${y}px` }]);
-    }
-    
-    console.log('[Panel Plugin] 透明度thumb位置更新:', { alpha, isVertical, x: !isVertical ? (1 - alpha) * rect.width : undefined, y: isVertical ? (1 - alpha) * rect.height : undefined });
-  }
-
   destroy() {
     // 清理事件监听器
     if (this.panel) {
       this.panel.removeEventListener('click', this.handlePanelClick.bind(this));
       this.panel.removeEventListener('mousedown', this.handlePanelMouseDown.bind(this));
-    }
-
-    if (this.hueBar) {
-      this.hueBar.removeEventListener('click', this.handleHueSliderClick.bind(this));
-      this.hueBar.removeEventListener('mousedown', this.handleHueSliderMouseDown.bind(this));
-    }
-
-    if (this.alphaBar) {
-      this.alphaBar.removeEventListener('click', this.handleAlphaSliderClick.bind(this));
-      this.alphaBar.removeEventListener('mousedown', this.handleAlphaSliderMouseDown.bind(this));
     }
   }
 }

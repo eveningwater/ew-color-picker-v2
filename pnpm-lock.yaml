@@ -54,6 +54,28 @@ importers:
         specifier: 1.0.5
         version: 1.0.5
 
+  packages/alpha:
+    dependencies:
+      '@ew-color-picker/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ew-color-picker/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
+      rollup:
+        specifier: ^3.0.0
+        version: 3.29.5
+      rollup-plugin-typescript2:
+        specifier: ^0.34.0
+        version: 0.34.1(rollup@3.29.5)(typescript@4.9.5)
+      typescript:
+        specifier: ^4.9.0
+        version: 4.9.5
+
   packages/box:
     dependencies:
       '@ew-color-picker/utils':
@@ -137,6 +159,28 @@ importers:
       '@ew-color-picker/utils':
         specifier: workspace:*
         version: link:../utils
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
+      rollup:
+        specifier: ^3.0.0
+        version: 3.29.5
+      rollup-plugin-typescript2:
+        specifier: ^0.34.0
+        version: 0.34.1(rollup@3.29.5)(typescript@4.9.5)
+      typescript:
+        specifier: ^4.9.0
+        version: 4.9.5
+
+  packages/hue:
+    dependencies:
+      '@ew-color-picker/core':
+        specifier: workspace:*
+        version: link:../core
+      '@ew-color-picker/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2

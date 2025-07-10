@@ -106,20 +106,29 @@ export default class ewColorPickerMergeOptions
     options?: ewColorPickerConstructorOptions,
     pluginNameProp?: ewColorPickerBindPluginOptions
   ): ewColorPickerOptions {
+    let result: any;
     if (isShallowObject(options)) {
       const { el, ...other } = options as ewColorPickerOptions;
-      return extend(defaultConfig, {
+      result = extend(defaultConfig, {
         el: checkContainer(el),
         ...other,
         ...pluginNameProp,
       });
     } else {
-      return extend({
+      result = extend({
         ...defaultConfig,
         el: checkContainer(options as unknown as WrapperElement),
         ...pluginNameProp,
       });
     }
+    // 自动补全 hue/alpha 插件 key
+    if (result.hue && !result.ewColorPickerHue) {
+      result.ewColorPickerHue = {};
+    }
+    if (result.alpha && !result.ewColorPickerAlpha) {
+      result.ewColorPickerAlpha = {};
+    }
+    return result;
   }
   bindOptions(
     options: ewColorPickerConstructorOptions,

@@ -50,7 +50,7 @@ import '@ew-color-picker/style';
 ├── .ew-color-picker
 │   ├── .ew-color-picker-content
 │   │   ├── .ew-color-picker-panel
-│   │   └── .ew-color-slider
+│   │   └── .ew-color-picker-slider
 │   ├── .ew-color-drop-container
 │   └── .ew-pre-define-color-container
 ```

@@ -1,0 +1,34 @@
+{
+  "name": "@ew-color-picker/hue",
+  "version": "1.0.0",
+  "description": "EW Color Picker Hue Plugin",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "clean": "rimraf dist"
+  },
+  "keywords": ["color-picker", "hue", "plugin", "typescript"],
+  "author": "eveningwater(854806732@qq.com)",
+  "license": "MIT",
+  "dependencies": {
+    "@ew-color-picker/core": "workspace:*",
+    "@ew-color-picker/utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "@ew-color-picker/core": "workspace:*",
+    "@ew-color-picker/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "rollup": "^3.0.0",
+    "rollup-plugin-typescript2": "^0.34.0",
+    "typescript": "^4.9.0",
+    "rimraf": "^3.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+} 

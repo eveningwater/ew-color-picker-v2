@@ -1,6 +1,8 @@
 import Core from "@ew-color-picker/core";
 import Box from "@ew-color-picker/box";
 import Panel from "@ew-color-picker/panel";
+import Hue from "@ew-color-picker/hue";
+import Alpha from "@ew-color-picker/alpha";
 import Input from "@ew-color-picker/input";
 import Button from "@ew-color-picker/button";
 import Predefine from "@ew-color-picker/predefine";
@@ -10,6 +12,8 @@ import Console from "@ew-color-picker/console";
 Core.use(Console);
 Core.use(Box);
 Core.use(Panel);
+Core.use(Hue);
+Core.use(Alpha);
 Core.use(Input);
 Core.use(Button);
 Core.use(Predefine);
