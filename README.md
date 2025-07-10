@@ -31,7 +31,6 @@
 packages/
 ├── core/           # 核心功能
 ├── utils/          # 工具函数
-├── template/       # DOM模板生成
 ├── panel/          # 颜色面板交互
 ├── input/          # 输入框功能
 ├── button/         # 按钮功能
@@ -183,13 +182,14 @@ picker.on('clear', function() {
 ### 创建自定义插件
 
 ```typescript
+import ewColorPicker from "@ew-color-picker/core";
 import { ApplyOrder } from '@ew-color-picker/utils';
 
 export default class CustomPlugin {
     static pluginName = "CustomPlugin";
     static applyOrder = ApplyOrder.Post;
 
-    constructor(public ewColorPicker: any) {
+    constructor(public ewColorPicker: ewColorPicker) {
         this.init();
     }
 
