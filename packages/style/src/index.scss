@@ -605,3 +605,8 @@
 .ew-color-picker-panel-container * {
   box-sizing: border-box;
 }
+
+.ew-color-picker-white-panel,
+.ew-color-picker-black-panel {
+  border-radius: inherit;
+}

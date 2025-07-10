@@ -1,6 +1,6 @@
-import { getELByClass, on, setCss, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder } from "@ew-color-picker/utils";
+import { getELByClass, on, setCss, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
-import { ewColorPickerOptions } from "@ew-color-picker/core";
+import ewColorPicker,{ ewColorPickerOptions } from "@ew-color-picker/core";
 
 export interface AlphaOptions {
   direction?: 'horizontal' | 'vertical';
@@ -10,25 +10,22 @@ export default class ewColorPickerAlphaPlugin {
   static pluginName = "ewColorPickerAlpha";
   static applyOrder = ApplyOrder.Post;
   options: AlphaOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
-  ewColorPicker: any;
   alphaBar: HTMLElement | null = null;
   alphaThumb: HTMLElement | null = null;
   isHorizontal: boolean = false;
 
-  constructor(ewColorPicker: any) {
-    console.log('[alpha plugin] 构造', ewColorPicker);
+  constructor(public ewColorPicker: ewColorPicker) {
     this.ewColorPicker = ewColorPicker;
     this.handleOptions();
     this.run();
   }
 
   handleOptions() {
-    this.options = Object.assign({}, this.options, this.ewColorPicker.options);
+    this.options = extend({}, this.options, this.ewColorPicker.options);
     this.isHorizontal = this.options.alphaDirection === 'horizontal';
   }
 
   run() {
-    console.log('[alpha plugin] run');
     this.render();
     setTimeout(() => {
       this.bindEvents();
@@ -36,34 +33,33 @@ export default class ewColorPickerAlphaPlugin {
   }
 
   render() {
-    console.log('[alpha plugin] render');
     const panelContainer = this.ewColorPicker.getMountPoint('panelContainer');
     if (!panelContainer) {
-      console.warn('[ewColorPicker] Panel container not found');
+      warn('[ewColorPicker] Panel container not found, please check the ewColorPicker instance!');
       return;
     }
     // 移除旧的 alpha 条
     const oldAlpha = panelContainer.querySelector('.ew-color-picker-slider.ew-alpha');
     if (oldAlpha) panelContainer.removeChild(oldAlpha);
     // 创建 alpha 条
-    const alphaSlider = document.createElement('div');
+    const alphaSlider = create('div');
     alphaSlider.className = 'ew-color-picker-slider ew-alpha ' + (this.isHorizontal ? 'ew-is-horizontal' : 'ew-color-picker-is-vertical');
-    this.alphaBar = document.createElement('div');
+    this.alphaBar = create('div');
     this.alphaBar.className = 'ew-color-picker-alpha-slider-bar';
     // 背景层
-    const alphaWrapper = document.createElement('div');
+    const alphaWrapper = create('div');
     alphaWrapper.className = 'ew-color-picker-alpha-slider-wrapper';
     this.alphaBar.appendChild(alphaWrapper);
-    const alphaBg = document.createElement('div');
+    const alphaBg = create('div');
     alphaBg.className = 'ew-color-picker-alpha-slider-bg';
     this.alphaBar.appendChild(alphaBg);
-    this.alphaThumb = document.createElement('div');
+    this.alphaThumb = create('div');
     this.alphaThumb.className = 'ew-color-picker-alpha-slider-thumb';
     this.alphaBar.appendChild(this.alphaThumb);
     alphaSlider.appendChild(this.alphaBar);
 
     // 插入到 bottom-row 之前
-    const bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row');
+    const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
     if (bottomRow && bottomRow.parentNode) {
       bottomRow.parentNode.insertBefore(alphaSlider, bottomRow);
     } else {
@@ -78,14 +74,18 @@ export default class ewColorPickerAlphaPlugin {
 
   bindEvents() {
     if (!this.alphaBar) return;
-    this.alphaBar.addEventListener('click', this.handleAlphaSliderClick.bind(this));
-    this.alphaBar.addEventListener('mousedown', this.handleAlphaSliderMouseDown.bind(this));
+    on(this.alphaBar, 'click', (event: Event) => {
+      this.handleAlphaSliderClick(event as MouseEvent);
+    });
+    on(this.alphaBar, 'mousedown', () => {
+      this.handleAlphaSliderMouseDown();
+    });
   }
 
   handleAlphaSliderClick(event: MouseEvent) {
     if (!this.alphaBar) return;
     const rect = this.alphaBar.getBoundingClientRect();
-    const isVertical = this.alphaBar.parentElement?.classList.contains('ew-color-picker-is-vertical');
+    const isVertical = hasClass(this.alphaBar.parentElement!, 'ew-color-picker-is-vertical');
     let alpha: number;
     if (isVertical) {
       const y = event.clientY - rect.top;
@@ -97,7 +97,7 @@ export default class ewColorPickerAlphaPlugin {
     this.updateAlpha(alpha);
   }
 
-  handleAlphaSliderMouseDown(event: MouseEvent) {
+  handleAlphaSliderMouseDown() {
     if (!this.alphaBar) return;
     const slider = this.alphaBar;
     const moveHandler = (e: MouseEvent) => {
@@ -114,11 +114,11 @@ export default class ewColorPickerAlphaPlugin {
       this.updateAlpha(alpha);
     };
     const upHandler = () => {
-      document.removeEventListener('mousemove', moveHandler);
-      document.removeEventListener('mouseup', upHandler);
+      off(document, 'mousemove', moveHandler as EventListener);
+      off(document, 'mouseup', upHandler as EventListener);
     };
-    document.addEventListener('mousemove', moveHandler);
-    document.addEventListener('mouseup', upHandler);
+    on(document, 'mousemove', moveHandler as EventListener);
+    on(document, 'mouseup', upHandler as EventListener);
   }
 
   updateAlpha(alpha: number) {
