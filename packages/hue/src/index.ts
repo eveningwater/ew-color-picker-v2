@@ -74,14 +74,14 @@ export default class ewColorPickerHuePlugin {
   handleHueSliderClick(event: MouseEvent) {
     if (!this.hueBar) return;
     const rect = this.hueBar.getBoundingClientRect();
-    const isVertical = this.hueBar.parentElement?.classList.contains('ew-color-picker-is-vertical');
+    const isHorizontal = this.isHorizontal;
     let hue: number;
-    if (isVertical) {
-      const y = event.clientY - rect.top;
-      hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
-    } else {
+    if (isHorizontal) {
       const x = event.clientX - rect.left;
       hue = Math.max(0, Math.min(360, (x / rect.width) * 360));
+    } else {
+      const y = event.clientY - rect.top;
+      hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
     }
     this.updateHue(hue);
   }
@@ -89,16 +89,16 @@ export default class ewColorPickerHuePlugin {
   handleHueSliderMouseDown(event: MouseEvent) {
     if (!this.hueBar) return;
     const slider = this.hueBar;
+    const isHorizontal = this.isHorizontal;
     const moveHandler = (e: MouseEvent) => {
       const rect = slider.getBoundingClientRect();
-      const isVertical = slider.parentElement?.classList.contains('ew-color-picker-is-vertical');
       let hue: number;
-      if (isVertical) {
-        const y = e.clientY - rect.top;
-        hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
-      } else {
+      if (isHorizontal) {
         const x = e.clientX - rect.left;
         hue = Math.max(0, Math.min(360, (x / rect.width) * 360));
+      } else {
+        const y = e.clientY - rect.top;
+        hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
       }
       this.updateHue(hue);
     };
@@ -128,14 +128,16 @@ export default class ewColorPickerHuePlugin {
 
   updateHueThumbPosition(hue: number) {
     if (!this.hueThumb || !this.hueBar) return;
-    const isVertical = this.hueBar.parentElement?.classList.contains('ew-color-picker-is-vertical');
+    const isHorizontal = this.isHorizontal;
     const rect = this.hueBar.getBoundingClientRect();
-    if (!isVertical) {
+    if (isHorizontal) {
       const x = Math.max(0, Math.min(rect.width, (hue / 360) * rect.width));
       setCss(this.hueThumb, 'left', `${x}px`);
+      setCss(this.hueThumb, 'top', `0px`);
     } else {
       const y = Math.max(0, Math.min(rect.height, (1 - hue / 360) * rect.height));
       setCss(this.hueThumb, 'top', `${y}px`);
+      setCss(this.hueThumb, 'left', `0px`);
     }
   }
 } 

@@ -77,48 +77,48 @@ export default class ewColorPickerAlphaPlugin {
     on(this.alphaBar, 'click', (event: Event) => {
       this.handleAlphaSliderClick(event as MouseEvent);
     });
-    on(this.alphaBar, 'mousedown', () => {
-      this.handleAlphaSliderMouseDown();
+    on(this.alphaBar, 'mousedown', (event: Event) => {
+      this.handleAlphaSliderMouseDown(event as MouseEvent);
     });
   }
 
   handleAlphaSliderClick(event: MouseEvent) {
     if (!this.alphaBar) return;
     const rect = this.alphaBar.getBoundingClientRect();
-    const isVertical = hasClass(this.alphaBar.parentElement!, 'ew-color-picker-is-vertical');
+    const isHorizontal = this.isHorizontal;
     let alpha: number;
-    if (isVertical) {
+    if (isHorizontal) {
+      const x = event.clientX - rect.left;
+      alpha = Math.max(0, Math.min(1, 1 - (x / rect.width)));
+    } else {
       const y = event.clientY - rect.top;
       alpha = Math.max(0, Math.min(1, (1 - y / rect.height)));
-    } else {
-      const x = event.clientX - rect.left;
-      alpha = Math.max(0, Math.min(1, x / rect.width));
     }
     this.updateAlpha(alpha);
   }
 
-  handleAlphaSliderMouseDown() {
+  handleAlphaSliderMouseDown(event: MouseEvent) {
     if (!this.alphaBar) return;
     const slider = this.alphaBar;
+    const isHorizontal = this.isHorizontal;
     const moveHandler = (e: MouseEvent) => {
       const rect = slider.getBoundingClientRect();
-      const isVertical = slider.parentElement?.classList.contains('ew-color-picker-is-vertical');
       let alpha: number;
-      if (isVertical) {
+      if (isHorizontal) {
+        const x = e.clientX - rect.left;
+        alpha = Math.max(0, Math.min(1, 1 - (x / rect.width)));
+      } else {
         const y = e.clientY - rect.top;
         alpha = Math.max(0, Math.min(1, (1 - y / rect.height)));
-      } else {
-        const x = e.clientX - rect.left;
-        alpha = Math.max(0, Math.min(1, x / rect.width));
       }
       this.updateAlpha(alpha);
     };
     const upHandler = () => {
-      off(document, 'mousemove', moveHandler as EventListener);
-      off(document, 'mouseup', upHandler as EventListener);
+      document.removeEventListener('mousemove', moveHandler);
+      document.removeEventListener('mouseup', upHandler);
     };
-    on(document, 'mousemove', moveHandler as EventListener);
-    on(document, 'mouseup', upHandler as EventListener);
+    document.addEventListener('mousemove', moveHandler);
+    document.addEventListener('mouseup', upHandler);
   }
 
   updateAlpha(alpha: number) {
@@ -133,14 +133,16 @@ export default class ewColorPickerAlphaPlugin {
 
   updateAlphaThumbPosition(alpha: number) {
     if (!this.alphaThumb || !this.alphaBar) return;
-    const isVertical = this.alphaBar.parentElement?.classList.contains('ew-color-picker-is-vertical');
+    const isHorizontal = this.isHorizontal;
     const rect = this.alphaBar.getBoundingClientRect();
-    if (!isVertical) {
+    if (isHorizontal) {
       const x = Math.max(0, Math.min(rect.width, (1 - alpha) * rect.width));
       setCss(this.alphaThumb, 'left', `${x}px`);
+      setCss(this.alphaThumb, 'top', `0px`);
     } else {
       const y = Math.max(0, Math.min(rect.height, (1 - alpha) * rect.height));
       setCss(this.alphaThumb, 'top', `${y}px`);
+      setCss(this.alphaThumb, 'left', `0px`);
     }
   }
 } 
