@@ -248,9 +248,6 @@ Core.use(CustomPlugin);
 
 MIT License
 
-## 🙏 致谢
-
-感谢原版 [ew-color-picker](https://github.com/eveningwater/ew-color-picker) 项目提供的优秀实现。
 
 ---
 

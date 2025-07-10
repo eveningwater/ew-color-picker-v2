@@ -118,6 +118,12 @@ export default class ewColorPickerHuePlugin {
     const newColor = colorHsvaToRgba(hsva);
     this.ewColorPicker.setColor(newColor);
     this.updateHueThumbPosition(hue);
+
+    // 调用 panel 插件的 updateHueBg 方法
+    const panelPlugin = this.ewColorPicker.plugins?.ewColorPickerPanel;
+    if (panelPlugin && typeof panelPlugin.updateHueBg === 'function') {
+      panelPlugin.updateHueBg();
+    }
   }
 
   updateHueThumbPosition(hue: number) {
