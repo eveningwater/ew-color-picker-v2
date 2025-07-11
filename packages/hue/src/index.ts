@@ -1,4 +1,4 @@
-import { getELByClass, on, setCss, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder } from "@ew-color-picker/utils";
+import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, warn, create } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
 import ewColorPicker, { ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -15,7 +15,6 @@ export default class ewColorPickerHuePlugin {
   isHorizontal: boolean = false;
 
   constructor(public ewColorPicker: ewColorPicker) {
-    console.log('[hue plugin] 构造', this.ewColorPicker);
     this.handleOptions();
     this.run();
   }
@@ -26,7 +25,6 @@ export default class ewColorPickerHuePlugin {
   }
 
   run() {
-    console.log('[hue plugin] run');
     this.render();
     setTimeout(() => {
       this.bindEvents();
@@ -34,21 +32,20 @@ export default class ewColorPickerHuePlugin {
   }
 
   render() {
-    console.log('[hue plugin] render');
     const panelContainer = this.ewColorPicker.getMountPoint('panelContainer');
     if (!panelContainer) {
-      console.warn('[ewColorPicker] Panel container not found');
+      warn('[ewColorPicker] Panel container not found');
       return;
     }
     // 移除旧的 hue 条
     const oldHue = panelContainer.querySelector('.ew-color-picker-slider.ew-color-picker-is-vertical, .ew-color-picker-slider.ew-color-picker-is-horizontal');
     if (oldHue) panelContainer.removeChild(oldHue);
     // 创建 hue 条
-    const hueSlider = document.createElement('div');
+    const hueSlider = create('div');
     hueSlider.className = 'ew-color-picker-slider ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical');
-    this.hueBar = document.createElement('div');
+    this.hueBar = create('div');
     this.hueBar.className = 'ew-color-picker-slider-bar';
-    this.hueThumb = document.createElement('div');
+    this.hueThumb = create('div');
     this.hueThumb.className = 'ew-color-picker-slider-thumb';
     this.hueBar.appendChild(this.hueThumb);
     hueSlider.appendChild(this.hueBar);
@@ -132,12 +129,12 @@ export default class ewColorPickerHuePlugin {
     const rect = this.hueBar.getBoundingClientRect();
     if (isHorizontal) {
       const x = Math.max(0, Math.min(rect.width, (hue / 360) * rect.width));
-      setCss(this.hueThumb, 'left', `${x}px`);
-      setCss(this.hueThumb, 'top', `0px`);
+      setStyle(this.hueThumb, 'left', `${x}px`);
+      setStyle(this.hueThumb, 'top', `0px`);
     } else {
       const y = Math.max(0, Math.min(rect.height, (1 - hue / 360) * rect.height));
-      setCss(this.hueThumb, 'top', `${y}px`);
-      setCss(this.hueThumb, 'left', `0px`);
+              setStyle(this.hueThumb, 'top', `${y}px`);
+        setStyle(this.hueThumb, 'left', `0px`);
     }
   }
 } 

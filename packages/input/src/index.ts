@@ -1,8 +1,7 @@
 import ewColorPicker from "@ew-color-picker/core";
 import {
-  getELByClass,
   on,
-  setCss,
+  setStyle,
   addClass,
   removeClass,
   hasClass,
@@ -77,6 +76,7 @@ export default class ewColorPickerInputPlugin {
       this.input = document.createElement('input');
       this.input.className = 'ew-color-picker-input';
       this.input.type = 'text';
+      this.input.name = 'ew-color-picker-input';
       this.input.placeholder = '请输入颜色值';
       // 直接插入到 bottomRow
       insertNode(bottomRow, this.input);

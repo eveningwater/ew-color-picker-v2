@@ -1,17 +1,13 @@
 import ewColorPicker from "@ew-color-picker/core";
 import {
-  getELByClass,
   on,
-  setCss,
-  setSomeCss,
+  setStyle,
   getRect,
-  ewObjToArray,
   isFunction,
   ApplyOrder,
   extend,
   warn,
   off,
-  setStyle,
   $,
   removeNode,
 } from "@ew-color-picker/utils";

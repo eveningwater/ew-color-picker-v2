@@ -1,10 +1,8 @@
 import ewColorPicker from "@ew-color-picker/core";
 import {
-  getELByClass,
   on,
   addClass,
   removeClass,
-  ewObjToArray,
   isFunction,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorToRgba, isValidColor, isAlphaColor } from "@ew-color-picker/utils";

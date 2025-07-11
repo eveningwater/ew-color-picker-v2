@@ -1,4 +1,4 @@
-import { getELByClass, on, setCss, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off } from "@ew-color-picker/utils";
+import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
 import ewColorPicker,{ ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -137,12 +137,12 @@ export default class ewColorPickerAlphaPlugin {
     const rect = this.alphaBar.getBoundingClientRect();
     if (isHorizontal) {
       const x = Math.max(0, Math.min(rect.width, (1 - alpha) * rect.width));
-      setCss(this.alphaThumb, 'left', `${x}px`);
-      setCss(this.alphaThumb, 'top', `0px`);
+      setStyle(this.alphaThumb, 'left', `${x}px`);
+      setStyle(this.alphaThumb, 'top', `0px`);
     } else {
       const y = Math.max(0, Math.min(rect.height, (1 - alpha) * rect.height));
-      setCss(this.alphaThumb, 'top', `${y}px`);
-      setCss(this.alphaThumb, 'left', `0px`);
+              setStyle(this.alphaThumb, 'top', `${y}px`);
+        setStyle(this.alphaThumb, 'left', `0px`);
     }
   }
 } 

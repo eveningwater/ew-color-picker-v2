@@ -1,8 +1,7 @@
 import ewColorPicker from "@ew-color-picker/core";
 import {
-  getELByClass,
   on,
-  setCss,
+  setStyle,
   addClass,
   removeClass,
   hasClass,

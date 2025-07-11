@@ -1,7 +1,6 @@
-import { isShallowObject, isString, isFunction, isUndefined, tryErrorHandler } from "./type";
+import { isShallowObject, isString, tryErrorHandler } from "./type";
 import { supportsPassive } from "./env";
 import { extend } from "./base";
-import { eventType } from "./const";
 import { warn } from "./assert";
 
 export type SafeCSSStyleDeclaration = {
@@ -21,13 +20,16 @@ export const hasClass = (el: HTMLElement, className: string) => {
 };
 
 export const addClass = (el: HTMLElement, className: string) => {
-  if (hasClass(el, className)) {
-    return;
+  // 支持多个类名，用空格分隔
+  const classNames = className.trim().split(/\s+/);
+  
+  for (const cls of classNames) {
+    if (cls && !hasClass(el, cls)) {
+      let newClass = el.className.split(" ").filter(Boolean);
+      newClass.push(cls);
+      el.className = newClass.join(" ");
+    }
   }
-
-  let newClass = el.className.split(" ");
-  newClass.push(className);
-  el.className = newClass.join(" ");
 };
 
 export const removeClass = (el: HTMLElement, className: string) => {
@@ -51,8 +53,24 @@ export const isDom = <T extends HTMLElement>(el: T) =>
 
 export const setStyle = (
   el: HTMLElement,
-  style: Partial<SafeCSSStyleDeclaration> = {}
-) => extend(el.style, style as SafeCSSStyleDeclaration);
+  style: Partial<SafeCSSStyleDeclaration> | string | Array<{ prop: string; value: string }> = {},
+  value?: string | number
+) => {
+  if (typeof style === 'string' && value !== undefined) {
+    // 兼容 setCss 的用法：setStyle(element, 'left', '10px')
+    const property = style;
+    const finalValue = typeof value === 'number' ? `${value}px` : value;
+    el.style[property as any] = finalValue;
+  } else if (Array.isArray(style)) {
+    // 兼容 setSomeCss 的用法：setStyle(element, [{ prop: 'left', value: '10px' }, { prop: 'top', value: '20px' }])
+    style.forEach(({ prop, value }) => {
+      el.style[prop as any] = value;
+    });
+  } else {
+    // 原有的用法：setStyle(element, { left: '10px', top: '20px' })
+    extend(el.style, style as SafeCSSStyleDeclaration);
+  }
+};
 export const removeStyle = (el: HTMLElement, props: string[] = []) => {
   for (const item of props) {
     el.style.removeProperty(item);
@@ -181,89 +199,6 @@ export const off = (
     capture: !!capture,
   });
 };
-
-export const clickOutSide = (
-  element: HTMLElement,
-  isUnbind = true,
-  callback: (r: DOMRect) => void
-) => {
-  const mouseHandler = (event: Event) => {
-    const rect = getRect(element);
-    const target = event.target as HTMLElement;
-    if (!target) return;
-    const targetRect = getRect(target);
-    if (
-      targetRect.x >= rect.x &&
-      targetRect.y >= rect.y &&
-      targetRect.width <= rect.width &&
-      targetRect.height <= rect.height
-    )
-      return;
-    if (isFunction(callback)) callback(targetRect);
-    if (isUnbind) {
-      // 延迟解除绑定
-      setTimeout(() => {
-        off(document, eventType[0], mouseHandler);
-      }, 0);
-    }
-  };
-  on(document, eventType[0], mouseHandler);
-};
-
-declare global {
-  interface Window {
-    // jQuery对象
-    jQuery: any;
-  }
-}
-export const isJQDom = <T>(dom: T) =>
-  !isUndefined(window.jQuery) && dom instanceof window.jQuery;
-
-export function getELByClass(element: HTMLElement, className: string, all?: boolean): HTMLElement | HTMLElement[] | null {
-  if (all) {
-    return Array.from(element.getElementsByClassName(className)) as HTMLElement[];
-  }
-  return element.querySelector(`.${className}`) as HTMLElement;
-}
-
-export function setCss(element: HTMLElement, property: string, value: string | number): void {
-  element.style[property as any] = typeof value === 'number' ? `${value}px` : value;
-}
-
-export function setSomeCss(element: HTMLElement, styles: Array<{ prop: string; value: string }>): void {
-  styles.forEach(({ prop, value }) => {
-    element.style[prop as any] = value;
-  });
-}
-
-export function getCss(element: HTMLElement, property: string): string {
-  return window.getComputedStyle(element).getPropertyValue(property);
-}
-
-export function classnames(classObject: Record<string, boolean>): string {
-  return Object.keys(classObject)
-    .filter(key => classObject[key])
-    .join(' ');
-}
-
-
-
-export function removeClickOutSide(context: any): void {
-  if (context._clickOutsideHandler) {
-    document.removeEventListener('click', context._clickOutsideHandler);
-    context._clickOutsideHandler = null;
-  }
-}
-
-export function ewObjToArray(obj: any): any[] {
-  if (Array.isArray(obj)) {
-    return obj;
-  }
-  if (obj && typeof obj === 'object') {
-    return Array.from(obj);
-  }
-  return [];
-}
 
 // 这些函数已经在base.ts中定义，这里只是重新导出
 export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, isPromise, removeAllSpace, throwError } from './base';
