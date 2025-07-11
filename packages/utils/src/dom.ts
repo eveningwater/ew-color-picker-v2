@@ -266,4 +266,4 @@ export function ewObjToArray(obj: any): any[] {
 }
 
 // 这些函数已经在base.ts中定义，这里只是重新导出
-export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, isPromise, ewAssign, removeAllSpace, ewError } from './base';
+export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, isPromise, removeAllSpace, ewError } from './base';

@@ -15,6 +15,9 @@ import {
   insertNode,
   on,
   off,
+  isString,
+  isObject,
+  $,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -22,6 +25,7 @@ import ewColorPickerMergeOptions, {
   ewColorPickerOptions,
   ewColorPickerConstructorOptions,
   WrapperElement,
+  defaultConfig,
 } from "./mergeOptions";
 
 // 插件构造函数接口
@@ -179,14 +183,39 @@ export default class ewColorPicker extends EventEmitter {
     return ewColorPicker;
   }
 
-  constructor(options: ewColorPickerConstructorOptions) {
+  constructor(options?: ewColorPickerConstructorOptions | string) {
     super(EVENT_TYPES);
     
     // 初始化配置
-    this.options = new ewColorPickerMergeOptions().bindOptions(options, DEFAULT_PLUGINS);
+    this.options = new ewColorPickerMergeOptions().bindOptions(this.normalizeOptions(options), DEFAULT_PLUGINS);
     
     // 初始化实例
     this.init();
+  }
+
+  normalizeOptions(options?: ewColorPickerConstructorOptions | string){
+    if(!isObject(options)){
+       if(isString(options)){
+          const el = $(options as string) as WrapperElement;
+          if(!el){
+            warn(`[ewColorPicker warning]: Cannot find element with selector: ${options}`);
+            return {
+              ...defaultConfig,
+              el: document.body
+            }
+          }
+          return {
+             ...defaultConfig,
+             el
+          }
+       }else{
+         return {
+           ...defaultConfig,
+           el: document.body
+         }
+       }
+    }
+    return options as ewColorPickerConstructorOptions;
   }
 
   private init(): void {

@@ -59,9 +59,8 @@
     <script src="../packages/ewColorPicker/dist/index.js"></script>
 
     <script>
-        // 基础颜色选择器
-        const colorPicker1 = new ewColorPicker({
-            el: document.getElementById('colorPicker1'),
+        const options = {
+            el: document.getElementById('#colorPicker1'),
             hasBox: true,
             hasPanel: true,
             hasInput: true,
@@ -72,7 +71,9 @@
             predefineColor: [],
             // hueDirection: 'horizontal',    // vertical | horizontal
             alphaDirection: 'horizontal',  // vertical | horizontal
-        });
+        }
+        // 基础颜色选择器
+        const colorPicker1 = new ewColorPicker('#colorPicker1');
 
         colorPicker1.on('change', function(color) {
             document.getElementById('result1').textContent = '选择的颜色: ' + color;
