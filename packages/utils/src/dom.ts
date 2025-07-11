@@ -174,6 +174,83 @@ export const getOffset = (el: HTMLElement | null) => {
   };
 };
 
+// 计算面板位置
+export const calculatePanelPosition = (
+  triggerElement: HTMLElement,
+  panelElement: HTMLElement,
+  placement: string = 'bottom',
+  margin: number = 8
+) => {
+  const triggerRect = getRect(triggerElement);
+  const panelRect = getRect(panelElement);
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  let left = 0;
+  let top = 0;
+  
+  // 解析位置字符串
+  const [position, align] = placement.split('-');
+  
+  switch (position) {
+    case 'top':
+      top = triggerRect.top - panelRect.height - margin;
+      if (align === 'start') {
+        left = triggerRect.left;
+      } else if (align === 'end') {
+        left = triggerRect.right - panelRect.width;
+      } else {
+        left = triggerRect.left + (triggerRect.width - panelRect.width) / 2;
+      }
+      break;
+      
+    case 'bottom':
+      top = triggerRect.bottom + margin;
+      if (align === 'start') {
+        left = triggerRect.left;
+      } else if (align === 'end') {
+        left = triggerRect.right - panelRect.width;
+      } else {
+        left = triggerRect.left + (triggerRect.width - panelRect.width) / 2;
+      }
+      break;
+      
+    case 'left':
+      left = triggerRect.left - panelRect.width - margin;
+      if (align === 'start') {
+        top = triggerRect.top;
+      } else if (align === 'end') {
+        top = triggerRect.bottom - panelRect.height;
+      } else {
+        top = triggerRect.top + (triggerRect.height - panelRect.height) / 2;
+      }
+      break;
+      
+    case 'right':
+      left = triggerRect.right + margin;
+      if (align === 'start') {
+        top = triggerRect.top;
+      } else if (align === 'end') {
+        top = triggerRect.bottom - panelRect.height;
+      } else {
+        top = triggerRect.top + (triggerRect.height - panelRect.height) / 2;
+      }
+      break;
+  }
+  
+  // 边界检查，确保面板不超出视口
+  if (left < 0) left = margin;
+  if (top < 0) top = margin;
+  if (left + panelRect.width > viewportWidth) {
+    left = viewportWidth - panelRect.width - margin;
+  }
+  if (top + panelRect.height > viewportHeight) {
+    top = viewportHeight - panelRect.height - margin;
+  }
+  
+  return { left, top };
+};
+
 export const on = (
   el: HTMLElement | Document | Window,
   type: string,

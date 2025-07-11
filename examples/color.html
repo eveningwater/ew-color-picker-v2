@@ -48,6 +48,7 @@
 <body>
     <div class="demo-container">
         <h1>EW Color Picker 插件架构版本</h1>
+        <input type="color" name="" id="">
         <div class="demo-item">
             <div class="demo-title">基础颜色选择器</div>
             <div id="colorPicker1"></div>
@@ -60,7 +61,7 @@
 
     <script>
         const options = {
-            hasBox: false,
+            hasBox: true,
             hasPanel: true,
             hasInput: true,
             hasClear: true,
@@ -70,7 +71,10 @@
             predefineColor: [],
             // hueDirection: 'horizontal',    // vertical | horizontal
             alphaDirection: 'horizontal',  // vertical | horizontal
-            isClickOutside: false,
+            isClickOutside: true,
+            openChangeColorMode: true,
+            autoPanelPosition: true,
+            panelPlacement: 'bottom-start' // 可以设置为: 'top', 'left', 'right', 'bottom', 'top-start', 'top-end', 'left-start', 'left-end', 'right-start', 'right-end', 'bottom-start', 'bottom-end'
         }
         // 基础颜色选择器
         const colorPicker1 = new ewColorPicker({

@@ -1,0 +1,27 @@
+{
+  "name": "@ew-color-picker/colorMode",
+  "version": "1.0.0",
+  "description": "Color mode conversion plugin for ew-color-picker",
+  "main": "dist/colorMode.js",
+  "module": "dist/colorMode.esm.js",
+  "types": "dist/colorMode.d.ts",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "dependencies": {
+    "@ew-color-picker/core": "workspace:*",
+    "@ew-color-picker/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "rollup": "^4.0.0",
+    "rollup-plugin-typescript2": "^0.35.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "color-picker",
+    "color-mode",
+    "plugin"
+  ],
+  "author": "ew-color-picker",
+  "license": "MIT"
+} 

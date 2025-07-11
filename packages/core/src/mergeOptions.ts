@@ -40,6 +40,8 @@ export interface ewColorPickerOptions {
   sureText?: string;
   togglePickerAnimation?: string;
   pickerAnimationTime?: number;
+  autoPanelPosition?: boolean;
+  panelPlacement?: 'top-start' | 'top' | 'top-end' | 'left-start' | 'left' | 'left-end' | 'right-start' | 'right' | 'right-end' | 'bottom-start' | 'bottom' | 'bottom-end';
   sure?: Function;
   clear?: Function;
   togglePicker?: Function;
@@ -71,6 +73,8 @@ export const defaultConfig: Omit<ewColorPickerOptions, "el"> = {
   sureText: "确定",
   togglePickerAnimation: "default",
   pickerAnimationTime: 200,
+  autoPanelPosition: false,
+  panelPlacement: "bottom",
   sure: () => {},
   clear: () => {},
   togglePicker: () => {},
@@ -133,14 +137,6 @@ export default class ewColorPickerMergeOptions
         el: document.body,
         ...pluginNameProp,
       });
-    }
-    
-    // 自动补全 hue/alpha 插件 key
-    if (result.hue && !result.ewColorPickerHue) {
-      result.ewColorPickerHue = {};
-    }
-    if (result.alpha && !result.ewColorPickerAlpha) {
-      result.ewColorPickerAlpha = {};
     }
     return result;
   }

@@ -17,6 +17,8 @@ import {
   off,
   tryErrorHandler,
   extend,
+  calculatePanelPosition,
+  getRect,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -85,11 +87,15 @@ export { ewColorPickerOptions, ewColorPickerConstructorOptions, WrapperElement }
 
 // 插件挂载点顺序枚举
 export enum PluginMountOrder {
+  CONSOLE = 0,       // 控制台日志 - 最优先（用于调试）
   BOX = 1,           // 颜色盒子 - 最外层容器
   PANEL = 2,         // 颜色面板 - 核心选择区域
-  INPUT = 3,         // 输入框 - 颜色值输入
-  BUTTON = 4,        // 按钮 - 确定/清除按钮
-  PREDEFINE = 5,     // 预定义颜色 - 预设颜色列表
+  HUE = 3,           // 色相滑块 - 颜色选择组件
+  ALPHA = 4,         // 透明度滑块 - 颜色选择组件
+  INPUT = 5,         // 输入框 - 颜色值输入
+  BUTTON = 6,        // 按钮 - 确定/清除按钮
+  PREDEFINE = 7,     // 预定义颜色 - 预设颜色列表
+  COLORMODE = 8,     // 颜色模式切换 - 最后（在按钮区域）
 }
 
 // 默认插件配置
@@ -97,19 +103,25 @@ const DEFAULT_PLUGINS = {
   ewColorPickerConsole: true,
   ewColorPickerBox: true,
   ewColorPickerPanel: true,
-  ewColorPickerSlider: true,
   ewColorPickerInput: true,
   ewColorPickerButton: true,
   ewColorPickerPredefine: true,
+  ewColorPickerColorMode: true,
+  ewColorPickerHue: true,
+  ewColorPickerAlpha: true,
 } as const;
 
 // 挂载点名称映射
 const MOUNT_ORDER_MAP: Record<string, number> = {
+  'ewColorPickerConsole': PluginMountOrder.CONSOLE,
   'ewColorPickerBox': PluginMountOrder.BOX,
   'ewColorPickerPanel': PluginMountOrder.PANEL,
+  'ewColorPickerHue': PluginMountOrder.HUE,
+  'ewColorPickerAlpha': PluginMountOrder.ALPHA,
   'ewColorPickerInput': PluginMountOrder.INPUT,
   'ewColorPickerButton': PluginMountOrder.BUTTON,
   'ewColorPickerPredefine': PluginMountOrder.PREDEFINE,
+  'ewColorPickerColorMode': PluginMountOrder.COLORMODE,
 };
 
 // 应用顺序映射
@@ -119,7 +131,7 @@ const APPLY_ORDER_MAP = {
 } as const;
 
 // 事件类型
-const EVENT_TYPES = ["destroy", "change", "sure", "clear", "toggle", "optionsUpdate"];
+const EVENT_TYPES = ["destroy", "change", "sure", "clear", "toggle", "optionsUpdate", "modeChange"];
 
 // 默认动画时间
 const DEFAULT_ANIMATION_TIME = 200;
@@ -258,11 +270,16 @@ export default class ewColorPicker extends EventEmitter {
     const type = animationType || getAnimationType(this);
     const time = duration || this.options.pickerAnimationTime || DEFAULT_ANIMATION_TIME;
     
+    // 自动定位逻辑已移到 panel 插件中
+    
     open(type, panelContainer, time).then(() => {
       this.pickerFlag = true;
       this.trigger('toggle', true);
       
       setTimeout(() => {
+        setTimeout(() => {
+          this.plugins.ewColorPickerPanel.handleAutoPosition();
+        }, 0);
         on(document, 'mousedown', this._onDocumentClick, { capture: true });
       }, 0);
     }).catch(error => {
@@ -282,6 +299,16 @@ export default class ewColorPicker extends EventEmitter {
     
     close(type, panelContainer, time).then(() => {
       if (this.isDestroyed) return;
+      
+      // 重置自动定位样式
+      if (this.options.autoPanelPosition && this.options.hasBox) {
+        setStyle(panelContainer, {
+          position: 'absolute',
+          left: '0',
+          top: '100%',
+          visibility: 'visible'
+        });
+      }
       
       this.pickerFlag = false;
       this.trigger('toggle', false);

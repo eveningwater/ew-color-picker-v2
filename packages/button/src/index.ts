@@ -103,6 +103,9 @@ export default class ewColorPickerButtonPlugin {
       this.setSureText(this.options.sureText || '确定');
       btnGroup.appendChild(this.sureButton);
     }
+    
+    // 根据当前颜色模式调整按钮组样式
+    this.adjustButtonGroupStyle();
   }
 
   bindEvents() {
@@ -119,6 +122,11 @@ export default class ewColorPickerButtonPlugin {
         this.debouncedOnSureColor();
       });
     }
+    
+    // 监听颜色模式变化事件
+    this.ewColorPicker.on('modeChange', () => {
+      this.adjustButtonGroupStyle();
+    });
   }
 
   onClearColor() {
@@ -180,6 +188,46 @@ export default class ewColorPickerButtonPlugin {
     // 清理DOM引用
     this.clearButton = null;
     this.sureButton = null;
+  }
+
+  // 根据颜色模式调整按钮组样式
+  adjustButtonGroupStyle() {
+    const panelContainer = this.ewColorPicker.getMountPoint('panelContainer');
+    if (!panelContainer) return;
+    
+    const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
+    if (!bottomRow) return;
+    
+    const btnGroup = $('.ew-color-picker-drop-btn-group', bottomRow);
+    if (!btnGroup) return;
+    
+    // 检查当前颜色模式
+    const hasMultipleInputs = $('.ew-color-picker-inputs-group', panelContainer) !== null;
+    
+    if (hasMultipleInputs) {
+      // HSL 或 RGB 模式：按钮组占据一行并居中
+      setStyle(btnGroup, {
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '8px',
+        width: '100%',
+        marginTop: '8px'
+      });
+      setStyle(bottomRow, {
+        flexDirection: 'column',
+        alignItems: 'stretch'
+      });
+    } else {
+      // HEX 模式：按钮组正常布局
+      setStyle(btnGroup, {
+        display: 'flex',
+        gap: '4px'
+      });
+      setStyle(bottomRow, {
+        flexDirection: 'row',
+        alignItems: 'center'
+      });
+    }
   }
 }
 

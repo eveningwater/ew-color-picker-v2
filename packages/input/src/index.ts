@@ -82,8 +82,30 @@ export default class ewColorPickerInputPlugin {
       return;
     }
     
+    // 查找按钮组容器（清空和确认按钮的父元素）
+    let btnGroup = $('.ew-color-picker-drop-btn-group', bottomRow);
+    
+    // 查找或创建 input 容器
+    let inputContainer = $('.ew-color-picker-input-container', bottomRow);
+    if (!inputContainer) {
+      inputContainer = create('div');
+      addClass(inputContainer, 'ew-color-picker-input-container');
+      setStyle(inputContainer, {
+        flex: '1',
+        minWidth: '0'
+      });
+      
+      // 如果存在按钮组，插入到按钮组之前
+      if (btnGroup && btnGroup.parentNode) {
+        btnGroup.parentNode.insertBefore(inputContainer, btnGroup);
+      } else {
+        // 如果没有按钮组，直接插入到 bottomRow
+        insertNode(bottomRow, inputContainer);
+      }
+    }
+    
     // 查找已存在的 input 元素，避免重复插入
-    this.input = $('input.ew-color-picker-input', bottomRow) as HTMLInputElement;
+    this.input = $('input.ew-color-picker-input', inputContainer) as HTMLInputElement;
     if (!this.input) {
       this.input = create<HTMLInputElement>('input');
       if (this.input) {
@@ -93,8 +115,9 @@ export default class ewColorPickerInputPlugin {
           name: 'ew-color-picker-input',
           placeholder: '请输入颜色值'
         });
-        // 直接插入到 bottomRow
-        insertNode(bottomRow, this.input);
+        
+        // 插入到 input 容器中
+        inputContainer.appendChild(this.input);
       }
     }
     

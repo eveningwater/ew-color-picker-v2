@@ -60,7 +60,9 @@ export const clone = function f<T>(obj: T) {
     }
     const res = (isArray(obj) ? [] : {}) as T;
     for (const k in obj) {
-        res[k] = isShallowObject(obj[k]) ? f(obj[k]) : obj[k];
+        if (obj.hasOwnProperty(k)) {
+            (res as any)[k] = isShallowObject((obj as any)[k]) ? f((obj as any)[k]) : (obj as any)[k];
+        }
     }
     return res;
 }
@@ -76,6 +78,13 @@ export const removeAllSpace = (value: string) => value.replace(/\s+/g, "");
  * @returns
  */
 export const isPromise = <T extends Promise<unknown>>(value: T) => !isUndefined(value) && !isNull(value) && isFunction(value.then) && isFunction(value.catch);
+
+/**
+ * 处理类名
+ * @param c 
+ * @returns 
+ */
+export const handleClassName = (c?: string) => (c ? ` ${c}` : "");
 
 // 重新导出type.ts中的函数
 export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, throwError } from './type';
