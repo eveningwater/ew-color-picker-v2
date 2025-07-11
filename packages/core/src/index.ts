@@ -16,6 +16,7 @@ import {
   on,
   off,
   tryErrorHandler,
+  extend,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -118,7 +119,7 @@ const APPLY_ORDER_MAP = {
 } as const;
 
 // 事件类型
-const EVENT_TYPES = ["destroy", "change", "sure", "clear", "toggle"];
+const EVENT_TYPES = ["destroy", "change", "sure", "clear", "toggle", "optionsUpdate"];
 
 // 默认动画时间
 const DEFAULT_ANIMATION_TIME = 200;
@@ -345,12 +346,49 @@ export default class ewColorPicker extends EventEmitter {
     });
   }
 
+  // 更新现有插件的配置
+  private updateExistingPlugins(): void {
+    Object.values(this.plugins).forEach((plugin) => {
+      tryErrorHandler(() => {
+        if (plugin?.updateOptions && isFunction(plugin.updateOptions)) {
+          plugin.updateOptions();
+        }
+      });
+    });
+  }
+
   // 公共方法
   public updateColor(color: string): void {
     if (this.isDestroyed) return;
     
     this.currentColor = color;
     this.trigger('change', color);
+  }
+
+  // 更新配置并重新渲染
+  public updateOptions(newOptions: Record<string, any>): void {
+    if (this.isDestroyed) return;
+    
+    // 保存原有的 el 属性
+    const originalEl = this.options.el;
+    
+    // 合并新配置
+    this.options = extend({}, this.options, newOptions) as ewColorPickerMergeOptionsData;
+    
+    // 确保 el 属性不被覆盖
+    this.options.el = originalEl;
+    
+    // 重新应用插件
+    this.reapplyPlugins();
+    
+    // 触发配置更新事件
+    this.trigger('optionsUpdate', this.options);
+  }
+
+  // 重新应用插件
+  private reapplyPlugins(): void {
+    // 更新现有插件的配置
+    this.updateExistingPlugins();
   }
 
   public openPicker(): void {

@@ -43,6 +43,12 @@ export default class ewColorPickerButtonPlugin {
     this.options = extend({}, this.options, this.ewColorPicker.options);
   }
 
+  // 更新配置并重新渲染
+  updateOptions(): void {
+    this.handleOptions();
+    this.render();
+  }
+
   run() {
     this.render();
     this.bindEvents();
@@ -64,31 +70,31 @@ export default class ewColorPickerButtonPlugin {
     }
     
     // 查找或创建按钮容器
-    const btnGroup = $('.ew-color-drop-btn-group', bottomRow);
+    let btnGroup = $('.ew-color-picker-drop-btn-group', bottomRow);
     if (!btnGroup) {
-      const btnGroup = create('div');
-      addClass(btnGroup, 'ew-color-drop-btn-group');
+      btnGroup = create('div');
+      addClass(btnGroup, 'ew-color-picker-drop-btn-group');
       // 直接插入到 bottomRow
       insertNode(bottomRow, btnGroup);
     }
     
     // 清空旧内容
-    btnGroup!.innerHTML = '';
+    btnGroup.innerHTML = '';
     
     // 渲染清空按钮
     if (this.options.hasClear) {
       this.clearButton = create<HTMLButtonElement>('button');
-      addClass(this.clearButton, 'ew-color-clear ew-color-drop-btn');
+      addClass(this.clearButton, 'ew-color-picker-clear-btn ew-color-picker-drop-btn');
       this.setClearText(this.options.clearText || '清空');
-      btnGroup!.appendChild(this.clearButton);
+      btnGroup.appendChild(this.clearButton);
     }
     
     // 渲染确定按钮
     if (this.options.hasSure) {
       this.sureButton = create<HTMLButtonElement>('button');
-      addClass(this.sureButton, 'ew-color-sure ew-color-drop-btn');
+      addClass(this.sureButton, 'ew-color-picker-sure-btn ew-color-picker-drop-btn');
       this.setSureText(this.options.sureText || '确定');
-      btnGroup!.appendChild(this.sureButton);
+      btnGroup.appendChild(this.sureButton);
     }
   }
 

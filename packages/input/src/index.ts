@@ -34,6 +34,20 @@ export default class ewColorPickerInputPlugin {
     this.options = Object.assign({}, this.options, this.ewColorPicker.options);
   }
 
+  // 更新配置并重新渲染
+  updateOptions(): void {
+    this.handleOptions();
+    if (this.options.hasInput) {
+      this.render();
+    } else {
+      // 如果禁用了输入框，移除DOM
+      if (this.input && this.input.parentNode) {
+        this.input.parentNode.removeChild(this.input);
+        this.input = null;
+      }
+    }
+  }
+
   run() {
     // options 已经通过 mergeOptions 完成了合并，直接使用即可
     if (this.options.hasInput) {
@@ -58,10 +72,10 @@ export default class ewColorPickerInputPlugin {
     }
     
     // 查找已存在的 input 元素，避免重复插入
-    this.input = bottomRow.querySelector('input.ew-color-input') as HTMLInputElement;
+    this.input = bottomRow.querySelector('input.ew-color-picker-input') as HTMLInputElement;
     if (!this.input) {
       this.input = document.createElement('input');
-      this.input.className = 'ew-color-input';
+      this.input.className = 'ew-color-picker-input';
       this.input.type = 'text';
       this.input.placeholder = '请输入颜色值';
       // 直接插入到 bottomRow

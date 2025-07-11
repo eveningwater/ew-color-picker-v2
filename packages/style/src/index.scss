@@ -16,7 +16,7 @@
 
 // 相对定位元素
 .ew-color-picker-alpha-slider-bar,
-.ew-color-drop-container,
+.ew-color-picker-drop-container,
 .ew-color-mode-container .ew-color-mode-down,
 .ew-color-mode-container .ew-color-mode-up,
 .ew-color-picker-panel,
@@ -30,8 +30,8 @@
 
 // 盒模型
 .ew-color-picker-alpha-slider-thumb,
-.ew-color-drop-btn,
-.ew-color-input,
+.ew-color-picker-drop-btn,
+.ew-color-picker-input,
 .ew-color-picker-no,
 .ew-color-picker-slider,
 .ew-color-picker-slider-thumb {
@@ -41,7 +41,7 @@
 // 鼠标指针
 .ew-color-picker-alpha-slider-bar,
 .ew-color-picker-alpha-slider-thumb,
-.ew-color-drop-btn,
+.ew-color-picker-drop-btn,
 .ew-color-picker-panel,
 .ew-color-picker-box,
 .ew-color-picker-slider-bar,
@@ -51,26 +51,26 @@
 }
 
 // 背景色
-.ew-color-input,
+.ew-color-picker-input,
 .ew-color-picker-panel-container,
 .ew-color-picker-arrow-left,
 .ew-color-picker-arrow-right,
 .ew-color-picker-box,
-.ew-color-sure {
+.ew-color-picker-sure-btn {
   background-color: #fff;
 }
 
 // 轮廓
-.ew-color-drop-btn,
-.ew-color-input,
+.ew-color-picker-drop-btn,
+.ew-color-picker-input,
 .ew-color-picker-box,
 .ew-pre-define-color {
   outline: none;
 }
 
 // 显示方式
-.ew-color-drop-btn,
-.ew-color-input,
+.ew-color-picker-drop-btn,
+.ew-color-picker-input,
 .ew-color-picker-arrow-left,
 .ew-color-picker-arrow-right,
 .ew-color-picker-box {
@@ -93,7 +93,7 @@
 }
 
 // 文本对齐
-.ew-color-drop-btn,
+.ew-color-picker-drop-btn,
 .ew-color-picker-no {
   text-align: center;
 }
@@ -261,7 +261,7 @@
 }
 
 // 底部容器
-.ew-color-drop-container {
+.ew-color-picker-drop-container {
   margin-top: 6px;
   padding-top: 4px;
   min-height: 28px;
@@ -269,7 +269,7 @@
 }
 
 // 模式容器输入框
-.ew-has-mode-container .ew-color-input {
+.ew-has-mode-container .ew-color-picker-input {
   width: 210px;
 }
 
@@ -291,17 +291,17 @@
   min-width: 0;
   box-sizing: border-box;
 }
-.ew-color-drop-btn-group {
+.ew-color-picker-drop-btn-group {
   display: flex;
   gap: 2px;
 }
-.ew-color-drop-btn-group button {
+.ew-color-picker-drop-btn-group button {
   min-width: 60px;
   box-sizing: border-box;
 }
 
 // 输入框样式
-.ew-color-input {
+.ew-color-picker-input {
   width: 180px;
   height: 32px;
   line-height: 32px;
@@ -312,13 +312,13 @@
   transition: border-color 0.2s;
   outline: none;
 }
-.ew-color-input:focus {
+.ew-color-picker-input:focus {
   border-color: #4096ef;
 }
 
 
 // 按钮
-.ew-color-drop-btn {
+.ew-color-picker-drop-btn {
   padding: 5px;
   font-size: 12px;
   border-radius: 3px;
@@ -332,7 +332,7 @@
 }
 
 // 清空按钮
-.ew-color-clear {
+.ew-color-picker-clear-btn {
   color: #4096ef;
   border-color: transparent;
   background-color: transparent;
@@ -341,15 +341,15 @@
 }
 
 // 清空按钮悬停
-.ew-color-clear:active,
-.ew-color-clear:hover {
+.ew-color-picker-clear-btn:active,
+.ew-color-picker-clear-btn:hover {
   color: #66b1ff;
 }
 
 
 // 确定按钮悬停
-.ew-color-sure:active,
-.ew-color-sure:hover {
+.ew-color-picker-sure-btn:active,
+.ew-color-picker-sure-btn:hover {
   border-color: #4096ef;
   color: #4096ef;
 }
@@ -438,7 +438,7 @@
 }
 
 // 禁用状态
-.ew-color-input.ew-input-disabled,
+.ew-color-picker-input.ew-input-disabled,
 .ew-color-picker-box-disabled {
   background-color: #ebe7e7;
   cursor: not-allowed;
@@ -535,7 +535,7 @@
     width: 200px;
     height: 120px;
   }
-  .ew-color-input {
+  .ew-color-picker-input {
     width: 120px;
   }
   .ew-pre-define-color-container {
