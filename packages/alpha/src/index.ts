@@ -1,4 +1,4 @@
-import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off } from "@ew-color-picker/utils";
+import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off, getRect } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
 import ewColorPicker,{ ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -15,7 +15,6 @@ export default class ewColorPickerAlphaPlugin {
   isHorizontal: boolean = false;
 
   constructor(public ewColorPicker: ewColorPicker) {
-    this.ewColorPicker = ewColorPicker;
     this.handleOptions();
     this.run();
   }
@@ -39,22 +38,22 @@ export default class ewColorPickerAlphaPlugin {
       return;
     }
     // 移除旧的 alpha 条
-    const oldAlpha = panelContainer.querySelector('.ew-color-picker-slider.ew-alpha');
+    const oldAlpha = $('.ew-color-picker-slider.ew-alpha', panelContainer);
     if (oldAlpha) panelContainer.removeChild(oldAlpha);
     // 创建 alpha 条
     const alphaSlider = create('div');
-    alphaSlider.className = 'ew-color-picker-slider ew-alpha ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical');
+    addClass(alphaSlider, 'ew-color-picker-slider ew-alpha ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical'));
     this.alphaBar = create('div');
-    this.alphaBar.className = 'ew-color-picker-alpha-slider-bar';
+    addClass(this.alphaBar, 'ew-color-picker-alpha-slider-bar');
     // 背景层
     const alphaWrapper = create('div');
-    alphaWrapper.className = 'ew-color-picker-alpha-slider-wrapper';
+    addClass(alphaWrapper, 'ew-color-picker-alpha-slider-wrapper');
     this.alphaBar.appendChild(alphaWrapper);
     const alphaBg = create('div');
-    alphaBg.className = 'ew-color-picker-alpha-slider-bg';
+    addClass(alphaBg, 'ew-color-picker-alpha-slider-bg');
     this.alphaBar.appendChild(alphaBg);
     this.alphaThumb = create('div');
-    this.alphaThumb.className = 'ew-color-picker-alpha-slider-thumb';
+    addClass(this.alphaThumb, 'ew-color-picker-alpha-slider-thumb');
     this.alphaBar.appendChild(this.alphaThumb);
     alphaSlider.appendChild(this.alphaBar);
 
@@ -114,12 +113,12 @@ export default class ewColorPickerAlphaPlugin {
       this.updateAlpha(alpha);
     };
     const upHandler = () => {
-      document.removeEventListener('mousemove', moveHandler);
-      document.removeEventListener('mouseup', upHandler);
+      off(document, 'mousemove', moveHandler as EventListener);
+      off(document, 'mouseup', upHandler);
     };
-    document.addEventListener('mousemove', moveHandler);
-    document.addEventListener('mouseup', upHandler);
-  }
+    on(document, 'mousemove', moveHandler as EventListener);
+    on(document, 'mouseup', upHandler as EventListener);
+  } 
 
   updateAlpha(alpha: number) {
     // 只更新 alpha，保持 h/s/v 不变
@@ -134,7 +133,7 @@ export default class ewColorPickerAlphaPlugin {
   updateAlphaThumbPosition(alpha: number) {
     if (!this.alphaThumb || !this.alphaBar) return;
     const isHorizontal = this.isHorizontal;
-    const rect = this.alphaBar.getBoundingClientRect();
+    const rect = getRect(this.alphaBar);
     if (isHorizontal) {
       const x = Math.max(0, Math.min(rect.width, (1 - alpha) * rect.width));
       setStyle(this.alphaThumb, 'left', `${x}px`);

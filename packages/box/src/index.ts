@@ -11,7 +11,9 @@ import {
   toStyleStr,
   addClass,
   removeClass,
-  warn
+  warn,
+  create,
+  $
 } from "@ew-color-picker/utils";
 import { ewColorPickerMergeOptionsData } from "packages/core/src/mergeOptions";
 import { PartialBoxProps } from "./type";
@@ -84,12 +86,12 @@ export default class ewColorPickerBoxPlugin {
     }
     
     // 查找或创建盒子容器
-    this.box = rootElement.querySelector(".ew-color-picker-box") as HTMLDivElement;
+    this.box = $('.ew-color-picker-box', rootElement);
     if (!this.box) {
-      this.box = document.createElement("div");
-      this.box.className = "ew-color-picker-box";
+      this.box = create("div");
+      addClass(this.box, "ew-color-picker-box");
       if (className) addClass(this.box, className);
-      if (style) this.box.setAttribute("style", typeof style === "string" ? style : toStyleStr(style));
+      if (style) setStyle(this.box, style);
       insertNode(rootElement, this.box);
     }
     
