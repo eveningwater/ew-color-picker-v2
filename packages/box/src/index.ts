@@ -8,7 +8,6 @@ import {
   off,
   removeStyle,
   setStyle,
-  toStyleStr,
   addClass,
   removeClass,
   warn,
