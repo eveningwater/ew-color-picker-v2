@@ -52,7 +52,7 @@ import '@ew-color-picker/style';
 │   │   ├── .ew-color-picker-panel
 │   │   └── .ew-color-picker-slider
 │   ├── .ew-color-drop-container
-│   └── .ew-pre-define-color-container
+│   └── .ew-color-picker-predefine-container
 ```
 
 ## 许可证

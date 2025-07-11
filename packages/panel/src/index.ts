@@ -10,6 +10,8 @@ import {
   off,
   $,
   removeNode,
+  create,
+  addClass,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba, colorRgbaToHex } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -84,10 +86,12 @@ export default class ewColorPickerPanelPlugin {
     if((this.isAlphaHorizontal && !this.isHueHorizontal) || (!this.isAlphaHorizontal && this.isHueHorizontal)){
       panelWidth = 285 + 12;
     }
-    this.panel = document.createElement('div');
-    this.panel.className = 'ew-color-picker-panel';
-    this.panel.style.width = panelWidth + 'px';
-    this.panel.style.height = '180px';
+    this.panel = create('div');
+    addClass(this.panel, 'ew-color-picker-panel');
+    setStyle(this.panel, {
+      width: panelWidth + 'px',
+      height: '180px'
+    });
 
     this.panelWidth = panelWidth;
     this.panelHeight = 180;
@@ -95,24 +99,24 @@ export default class ewColorPickerPanelPlugin {
     panelContainer.appendChild(this.panel);
 
     // 渲染白色和黑色渐变层
-    this.whitePanel = document.createElement('div');
-    this.whitePanel.className = 'ew-color-picker-white-panel';
+    this.whitePanel = create('div');
+    addClass(this.whitePanel, 'ew-color-picker-white-panel');
     this.panel.appendChild(this.whitePanel);
     
-    this.blackPanel = document.createElement('div');
-    this.blackPanel.className = 'ew-color-picker-black-panel';
+    this.blackPanel = create('div');
+    addClass(this.blackPanel, 'ew-color-picker-black-panel');
     this.panel.appendChild(this.blackPanel);
     
     // 渲染光标
-    this.cursor = document.createElement('div');
-    this.cursor.className = 'ew-color-picker-panel-cursor';
+    this.cursor = create('div');
+    addClass(this.cursor, 'ew-color-picker-panel-cursor');
     this.panel.appendChild(this.cursor);
 
     // 创建底部行容器（只插入一次）
-    let bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row');
+    let bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
     if (!bottomRow) {
-      bottomRow = document.createElement('div');
-      bottomRow.className = 'ew-color-picker-bottom-row';
+      bottomRow = create('div');
+      addClass(bottomRow, 'ew-color-picker-bottom-row');
       panelContainer.appendChild(bottomRow);
     }
 

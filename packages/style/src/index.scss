@@ -46,7 +46,7 @@
 .ew-color-picker-box,
 .ew-color-picker-slider-bar,
 .ew-color-picker-slider-thumb,
-.ew-pre-define-color {
+.ew-color-picker-predefine-color {
   cursor: pointer;
 }
 
@@ -64,7 +64,7 @@
 .ew-color-picker-drop-btn,
 .ew-color-picker-input,
 .ew-color-picker-box,
-.ew-pre-define-color {
+.ew-color-picker-predefine-color {
   outline: none;
 }
 
@@ -79,7 +79,7 @@
 
 // 清除浮动
 .ew-color-picker-panel-container .ew-color-picker-content:after,
-.ew-pre-define-color-container:after {
+.ew-color-picker-predefine-container:after {
   content: "";
   display: table;
   clear: both;
@@ -88,7 +88,7 @@
 // 浮动
 .ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-alpha-slider-bar,
 .ew-color-picker-slider.ew-color-picker-is-vertical .ew-color-picker-slider-bar,
-.ew-pre-define-color {
+.ew-color-picker-predefine-color {
   float: left;
 }
 
@@ -219,7 +219,7 @@
 
 // 透明度背景
 .ew-color-picker-alpha-slider-wrapper,
-.ew-pre-define-color.ew-has-alpha {
+.ew-color-picker-predefine-color.ew-color-picker-has-alpha {
   background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==");
 }
 
@@ -355,20 +355,20 @@
 }
 
 // 预定义颜色容器
-.ew-pre-define-color-container {
+.ew-color-picker-predefine-container {
   width: 280px;
   font-size: 12px;
   margin-top: 12px;
 }
 
 // 预定义颜色容器清除浮动
-.ew-pre-define-color-container:after {
+.ew-color-picker-predefine-container:after {
   visibility: hidden;
   height: 0;
 }
 
 // 预定义颜色项
-.ew-pre-define-color {
+.ew-color-picker-predefine-color {
   margin: 0 0 8px 8px;
   width: 20px;
   height: 20px;
@@ -377,29 +377,29 @@
 }
 
 // 预定义颜色项内容
-.ew-pre-define-color-item {
+.ew-color-picker-predefine-color-item {
   height: 100%;
   border-radius: 3px;
 }
 
 // 预定义颜色禁用
-.ew-pre-define-color.ew-pre-define-color-disabled {
+.ew-color-picker-predefine-color.ew-color-picker-predefine-color-disabled {
   cursor: not-allowed;
 }
 
 // 预定义颜色换行
-.ew-pre-define-color:nth-child(10n+1) {
+.ew-color-picker-predefine-color:nth-child(10n+1) {
   margin-left: 0;
 }
 
 // 预定义颜色悬停
-.ew-pre-define-color:not(.ew-pre-define-color-disabled):active,
-.ew-pre-define-color:not(.ew-pre-define-color-disabled):hover {
+.ew-color-picker-predefine-color:not(.ew-color-picker-predefine-color-disabled):active,
+.ew-color-picker-predefine-color:not(.ew-color-picker-predefine-color-disabled):hover {
   opacity: 0.8;
 }
 
 // 预定义颜色激活
-.ew-pre-define-color-active {
+.ew-color-picker-predefine-color-active {
   box-shadow: 0 0 3px 2px #409eff;
 }
 
@@ -538,7 +538,7 @@
   .ew-color-picker-input {
     width: 120px;
   }
-  .ew-pre-define-color-container {
+  .ew-color-picker-predefine-container {
     width: 200px;
   }
 }
