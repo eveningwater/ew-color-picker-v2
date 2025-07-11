@@ -60,8 +60,7 @@
 
     <script>
         const options = {
-            el: document.getElementById('#colorPicker1'),
-            hasBox: true,
+            hasBox: false,
             hasPanel: true,
             hasInput: true,
             hasClear: true,
@@ -71,9 +70,13 @@
             predefineColor: [],
             // hueDirection: 'horizontal',    // vertical | horizontal
             alphaDirection: 'horizontal',  // vertical | horizontal
+            isClickOutside: false,
         }
         // 基础颜色选择器
-        const colorPicker1 = new ewColorPicker('#colorPicker1');
+        const colorPicker1 = new ewColorPicker({
+            el: '#colorPicker1',
+            ...options,
+        });
 
         colorPicker1.on('change', function(color) {
             document.getElementById('result1').textContent = '选择的颜色: ' + color;
@@ -81,12 +84,27 @@
 
         colorPicker1.on('sure', function(color) {
             colorPicker1.closePicker();
-            console.log('点击了确定，当前颜色为：' + color);
+            console.log('🎯 用户确认颜色选择', color);
         });
 
         colorPicker1.on('toggle', function(flag) {
-            console.log('面板状态变化:', flag ? '显示' : '隐藏');
+            console.log('🔄 面板状态变化:', flag ? '显示' : '隐藏');
         });
+
+        // 添加一些测试日志来展示新样式
+        console.log('🎨 EW Color Picker 已初始化', {
+            version: '2.0.0',
+            features: ['panel', 'hue', 'alpha', 'input', 'buttons']
+        });
+        
+        // 模拟一些警告和错误情况
+        setTimeout(() => {
+            console.warn('⚠️ 这是一个示例警告信息');
+        }, 2000);
+        
+        setTimeout(() => {
+            console.error('❌ 这是一个示例错误信息');
+        }, 4000);
     </script>
 </body>
 </html>

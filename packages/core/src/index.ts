@@ -18,6 +18,8 @@ import {
   isString,
   isObject,
   $,
+  error,
+  tryErrorHandler,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -187,39 +189,14 @@ export default class ewColorPicker extends EventEmitter {
     super(EVENT_TYPES);
     
     // 初始化配置
-    this.options = new ewColorPickerMergeOptions().bindOptions(this.normalizeOptions(options), DEFAULT_PLUGINS);
+    this.options = new ewColorPickerMergeOptions().bindOptions(options, DEFAULT_PLUGINS);
     
     // 初始化实例
     this.init();
   }
 
-  normalizeOptions(options?: ewColorPickerConstructorOptions | string){
-    if(!isObject(options)){
-       if(isString(options)){
-          const el = $(options as string) as WrapperElement;
-          if(!el){
-            warn(`[ewColorPicker warning]: Cannot find element with selector: ${options}`);
-            return {
-              ...defaultConfig,
-              el: document.body
-            }
-          }
-          return {
-             ...defaultConfig,
-             el
-          }
-       }else{
-         return {
-           ...defaultConfig,
-           el: document.body
-         }
-       }
-    }
-    return options as ewColorPickerConstructorOptions;
-  }
-
   private init(): void {
-    try {
+    tryErrorHandler(() => {
       this.wrapper = this.options.el;
       this.wrapper.isEwColorPickerContainer = true;
       
@@ -230,9 +207,7 @@ export default class ewColorPicker extends EventEmitter {
       this.initCoreProperties();
       this.createMountPoints();
       this.applyPlugins();
-    } catch (error) {
-      warn(`[ewColorPicker error]: Failed to initialize color picker: ${error}`);
-    }
+    });
   }
 
   private initCoreProperties(): void {
@@ -290,10 +265,12 @@ export default class ewColorPicker extends EventEmitter {
       this.pickerFlag = true;
       this.trigger('toggle', true);
       
-      // 延迟绑定外部点击事件，避免立即触发
-      setTimeout(() => {
+      // 只有当 isClickOutside 为 true 时才绑定外部点击事件
+      if (this.options.isClickOutside !== false) {
+        setTimeout(() => {
           on(document, 'mousedown', this._onDocumentClick, { capture: true });
-      }, 0);
+        }, 0);
+      }
     }).catch(error => {
       warn(`[ewColorPicker error]: Failed to show panel: ${error}`);
     });
@@ -367,13 +344,11 @@ export default class ewColorPicker extends EventEmitter {
 
     // 实例化插件
     sortedPlugins.forEach(({ ctor, name }) => {
-      try {
+      tryErrorHandler(() => {
         if (this.options[name] && isFunction(ctor)) {
           this.plugins[name] = new ctor(this);
         }
-      } catch (error) {
-        warn(`[ewColorPicker error]: Failed to instantiate plugin '${name}': ${error}`);
-      }
+      });
     });
   }
 
@@ -403,31 +378,25 @@ export default class ewColorPicker extends EventEmitter {
     
     // 销毁所有插件
     Object.values(this.plugins).forEach((plugin) => {
-      try {
+      tryErrorHandler(() => {
         if (plugin?.destroy && isFunction(plugin.destroy)) {
           plugin.destroy();
         }
-      } catch (error) {
-        warn(`[ewColorPicker error]: Failed to destroy plugin: ${error}`);
-      }
+      });
     });
     
     // 清理所有挂载点
     this.mountPoints.forEach(el => {
-      try {
+      tryErrorHandler(() => {
         removeElement(el);
-      } catch (error) {
-        warn(`[ewColorPicker error]: Failed to remove mount point: ${error}`);
-      }
+      });
     });
     this.mountPoints.clear();
     
     // 清理主容器
-    try {
+    tryErrorHandler(() => {
       removeElement(this.wrapper);
-    } catch (error) {
-      warn(`[ewColorPicker error]: Failed to remove wrapper: ${error}`);
-    }
+    });
     
     // 清理插件引用
     this.plugins = {};

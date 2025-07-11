@@ -1,4 +1,4 @@
-import { isShallowObject, isString, isFunction, isUndefined } from "./type";
+import { isShallowObject, isString, isFunction, isUndefined, tryErrorHandler } from "./type";
 import { supportsPassive } from "./env";
 import { extend } from "./base";
 import { eventType } from "./const";
@@ -74,14 +74,14 @@ export const getStyle = (
   if (styleName === "float") {
     styleName = "cssFloat";
   }
-  try {
+  let result = null;
+  tryErrorHandler(() => {
     const computed = document.defaultView
       ? document.defaultView.getComputedStyle(el, pseudoElt)
       : window.getComputedStyle(el, pseudoElt);
-    return el.style[styleName] || computed ? computed[styleName] : null;
-  } catch (e) {
-    return el.style[styleName];
-  }
+    result = el.style[styleName] || computed ? computed[styleName] : null;
+  });
+  return result || el.style[styleName];
 };
 // export const getStyle = (el: HTMLElement, prop: keyof CSSStyleDeclaration, pseudoElt?: string) => window.getComputedStyle(el, pseudoElt)[prop];
 export const setAttr = <T>(el: HTMLElement, values: Record<string, T>) => {
@@ -112,8 +112,8 @@ export const insertNode = (el: HTMLElement, node: Node, oldNode?: Node | null) =
   }
 };
 export const checkContainer = (el: string | HTMLElement): HTMLElement => {
-  if (typeof el === 'string') {
-    const element = document.querySelector(el);
+  if (isString(el)) {
+    const element = $(el);
     if (!element) {
       warn(`[ewColorPicker warning]: Cannot find element with selector: ${el}`);
       return document.body;
@@ -266,4 +266,4 @@ export function ewObjToArray(obj: any): any[] {
 }
 
 // 这些函数已经在base.ts中定义，这里只是重新导出
-export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, isPromise, removeAllSpace, ewError } from './base';
+export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, isPromise, removeAllSpace, throwError } from './base';

@@ -1,47 +1,53 @@
+import { error } from "./assert";
 import { _toString } from "./const";
 
-const noop = function () { return true };
-export const basicDataTypeList = ["Number", "String", "Function", "Undefined", "Boolean"] as const;
-export const objDataTypeList = ["Object", "Array", "RegExp"] as const;
-export type TypeKey = typeof basicDataTypeList[number] | typeof objDataTypeList[number];
-export type IsTypeUtil = Record<`is${TypeKey}`, <T>(v: T) => boolean>;
-export interface AllTypeRes extends IsTypeUtil {
-    isNull: <T>(v: T) => boolean
-    isShallowObject: <T>(v: T) => boolean
-};
-const res: AllTypeRes = {
-    isNull: v => v === null,
-    isShallowObject: v => typeof v === 'object' && !res.isNull!(v),
-    isNumber: noop,
-    isString: noop,
-    isFunction: noop,
-    isUndefined: noop,
-    isBoolean: noop,
-    isObject: noop,
-    isArray: noop,
-    isRegExp: noop
-};
-basicDataTypeList.forEach(type => res[`is${type}`] = (value) => typeof value === type.toLowerCase());
-objDataTypeList.forEach(type => res[`is${type}`] = (value) => _toString.call(value).slice(8, -1).toLowerCase() === type.toLowerCase());
-export const isNull = res.isNull;
-export const isShallowObject = res.isShallowObject;
-export const isNumber = res.isNumber;
-export const isString = res.isString;
-export const isFunction = res.isFunction;
-export const isUndefined = res.isUndefined;
-export const isBoolean = res.isBoolean;
-export const isObject = res.isObject;
-export const isRegExp = res.isRegExp;
-export const isArray = res.isArray;
+// 基础类型守卫函数
+export const isNull = <T>(v: T): v is Extract<T, null> => v === null;
 
-// 添加缺失的函数
+export const isUndefined = <T>(v: T): v is Extract<T, undefined> => typeof v === 'undefined';
+
+export const isString = (v: any): v is string => typeof v === 'string';
+
+export const isNumber = (v: any): v is number => typeof v === 'number';
+
+export const isBoolean = (v: any): v is boolean => typeof v === 'boolean';
+
+export const isFunction = (v: any): v is Function => typeof v === 'function';
+
+// 对象类型守卫函数
+export const isShallowObject = <T>(v: T): v is Extract<T, object> => 
+  typeof v === 'object' && !isNull(v);
+
+export const isObject = (v: any): v is object => 
+  _toString.call(v).slice(8, -1).toLowerCase() === 'object';
+
+export const isArray = (v: any): v is any[] => 
+  _toString.call(v).slice(8, -1).toLowerCase() === 'array';
+
+export const isRegExp = (v: any): v is RegExp => 
+  _toString.call(v).slice(8, -1).toLowerCase() === 'regexp';
+
+// 深度类型检查函数
 export const isDeepArray = (value: any): value is any[] => Array.isArray(value);
 
 export const isDeepObject = (value: any): value is object => 
   value !== null && typeof value === 'object' && !Array.isArray(value);
 
-
-
-export const ewError = (message: string): never => {
+// 错误处理函数
+export const throwError = (message: string): never => {
   throw new Error(`[ewColorPicker error]: ${message}`);
 };
+
+export const tryErrorHandler = (fn: () => void) => {
+  try {
+    fn();
+  } catch (err) {
+    error(`[ewColorPicker error]: ${err}`);
+  }
+};
+
+// 为了向后兼容，保留原有的类型定义
+export const basicDataTypeList = ["Number", "String", "Function", "Undefined", "Boolean"] as const;
+export const objDataTypeList = ["Object", "Array", "RegExp"] as const;
+export type TypeKey = typeof basicDataTypeList[number] | typeof objDataTypeList[number];
+export type IsTypeUtil = Record<`is${TypeKey}`, <T>(v: T) => boolean>;

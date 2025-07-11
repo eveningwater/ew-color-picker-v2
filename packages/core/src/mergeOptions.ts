@@ -2,6 +2,7 @@ import {
   checkContainer,
   extend,
   isShallowObject,
+  isString,
 } from "@ew-color-picker/utils";
 
 // 定义类型接口，避免循环导入
@@ -103,24 +104,37 @@ export default class ewColorPickerMergeOptions
     super();
   }
   merge(
-    options?: ewColorPickerConstructorOptions,
+    options?: ewColorPickerConstructorOptions | string,
     pluginNameProp?: ewColorPickerBindPluginOptions
   ): ewColorPickerOptions {
     let result: any;
-    if (isShallowObject(options)) {
+    
+    // 处理字符串选择器的情况
+    if (isString(options)) {
+      const el = checkContainer(options as string);
+      result = extend(defaultConfig, {
+        el,
+        ...pluginNameProp,
+      });
+    }
+    // 处理对象配置的情况
+    else if (isShallowObject(options)) {
       const { el, ...other } = options as ewColorPickerOptions;
       result = extend(defaultConfig, {
         el: checkContainer(el),
         ...other,
         ...pluginNameProp,
       });
-    } else {
+    }
+    // 处理空值或未定义的情况
+    else {
       result = extend({
         ...defaultConfig,
-        el: checkContainer(options as unknown as WrapperElement),
+        el: document.body,
         ...pluginNameProp,
       });
     }
+    
     // 自动补全 hue/alpha 插件 key
     if (result.hue && !result.ewColorPickerHue) {
       result.ewColorPickerHue = {};
@@ -131,7 +145,7 @@ export default class ewColorPickerMergeOptions
     return result;
   }
   bindOptions(
-    options: ewColorPickerConstructorOptions,
+    options?: ewColorPickerConstructorOptions | string,
     pluginNameProp: ewColorPickerBindPluginOptions = {}
   ) {
     const mergeOptions = this.merge(options, pluginNameProp);

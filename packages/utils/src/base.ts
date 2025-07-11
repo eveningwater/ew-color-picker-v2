@@ -78,4 +78,4 @@ export const removeAllSpace = (value: string) => value.replace(/\s+/g, "");
 export const isPromise = <T extends Promise<unknown>>(value: T) => !isUndefined(value) && !isNull(value) && isFunction(value.then) && isFunction(value.catch);
 
 // 重新导出type.ts中的函数
-export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, ewError } from './type';
+export { isString, isFunction, isUndefined, isNull, isDeepArray, isDeepObject, throwError } from './type';
