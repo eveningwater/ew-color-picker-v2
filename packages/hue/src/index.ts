@@ -1,4 +1,4 @@
-import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, warn, create } from "@ew-color-picker/utils";
+import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, warn, create, extend, off, $ } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
 import ewColorPicker, { ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -20,7 +20,7 @@ export default class ewColorPickerHuePlugin {
   }
 
   handleOptions() {
-    this.options = Object.assign({}, this.options, this.ewColorPicker.options);
+    this.options = extend({}, this.options, this.ewColorPicker.options);
     this.isHorizontal = this.options.hueDirection === 'horizontal';
   }
 
@@ -38,19 +38,19 @@ export default class ewColorPickerHuePlugin {
       return;
     }
     // 移除旧的 hue 条
-    const oldHue = panelContainer.querySelector('.ew-color-picker-slider.ew-color-picker-is-vertical, .ew-color-picker-slider.ew-color-picker-is-horizontal');
+    const oldHue = $('.ew-color-picker-slider.ew-color-picker-is-vertical, .ew-color-picker-slider.ew-color-picker-is-horizontal', panelContainer);
     if (oldHue) panelContainer.removeChild(oldHue);
     // 创建 hue 条
     const hueSlider = create('div');
-    hueSlider.className = 'ew-color-picker-slider ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical');
+    addClass(hueSlider, 'ew-color-picker-slider ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical'));
     this.hueBar = create('div');
-    this.hueBar.className = 'ew-color-picker-slider-bar';
+    addClass(this.hueBar, 'ew-color-picker-slider-bar');
     this.hueThumb = create('div');
-    this.hueThumb.className = 'ew-color-picker-slider-thumb';
+    addClass(this.hueThumb, 'ew-color-picker-slider-thumb');
     this.hueBar.appendChild(this.hueThumb);
     hueSlider.appendChild(this.hueBar);
     // 插入到 bottom-row 之前
-    const bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row');
+    const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
     if (bottomRow && bottomRow.parentNode) {
       bottomRow.parentNode.insertBefore(hueSlider, bottomRow);
     } else {
@@ -64,8 +64,8 @@ export default class ewColorPickerHuePlugin {
 
   bindEvents() {
     if (!this.hueBar) return;
-    this.hueBar.addEventListener('click', this.handleHueSliderClick.bind(this));
-    this.hueBar.addEventListener('mousedown', this.handleHueSliderMouseDown.bind(this));
+    on(this.hueBar, 'click', this.handleHueSliderClick.bind(this) as EventListener);
+    on(this.hueBar, 'mousedown', this.handleHueSliderMouseDown.bind(this) as EventListener);
   }
 
   handleHueSliderClick(event: MouseEvent) {
@@ -100,11 +100,11 @@ export default class ewColorPickerHuePlugin {
       this.updateHue(hue);
     };
     const upHandler = () => {
-      document.removeEventListener('mousemove', moveHandler);
-      document.removeEventListener('mouseup', upHandler);
+      off(document, 'mousemove', moveHandler as EventListener);
+      off(document, 'mouseup', upHandler as EventListener);
     };
-    document.addEventListener('mousemove', moveHandler);
-    document.addEventListener('mouseup', upHandler);
+    on(document, 'mousemove', moveHandler as EventListener);
+    on(document, 'mouseup', upHandler as EventListener);
   }
 
   updateHue(hue: number) {

@@ -66,7 +66,7 @@ export default class ewColorPickerPredefinePlugin {
     
     // 清空旧内容
     if (this.container) {
-      this.container.innerHTML = '';
+      this.container.textContent = '';
       this.predefineItems = [];
       
       // 渲染预定义色块

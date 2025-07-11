@@ -78,7 +78,7 @@ export default class ewColorPickerButtonPlugin {
     }
     
     // 清空旧内容
-    btnGroup.innerHTML = '';
+    btnGroup.textContent = '';
     
     // 渲染清空按钮
     if (this.options.hasClear) {

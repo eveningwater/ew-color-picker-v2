@@ -8,6 +8,10 @@ import {
   isFunction,
   insertNode,
   ApplyOrder,
+  $,
+  create,
+  setAttr,
+  warn,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorToRgba, isValidColor } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -64,22 +68,26 @@ export default class ewColorPickerInputPlugin {
     }
     
     // 查找底部行容器
-    const bottomRow = panelContainer.querySelector('.ew-color-picker-bottom-row') as HTMLElement;
+    const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
     if (!bottomRow) {
-      console.warn('[ewColorPicker] Bottom row container not found');
+      warn('[ewColorPicker] Bottom row container not found');
       return;
     }
     
     // 查找已存在的 input 元素，避免重复插入
-    this.input = bottomRow.querySelector('input.ew-color-picker-input') as HTMLInputElement;
+    this.input = $('input.ew-color-picker-input', bottomRow) as HTMLInputElement;
     if (!this.input) {
-      this.input = document.createElement('input');
-      this.input.className = 'ew-color-picker-input';
-      this.input.type = 'text';
-      this.input.name = 'ew-color-picker-input';
-      this.input.placeholder = '请输入颜色值';
-      // 直接插入到 bottomRow
-      insertNode(bottomRow, this.input);
+      this.input = create<HTMLInputElement>('input');
+      if (this.input) {
+        addClass(this.input, 'ew-color-picker-input');
+        setAttr(this.input, {
+          type: 'text',
+          name: 'ew-color-picker-input',
+          placeholder: '请输入颜色值'
+        });
+        // 直接插入到 bottomRow
+        insertNode(bottomRow, this.input);
+      }
     }
     
     // 设置当前值
@@ -90,7 +98,9 @@ export default class ewColorPickerInputPlugin {
       currentColor = defaultColor;
       this.ewColorPicker.setColor(currentColor);
     }
-    this.input.value = currentColor;
+    if (this.input) {
+      this.input.value = currentColor;
+    }
     
     // 如果禁用，添加禁用样式
     if (this.options.disabled) {
@@ -125,7 +135,7 @@ export default class ewColorPickerInputPlugin {
 
     // 验证颜色格式
     if (!isValidColor(value)) {
-      console.warn(`[ewColorPicker warning]: Invalid color format: ${value}`);
+      warn(`[ewColorPicker warning]: Invalid color format: ${value}`);
       return;
     }
 
