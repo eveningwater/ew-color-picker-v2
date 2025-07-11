@@ -388,3 +388,31 @@ export function getColorBrightness(color: string): number {
 export function isDarkColor(color: string): boolean {
   return getColorBrightness(color) < 128;
 }
+
+// 颜色转换缓存
+const colorCache = new Map<string, any>();
+
+// 带缓存的颜色转换函数
+export function colorRgbaToHsvaWithCache(color: string) {
+  if (colorCache.has(color)) {
+    return colorCache.get(color);
+  }
+  
+  const result = colorRgbaToHsva(color);
+  colorCache.set(color, result);
+  
+  // 限制缓存大小，避免内存泄漏
+  if (colorCache.size > 1000) {
+    const firstKey = colorCache.keys().next().value;
+    if (firstKey) {
+      colorCache.delete(firstKey);
+    }
+  }
+  
+  return result;
+}
+
+// 清理颜色缓存
+export function clearColorCache() {
+  colorCache.clear();
+}

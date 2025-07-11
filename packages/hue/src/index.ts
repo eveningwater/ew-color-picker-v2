@@ -1,4 +1,4 @@
-import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, warn, create, extend, off, $ } from "@ew-color-picker/utils";
+import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, warn, create, extend, off, $, throttle, getRect } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
 import ewColorPicker, { ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -13,9 +13,14 @@ export default class ewColorPickerHuePlugin {
   hueBar: HTMLElement | null = null;
   hueThumb: HTMLElement | null = null;
   isHorizontal: boolean = false;
+  
+  // 节流处理鼠标移动事件
+  private throttledUpdateHue: (hue: number) => void;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
+    // 初始化节流函数
+    this.throttledUpdateHue = throttle(this.updateHue.bind(this), 16); // 60fps
     this.run();
   }
 
@@ -70,7 +75,7 @@ export default class ewColorPickerHuePlugin {
 
   handleHueSliderClick(event: MouseEvent) {
     if (!this.hueBar) return;
-    const rect = this.hueBar.getBoundingClientRect();
+    const rect = getRect(this.hueBar);
     const isHorizontal = this.isHorizontal;
     let hue: number;
     if (isHorizontal) {
@@ -88,7 +93,7 @@ export default class ewColorPickerHuePlugin {
     const slider = this.hueBar;
     const isHorizontal = this.isHorizontal;
     const moveHandler = (e: MouseEvent) => {
-      const rect = slider.getBoundingClientRect();
+      const rect = getRect(slider);
       let hue: number;
       if (isHorizontal) {
         const x = e.clientX - rect.left;
@@ -97,7 +102,7 @@ export default class ewColorPickerHuePlugin {
         const y = e.clientY - rect.top;
         hue = Math.max(0, Math.min(360, (1 - y / rect.height) * 360));
       }
-      this.updateHue(hue);
+      this.throttledUpdateHue(hue);
     };
     const upHandler = () => {
       off(document, 'mousemove', moveHandler as EventListener);
@@ -126,7 +131,7 @@ export default class ewColorPickerHuePlugin {
   updateHueThumbPosition(hue: number) {
     if (!this.hueThumb || !this.hueBar) return;
     const isHorizontal = this.isHorizontal;
-    const rect = this.hueBar.getBoundingClientRect();
+    const rect = getRect(this.hueBar);
     if (isHorizontal) {
       const x = Math.max(0, Math.min(rect.width, (hue / 360) * rect.width));
       setStyle(this.hueThumb, 'left', `${x}px`);
@@ -136,5 +141,17 @@ export default class ewColorPickerHuePlugin {
               setStyle(this.hueThumb, 'top', `${y}px`);
         setStyle(this.hueThumb, 'left', `0px`);
     }
+  }
+
+  destroy() {
+    // 清理事件监听器
+    if (this.hueBar) {
+      off(this.hueBar, 'click', this.handleHueSliderClick.bind(this) as EventListener);
+      off(this.hueBar, 'mousedown', this.handleHueSliderMouseDown.bind(this) as EventListener);
+    }
+    
+    // 清理DOM引用
+    this.hueBar = null;
+    this.hueThumb = null;
   }
 } 

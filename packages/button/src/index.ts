@@ -14,6 +14,7 @@ import {
   $,
   off,
   setAttr,
+  debounce,
 } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -32,9 +33,16 @@ export default class ewColorPickerButtonPlugin {
   options: ButtonOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
   clearButton: HTMLButtonElement | null = null;
   sureButton: HTMLButtonElement | null = null;
+  
+  // 防抖处理按钮点击事件
+  private debouncedOnClearColor: () => void;
+  private debouncedOnSureColor: () => void;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
+    // 初始化防抖函数
+    this.debouncedOnClearColor = debounce(this.onClearColor.bind(this), 100);
+    this.debouncedOnSureColor = debounce(this.onSureColor.bind(this), 100);
     this.run();
   }
 
@@ -101,14 +109,14 @@ export default class ewColorPickerButtonPlugin {
     // 清空按钮事件
     if (this.clearButton) {
       on(this.clearButton, 'click', () => {
-        this.onClearColor();
+        this.debouncedOnClearColor();
       });
     }
 
     // 确定按钮事件
     if (this.sureButton) {
       on(this.sureButton, 'click', () => {
-        this.onSureColor();
+        this.debouncedOnSureColor();
       });
     }
   }
@@ -163,11 +171,15 @@ export default class ewColorPickerButtonPlugin {
 
   destroy() {
     if (this.clearButton) {
-      off(this.clearButton, 'click', this.onClearColor.bind(this) as EventListener);
+      off(this.clearButton, 'click', this.debouncedOnClearColor as unknown as EventListener);
     }
     if (this.sureButton) {
-      off(this.sureButton, 'click', this.onSureColor.bind(this) as EventListener);
+      off(this.sureButton, 'click', this.debouncedOnSureColor as unknown as EventListener);
     }
+    
+    // 清理DOM引用
+    this.clearButton = null;
+    this.sureButton = null;
   }
 }
 

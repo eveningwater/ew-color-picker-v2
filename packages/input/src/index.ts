@@ -12,6 +12,9 @@ import {
   create,
   setAttr,
   warn,
+  debounce,
+  extend,
+  off,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorToRgba, isValidColor } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -27,14 +30,19 @@ export default class ewColorPickerInputPlugin {
   static applyOrder = ApplyOrder.Post;
   options: InputOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
   input: HTMLInputElement | null = null;
+  
+  // 防抖处理输入事件
+  private debouncedOnInputColor: (value: string) => void;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
+    // 初始化防抖函数
+    this.debouncedOnInputColor = debounce(this.onInputColor.bind(this), 300);
     this.run();
   }
 
   handleOptions() {
-    this.options = Object.assign({}, this.options, this.ewColorPicker.options);
+    this.options = extend({}, this.options, this.ewColorPicker.options);
   }
 
   // 更新配置并重新渲染
@@ -63,7 +71,7 @@ export default class ewColorPickerInputPlugin {
     // 直接使用面板容器
     const panelContainer = this.ewColorPicker.getMountPoint('panelContainer');
     if (!panelContainer) {
-      console.warn('[ewColorPicker] Panel container not found');
+      warn('[ewColorPicker] Panel container not found');
       return;
     }
     
@@ -113,14 +121,14 @@ export default class ewColorPickerInputPlugin {
 
     // 失焦事件
     on(this.input, 'blur', (event: Event) => {
-      this.onInputColor((event.target as HTMLInputElement).value);
+      this.debouncedOnInputColor((event.target as HTMLInputElement).value);
     });
 
     // 回车事件
     on(this.input, 'keydown', (event: Event) => {
       const keyboardEvent = event as KeyboardEvent;
       if (keyboardEvent.key === 'Enter') {
-        this.onInputColor((keyboardEvent.target as HTMLInputElement).value);
+        this.debouncedOnInputColor((keyboardEvent.target as HTMLInputElement).value);
       }
     });
 
@@ -186,9 +194,12 @@ export default class ewColorPickerInputPlugin {
 
   destroy() {
     if (this.input) {
-      this.input.removeEventListener('blur', this.onInputColor.bind(this) as unknown as EventListener);
-      this.input.removeEventListener('keydown', this.onInputColor.bind(this) as unknown as EventListener);
+      off(this.input, 'blur', this.debouncedOnInputColor as unknown as EventListener);
+      off(this.input, 'keydown', this.debouncedOnInputColor as unknown as EventListener);
     }
+    
+    // 清理DOM引用
+    this.input = null;
   }
 }
 

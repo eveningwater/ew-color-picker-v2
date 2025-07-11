@@ -1,4 +1,4 @@
-import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off, getRect } from "@ew-color-picker/utils";
+import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off, getRect, throttle } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
 import ewColorPicker,{ ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -13,9 +13,14 @@ export default class ewColorPickerAlphaPlugin {
   alphaBar: HTMLElement | null = null;
   alphaThumb: HTMLElement | null = null;
   isHorizontal: boolean = false;
+  
+  // 节流处理鼠标移动事件
+  private throttledUpdateAlpha: (alpha: number) => void;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
+    // 初始化节流函数
+    this.throttledUpdateAlpha = throttle(this.updateAlpha.bind(this), 16); // 60fps
     this.run();
   }
 
@@ -110,7 +115,7 @@ export default class ewColorPickerAlphaPlugin {
         const y = e.clientY - rect.top;
         alpha = Math.max(0, Math.min(1, (1 - y / rect.height)));
       }
-      this.updateAlpha(alpha);
+      this.throttledUpdateAlpha(alpha);
     };
     const upHandler = () => {
       off(document, 'mousemove', moveHandler as EventListener);
@@ -143,5 +148,17 @@ export default class ewColorPickerAlphaPlugin {
               setStyle(this.alphaThumb, 'top', `${y}px`);
         setStyle(this.alphaThumb, 'left', `0px`);
     }
+  }
+
+  destroy() {
+    // 清理事件监听器
+    if (this.alphaBar) {
+      off(this.alphaBar, 'click', this.handleAlphaSliderClick.bind(this) as EventListener);
+      off(this.alphaBar, 'mousedown', this.handleAlphaSliderMouseDown.bind(this) as EventListener);
+    }
+    
+    // 清理DOM引用
+    this.alphaBar = null;
+    this.alphaThumb = null;
   }
 } 

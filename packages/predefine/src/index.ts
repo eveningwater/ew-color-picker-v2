@@ -11,6 +11,8 @@ import {
   setStyle,
   isString,
   isObject,
+  debounce,
+  off,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorToRgba, isValidColor, isAlphaColor } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -30,9 +32,14 @@ export default class ewColorPickerPredefinePlugin {
   options: PredefineOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
   predefineItems: HTMLElement[] = [];
   container: HTMLElement | null = null;
+  
+  // 防抖处理颜色点击事件
+  private debouncedOnPredefineColorClick: (event: Event, color: string) => void;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
+    // 初始化防抖函数
+    this.debouncedOnPredefineColorClick = debounce(this.onPredefineColorClick.bind(this), 100);
     this.run();
   }
 
@@ -99,7 +106,7 @@ export default class ewColorPickerPredefinePlugin {
 
       // 点击事件
       on(item, 'click', (event: Event) => {
-        this.onPredefineColorClick(event, color);
+        this.debouncedOnPredefineColorClick(event, color);
       });
 
       // 失焦事件
@@ -164,9 +171,13 @@ export default class ewColorPickerPredefinePlugin {
 
   destroy() {
     this.predefineItems.forEach(item => {
-      item.removeEventListener('click', this.onPredefineColorClick.bind(this) as unknown as EventListener);
-      item.removeEventListener('blur', () => {});
+      off(item, 'click', this.debouncedOnPredefineColorClick as unknown as EventListener);
+      off(item, 'blur', () => {});
     });
+    
+    // 清理DOM引用
+    this.predefineItems = [];
+    this.container = null;
   }
 }
 
