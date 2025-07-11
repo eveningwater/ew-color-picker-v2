@@ -13,6 +13,7 @@ import {
   extend,
   $,
 } from "@ew-color-picker/utils";
+import { upArrowIcon, downArrowIcon } from "@ew-color-picker/icon";
 
 export interface InputNumberOptions {
   value?: number;
@@ -88,14 +89,14 @@ export default class InputNumber {
     addClass(this.upButton, 'ew-input-number__button');
     addClass(this.upButton, 'ew-input-number__button--up');
     setAttr(this.upButton, { type: 'button' });
-    this.upButton.innerHTML = '▲';
+    this.upButton.innerHTML = upArrowIcon('ew-input-number__icon', 12);
     
     // 创建下按钮
     this.downButton = create<HTMLButtonElement>('button');
     addClass(this.downButton, 'ew-input-number__button');
     addClass(this.downButton, 'ew-input-number__button--down');
     setAttr(this.downButton, { type: 'button' });
-    this.downButton.innerHTML = '▼';
+    this.downButton.innerHTML = downArrowIcon('ew-input-number__icon', 12);
     
     // 组装DOM结构
     buttonContainer.appendChild(this.upButton);
