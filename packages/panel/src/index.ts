@@ -120,11 +120,11 @@ export default class ewColorPickerPanelPlugin {
     this.whitePanel = create("div");
     addClass(this.whitePanel, "ew-color-picker-white-panel");
     this.panel.appendChild(this.whitePanel);
-
+    
     this.blackPanel = create("div");
     addClass(this.blackPanel, "ew-color-picker-black-panel");
     this.panel.appendChild(this.blackPanel);
-
+    
     // 渲染光标
     this.cursor = create("div");
     addClass(this.cursor, "ew-color-picker-panel-cursor");
@@ -170,7 +170,7 @@ export default class ewColorPickerPanelPlugin {
     // 计算饱和度和明度
     const saturation = Math.max(0, Math.min(100, (x / this.panelWidth) * 100));
     const value = Math.max(0, Math.min(100, (1 - y / this.panelHeight) * 100));
-
+    
     // 更新光标位置和颜色
     this.updateCursorPosition(saturation, value);
     this.updateColor(saturation, value);
@@ -222,7 +222,7 @@ export default class ewColorPickerPanelPlugin {
     const hsva = colorRgbaToHsva(currentColor);
     hsva.s = saturation;
     hsva.v = value;
-
+    
     const newColor = colorHsvaToRgba(hsva);
     this.ewColorPicker.setColor(newColor);
     // 触发change事件
@@ -420,7 +420,7 @@ export default class ewColorPickerPanelPlugin {
             } else if (align === "end") {
               // right-end: 面板底部与box底部对齐
               top = boxHeight;
-            } else {
+    } else {
               // right-center: 面板中心与box中心对齐
               top = -this.containerHeight / 2;
             }
@@ -493,22 +493,22 @@ export default class ewColorPickerPanelPlugin {
       return { left, top };
     }
 
-    // 小屏幕特殊处理：如果面板宽度超过视口宽度的80%，采用居中策略
+    // 小屏幕特殊处理：如果面板宽度超过视口宽度的80%，采用移动端定位策略
     const isSmallScreen = this.containerWidth > viewportWidth * 0.8;
     
     if (isSmallScreen) {
-      console.log('📱 Small screen detected, using center strategy');
+      console.log('📱 Small screen detected, using mobile positioning strategy');
       
-      // 计算居中位置
-      const centerLeft = Math.max(margin, (viewportWidth - this.containerWidth) / 2);
-      const centerTop = Math.max(margin, (viewportHeight - this.containerHeight) / 2);
+      // 获取box的尺寸
+      const boxWidth = colorBox.offsetWidth;
+      const boxHeight = colorBox.offsetHeight;
       
-      // 确保不超出边界
-      const adjustedLeft = Math.min(centerLeft, viewportWidth - this.containerWidth - margin);
-      const adjustedTop = Math.min(centerTop, viewportHeight - this.containerHeight - margin);
+      // 移动端定位：面板显示在box下方，水平定位在视口右侧
+      const mobileTop = boxHeight; // 面板顶部对齐box底部
+      const mobileLeft = -(viewportWidth - this.containerWidth); // 水平定位在视口右侧
       
-      console.log('✅ Small screen center position:', { left: adjustedLeft, top: adjustedTop });
-      return { left: adjustedLeft, top: adjustedTop };
+      console.log('✅ Mobile position:', { left: mobileLeft, top: mobileTop });
+      return { left: mobileLeft, top: mobileTop };
     }
 
     // 智能边界调整策略 - 尝试所有可能的位置组合
@@ -627,12 +627,12 @@ export default class ewColorPickerPanelPlugin {
           top = -this.containerHeight - boxHeight / 2;
         } else if (align === "end") {
           top = boxHeight;
-        } else {
+    } else {
           top = -this.containerHeight / 2;
         }
         break;
     }
-
+    
     return { left, top };
   }
 
@@ -649,4 +649,4 @@ declare module "@ew-color-picker/panel" {
   interface CustomOptions {
     ewColorPickerPanel: PanelOptions;
   }
-}
+} 

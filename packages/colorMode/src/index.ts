@@ -19,6 +19,7 @@ import {
 import { colorRgbaToHsva, colorToRgba, isValidColor } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 import { upArrowIcon, downArrowIcon } from "@ew-color-picker/icon";
+import InputNumber from "@ew-color-picker/input-number";
 
 // 颜色模式类型 - 只支持三种模式
 export type ColorMode = 'hex' | 'rgb' | 'hsl';
@@ -365,51 +366,47 @@ export default class ewColorPickerColorModePlugin {
       lab.textContent = label;
       col.appendChild(lab);
       // input
-      let input: HTMLInputElement;
+      let input: HTMLElement;
       if (this.currentMode === 'rgb') {
-        input = create<HTMLInputElement>('input');
-        setAttr(input, {
-          type: 'number',
-          min: idx === 3 ? '0' : '0',
-          max: idx === 3 ? '1' : '255',
-          step: idx === 3 ? '0.1' : '1',
+        // 使用自定义InputNumber组件
+        input = new InputNumber({
+          value: 0,
+          min: idx === 3 ? 0 : 0,
+          max: idx === 3 ? 1 : 255,
+          step: idx === 3 ? 0.1 : 1,
+          precision: idx === 3 ? 1 : 0,
           placeholder: label,
-          class: `ew-color-picker-rgb-${label.toLowerCase()}-input ew-color-picker-input`
-        });
-        setStyle(input, {
-          width: '100%',
-          padding: '4px 8px',
-          border: '1px solid #ddd',
-          borderRadius: '4px',
-          fontSize: '12px',
-          textAlign: 'center'
-        });
-        on(input, 'input', debounce(() => {
-          this.updateColorFromRgbInputs();
-        }, 300));
+          size: 'small',
+          onChange: () => {
+            this.updateColorFromRgbInputs();
+          }
+        }).getElement();
+        input.classList.add(`ew-color-picker-rgb-${label.toLowerCase()}-input`, 'ew-color-picker-input');
       } else if (this.currentMode === 'hsl') {
-        input = create<HTMLInputElement>('input');
-        setAttr(input, {
-          type: idx === 0 || idx === 3 ? 'number' : 'text', // H 和 A 为 number，S、L 为 text
-          min: idx === 0 ? '0' : (idx === 3 ? '0' : undefined),
-          max: idx === 0 ? '360' : (idx === 3 ? '1' : undefined),
-          step: idx === 0 ? '1' : (idx === 3 ? '0.1' : undefined),
-          placeholder: label,
-          class: `ew-color-picker-hsl-${label.toLowerCase()}-input ew-color-picker-input`
-        });
-        setStyle(input, {
-          width: '100%',
-          padding: '4px 8px',
-          border: '1px solid #ddd',
-          borderRadius: '4px',
-          fontSize: '12px',
-          textAlign: 'center'
-        });
-        on(input, 'input', debounce(() => {
-          this.updateColorFromHslInputs();
-        }, 300));
+        input = idx === 0 || idx === 3
+          ? new InputNumber({
+              value: 0,
+              min: idx === 0 ? 0 : 0,
+              max: idx === 0 ? 360 : 1,
+              step: idx === 0 ? 1 : 0.1,
+              precision: idx === 0 ? 0 : 1,
+              placeholder: label,
+              size: 'small',
+              onChange: () => {
+                this.updateColorFromHslInputs();
+              }
+            }).getElement()
+          : create<HTMLInputElement>('input');
+        if (!(input instanceof HTMLInputElement)) {
+          input.classList.add(`ew-color-picker-hsl-${label.toLowerCase()}-input`, 'ew-color-picker-input');
+        } else {
+          setAttr(input, {
+            type: 'text',
+            placeholder: label,
+            class: `ew-color-picker-hsl-${label.toLowerCase()}-input ew-color-picker-input`
+          });
+        }
       } else {
-        // Fallback for unknown mode
         input = create<HTMLInputElement>('input');
         setAttr(input, { type: 'text', placeholder: 'Unknown' });
       }
@@ -430,10 +427,14 @@ export default class ewColorPickerColorModePlugin {
     if (!rgba) return;
 
     if (this.currentMode === 'rgb') {
-      const rInput = $('.ew-color-picker-rgb-r-input') as HTMLInputElement;
-      const gInput = $('.ew-color-picker-rgb-g-input') as HTMLInputElement;
-      const bInput = $('.ew-color-picker-rgb-b-input') as HTMLInputElement;
-      const aInput = $('.ew-color-picker-rgb-alpha-input') as HTMLInputElement;
+      const rInputWrap = $('.ew-color-picker-rgb-r-input') as HTMLElement;
+      const gInputWrap = $('.ew-color-picker-rgb-g-input') as HTMLElement;
+      const bInputWrap = $('.ew-color-picker-rgb-b-input') as HTMLElement;
+      const aInputWrap = $('.ew-color-picker-rgb-alpha-input') as HTMLElement;
+      const rInput = rInputWrap?.querySelector('input') as HTMLInputElement;
+      const gInput = gInputWrap?.querySelector('input') as HTMLInputElement;
+      const bInput = bInputWrap?.querySelector('input') as HTMLInputElement;
+      const aInput = aInputWrap?.querySelector('input') as HTMLInputElement;
 
       if (rInput) rInput.value = Math.round(rgba.r).toString();
       if (gInput) gInput.value = Math.round(rgba.g).toString();
@@ -441,10 +442,12 @@ export default class ewColorPickerColorModePlugin {
       if (aInput) aInput.value = rgba.a.toFixed(1);
     } else if (this.currentMode === 'hsl') {
       const hsl = this.rgbToHsl(rgba.r, rgba.g, rgba.b);
-      const hInput = $('.ew-color-picker-hsl-h-input') as HTMLInputElement;
+      const hInputWrap = $('.ew-color-picker-hsl-h-input') as HTMLElement;
       const sInput = $('.ew-color-picker-hsl-s-input') as HTMLInputElement;
       const lInput = $('.ew-color-picker-hsl-l-input') as HTMLInputElement;
-      const aInput = $('.ew-color-picker-hsl-alpha-input') as HTMLInputElement;
+      const aInputWrap = $('.ew-color-picker-hsl-alpha-input') as HTMLElement;
+      const hInput = hInputWrap?.querySelector('input') as HTMLInputElement;
+      const aInput = aInputWrap?.querySelector('input') as HTMLInputElement;
 
       if (hInput) hInput.value = Math.round(hsl.h).toString();
       if (sInput) sInput.value = Math.round(hsl.s).toString() + '%';
@@ -473,10 +476,14 @@ export default class ewColorPickerColorModePlugin {
   }
 
   updateColorFromRgbInputs() {
-    const rInput = $('.ew-color-picker-rgb-r-input') as HTMLInputElement;
-    const gInput = $('.ew-color-picker-rgb-g-input') as HTMLInputElement;
-    const bInput = $('.ew-color-picker-rgb-b-input') as HTMLInputElement;
-    const aInput = $('.ew-color-picker-rgb-alpha-input') as HTMLInputElement;
+    const rInputWrap = $('.ew-color-picker-rgb-r-input') as HTMLElement;
+    const gInputWrap = $('.ew-color-picker-rgb-g-input') as HTMLElement;
+    const bInputWrap = $('.ew-color-picker-rgb-b-input') as HTMLElement;
+    const aInputWrap = $('.ew-color-picker-rgb-alpha-input') as HTMLElement;
+    const rInput = rInputWrap?.querySelector('input') as HTMLInputElement;
+    const gInput = gInputWrap?.querySelector('input') as HTMLInputElement;
+    const bInput = bInputWrap?.querySelector('input') as HTMLInputElement;
+    const aInput = aInputWrap?.querySelector('input') as HTMLInputElement;
 
     if (!rInput || !gInput || !bInput) return;
 
@@ -490,10 +497,12 @@ export default class ewColorPickerColorModePlugin {
   }
 
   updateColorFromHslInputs() {
-    const hInput = $('.ew-color-picker-hsl-h-input') as HTMLInputElement;
+    const hInputWrap = $('.ew-color-picker-hsl-h-input') as HTMLElement;
     const sInput = $('.ew-color-picker-hsl-s-input') as HTMLInputElement;
     const lInput = $('.ew-color-picker-hsl-l-input') as HTMLInputElement;
-    const aInput = $('.ew-color-picker-hsl-alpha-input') as HTMLInputElement;
+    const aInputWrap = $('.ew-color-picker-hsl-alpha-input') as HTMLElement;
+    const hInput = hInputWrap?.querySelector('input') as HTMLInputElement;
+    const aInput = aInputWrap?.querySelector('input') as HTMLInputElement;
 
     if (!hInput || !sInput || !lInput) return;
 
