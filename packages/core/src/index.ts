@@ -15,10 +15,6 @@ import {
   insertNode,
   on,
   off,
-  isString,
-  isObject,
-  $,
-  error,
   tryErrorHandler,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
@@ -265,12 +261,9 @@ export default class ewColorPicker extends EventEmitter {
       this.pickerFlag = true;
       this.trigger('toggle', true);
       
-      // 只有当 isClickOutside 为 true 时才绑定外部点击事件
-      if (this.options.isClickOutside !== false) {
-        setTimeout(() => {
-          on(document, 'mousedown', this._onDocumentClick, { capture: true });
-        }, 0);
-      }
+      setTimeout(() => {
+        on(document, 'mousedown', this._onDocumentClick, { capture: true });
+      }, 0);
     }).catch(error => {
       warn(`[ewColorPicker error]: Failed to show panel: ${error}`);
     });
@@ -299,7 +292,7 @@ export default class ewColorPicker extends EventEmitter {
 
   // 点击外部关闭面板
   private _onDocumentClick = (e: Event): void => {
-    if (this.isDestroyed) return;
+    if (this.isDestroyed || !this.options.isClickOutside) return;
     
     const panelContainer = this.mountPoints.get('panelContainer');
     const rootElement = this.mountPoints.get('root');

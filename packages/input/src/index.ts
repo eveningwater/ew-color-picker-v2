@@ -35,11 +35,8 @@ export default class ewColorPickerInputPlugin {
   }
 
   run() {
-    // 优先读取插件专属配置，否则读取全局
-    const hasInput = (this.ewColorPicker.options.ewColorPickerInput && typeof this.ewColorPicker.options.ewColorPickerInput.hasInput !== 'undefined')
-      ? this.ewColorPicker.options.ewColorPickerInput.hasInput
-      : this.ewColorPicker.options.hasInput;
-    if (hasInput) {
+    // options 已经通过 mergeOptions 完成了合并，直接使用即可
+    if (this.options.hasInput) {
       this.render();
       this.bindEvents();
     }

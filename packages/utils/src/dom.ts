@@ -8,7 +8,7 @@ export type SafeCSSStyleDeclaration = {
   [key: string]: string;
 } & CSSStyleDeclaration;
 
-export const create = (tag: string) => document.createElement(tag);
+export const create = <T extends HTMLElement>(tag: string) => document.createElement(tag) as T;
 export const createByTemplate = (temp: string) =>
   document
     .createRange()
