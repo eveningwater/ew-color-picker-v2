@@ -1,5 +1,4 @@
-// 声明 __DEV__ 变量（由 rollup 插件替换）
-declare const __DEV__: boolean;
+
 
 import {
   isNull,
@@ -391,6 +390,8 @@ export default class ewColorPicker extends EventEmitter {
       panel: ['ewColorPickerPanel'],
       // input 插件依赖
       input: ['ewColorPickerInput'],
+      // input-number 插件依赖
+      inputNumber: ['ewColorPickerInputNumber'],
       // button 插件依赖
       button: ['ewColorPickerButton'],
       // predefine 插件依赖
@@ -424,58 +425,47 @@ export default class ewColorPicker extends EventEmitter {
   private checkSpecificFeatureDependencies(): void {
     // 检查 hue 方向配置
     if (this.options.hueDirection && !ewColorPicker.pluginsMap['ewColorPickerHue']) {
-      if (__DEV__) {
-        warn('[ewColorPicker warning]: hueDirection is configured but ewColorPickerHue plugin is not injected. Please use ewColorPicker.use(HuePlugin) to register the plugin.');
-      }
+      warn('[ewColorPicker warning]: hueDirection is configured but ewColorPickerHue plugin is not injected. Please use ewColorPicker.use(HuePlugin) to register the plugin.');
     }
 
     // 检查 alpha 方向配置
     if (this.options.alphaDirection && !ewColorPicker.pluginsMap['ewColorPickerAlpha']) {
-      if (__DEV__) {
-        warn('[ewColorPicker warning]: alphaDirection is configured but ewColorPickerAlpha plugin is not injected. Please use ewColorPicker.use(AlphaPlugin) to register the plugin.');
-      }
+      warn('[ewColorPicker warning]: alphaDirection is configured but ewColorPickerAlpha plugin is not injected. Please use ewColorPicker.use(AlphaPlugin) to register the plugin.');
     }
 
     // 检查预定义颜色配置
     if (this.options.predefineColor && this.options.predefineColor.length > 0 && !ewColorPicker.pluginsMap['ewColorPickerPredefine']) {
-      if (__DEV__) {
-        warn('[ewColorPicker warning]: predefineColor is configured but ewColorPickerPredefine plugin is not injected. Please use ewColorPicker.use(PredefinePlugin) to register the plugin.');
-      }
+      warn('[ewColorPicker warning]: predefineColor is configured but ewColorPickerPredefine plugin is not injected. Please use ewColorPicker.use(PredefinePlugin) to register the plugin.');
     }
 
     // 检查输入框配置
     if (this.options.hasInput && !ewColorPicker.pluginsMap['ewColorPickerInput']) {
-      if (__DEV__) {
-        warn('[ewColorPicker warning]: hasInput is enabled but ewColorPickerInput plugin is not injected. Please use ewColorPicker.use(InputPlugin) to register the plugin.');
-      }
+      warn('[ewColorPicker warning]: hasInput is enabled but ewColorPickerInput plugin is not injected. Please use ewColorPicker.use(InputPlugin) to register the plugin.');
     }
 
     // 检查按钮配置
     if ((this.options.hasClear || this.options.hasSure) && !ewColorPicker.pluginsMap['ewColorPickerButton']) {
-      if (__DEV__) {
-        warn('[ewColorPicker warning]: hasClear or hasSure is enabled but ewColorPickerButton plugin is not injected. Please use ewColorPicker.use(ButtonPlugin) to register the plugin.');
-      }
+      warn('[ewColorPicker warning]: hasClear or hasSure is enabled but ewColorPickerButton plugin is not injected. Please use ewColorPicker.use(ButtonPlugin) to register the plugin.');
     }
 
     // 检查颜色模式切换配置
     if (this.options.openChangeColorMode && !ewColorPicker.pluginsMap['ewColorPickerColorMode']) {
-      if (__DEV__) {
-        warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerColorMode plugin is not injected. Please use ewColorPicker.use(ColorModePlugin) to register the plugin.');
-      }
+      warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerColorMode plugin is not injected. Please use ewColorPicker.use(ColorModePlugin) to register the plugin.');
+    }
+
+    // 检查颜色模式切换配置下的 input-number 插件依赖
+    if (this.options.openChangeColorMode && !ewColorPicker.pluginsMap['ewColorPickerInputNumber']) {
+      warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerInputNumber plugin is not injected. ColorMode plugin requires InputNumber plugin for color value input. Please use ewColorPicker.use(InputNumberPlugin) to register the plugin.');
     }
 
     // 检查盒子配置
     if (this.options.hasBox && !ewColorPicker.pluginsMap['ewColorPickerBox']) {
-      if (__DEV__) {
-        warn('[ewColorPicker warning]: hasBox is enabled but ewColorPickerBox plugin is not injected. Please use ewColorPicker.use(BoxPlugin) to register the plugin.');
-      }
+      warn('[ewColorPicker warning]: hasBox is enabled but ewColorPickerBox plugin is not injected. Please use ewColorPicker.use(BoxPlugin) to register the plugin.');
     }
 
     // 检查面板配置
     if (this.options.hasPanel && !ewColorPicker.pluginsMap['ewColorPickerPanel']) {
-      if (__DEV__) {
-        warn('[ewColorPicker warning]: hasPanel is enabled but ewColorPickerPanel plugin is not injected. Please use ewColorPicker.use(PanelPlugin) to register the plugin.');
-      }
+      warn('[ewColorPicker warning]: hasPanel is enabled but ewColorPickerPanel plugin is not injected. Please use ewColorPicker.use(PanelPlugin) to register the plugin.');
     }
   }
 
