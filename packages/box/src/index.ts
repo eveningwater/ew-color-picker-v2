@@ -14,13 +14,13 @@ import {
   create,
   $
 } from "@ew-color-picker/utils";
-import { ewColorPickerMergeOptionsData } from "packages/core/src/mergeOptions";
+import { ewColorPickerOptions } from "@ew-color-picker/core";
 import { PartialBoxProps } from "./type";
 import { getBoxChildren, processSizeConfig } from "./method";
 
 export default class ewColorPickerBoxPlugin {
   static pluginName = "ewColorPickerBox";
-  options: ewColorPickerBoxPluginOptions & Omit<ewColorPickerMergeOptionsData, "el"> = {};
+  options: ewColorPickerBoxPluginOptions & Omit<ewColorPickerOptions, "el"> = {};
   box: HTMLElement | null;
   hasColor: boolean;
   _handlers: Array<() => void> = [];

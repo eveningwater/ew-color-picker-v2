@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+import { execSync } from 'child_process';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 获取所有包的测试文件
 function getTestFiles() {
@@ -85,11 +89,12 @@ function main() {
   }
 }
 
-if (require.main === module) {
+// 检查是否为直接运行
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-module.exports = {
+export {
   runTests,
   runCoverage,
   getTestFiles
