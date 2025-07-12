@@ -72,9 +72,12 @@ describe('Predefine Plugin', () => {
       expect(swatches.length).toBe(3);
     });
 
-    it('should handle color swatch click events', () => {
+    it('should handle color swatch click events', async () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
@@ -82,19 +85,28 @@ describe('Predefine Plugin', () => {
       // Simulate swatch click
       firstSwatch.click();
       
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       // Should call setColor
       expect(mockCore.setColor).toHaveBeenCalled();
     });
 
-    it('should highlight selected color', () => {
+    it('should highlight selected color', async () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
       
       // Click first swatch
       firstSwatch.click();
+      
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       // Should have active class
       expect(firstSwatch.classList.contains('ew-color-picker-predefine-color-active')).toBe(true);

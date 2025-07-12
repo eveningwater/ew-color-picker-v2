@@ -66,14 +66,20 @@ describe('color-mode Plugin', () => {
       expect(modeButtons.length).toBeGreaterThan(0);
     });
 
-    it('should handle mode button click events', () => {
+    it('should handle mode button click events', async () => {
       const plugin = new ColorModePlugin(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const upButton = container.querySelector('.ew-color-picker-mode-up-btn') as HTMLElement;
       expect(upButton).toBeTruthy();
       
       // Simulate mode button click
       upButton.click();
+      
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       // Should call trigger or update mode
       expect(mockCore.trigger).toHaveBeenCalled();
@@ -89,8 +95,11 @@ describe('color-mode Plugin', () => {
       expect(modeText.textContent).toBeTruthy();
     });
 
-    it('should switch active mode on button click', () => {
+    it('should switch active mode on button click', async () => {
       const plugin = new ColorModePlugin(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const upButton = container.querySelector('.ew-color-picker-mode-up-btn') as HTMLElement;
       const downButton = container.querySelector('.ew-color-picker-mode-down-btn') as HTMLElement;
@@ -100,6 +109,9 @@ describe('color-mode Plugin', () => {
       
       // Click up button
       upButton.click();
+      
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       // Should call trigger or update mode
       expect(mockCore.trigger).toHaveBeenCalled();

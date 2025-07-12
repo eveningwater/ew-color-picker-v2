@@ -32,8 +32,11 @@ describe('Panel Plugin', () => {
   });
 
   describe('plugin installation', () => {
-    it('should install plugin correctly', () => {
+    it('should install plugin correctly', async () => {
       const plugin = new PanelPlugin(mockCore);
+      
+      // 等待安装完成
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       expect(plugin).toBeInstanceOf(PanelPlugin);
       expect(mockCore.on).toHaveBeenCalled();
@@ -60,7 +63,7 @@ describe('Panel Plugin', () => {
       const plugin = new PanelPlugin(mockCore);
       
       // 等待事件绑定完成
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const panelElement = container.querySelector('.ew-color-picker-panel') as HTMLElement;
       expect(panelElement).toBeTruthy();
@@ -87,6 +90,9 @@ describe('Panel Plugin', () => {
       
       panelElement.dispatchEvent(mouseEvent);
       
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       // Should call setColor
       expect(mockCore.setColor).toHaveBeenCalled();
     });
@@ -95,7 +101,7 @@ describe('Panel Plugin', () => {
       const plugin = new PanelPlugin(mockCore);
       
       // 等待事件绑定完成
-      await new Promise(resolve => setTimeout(resolve, 20));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const panelElement = container.querySelector('.ew-color-picker-panel') as HTMLElement;
       
@@ -120,6 +126,9 @@ describe('Panel Plugin', () => {
       });
       
       panelElement.dispatchEvent(mouseEvent);
+      
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       expect(mockCore.setColor).toHaveBeenCalled();
     });

@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
 import HuePlugin from '../src/index';
 import { createMockCore } from '../../../test/mockCore';
 
@@ -8,7 +7,7 @@ describe('Hue Plugin', () => {
   let mockCore: any;
 
   beforeEach(() => {
-    container = create('div');
+    container = document.createElement('div');
     document.body.appendChild(container);
     
     mockCore = createMockCore(container, {
@@ -55,7 +54,7 @@ describe('Hue Plugin', () => {
       plugin.install(mockCore);
       
       // 等待事件绑定完成
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const hueElement = container.querySelector('.ew-color-picker-slider') as HTMLElement;
       expect(hueElement).toBeTruthy();
@@ -86,6 +85,9 @@ describe('Hue Plugin', () => {
       
       hueBar.dispatchEvent(mouseEvent);
       
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       // Should call setColor
       expect(mockCore.setColor).toHaveBeenCalled();
     });
@@ -95,7 +97,7 @@ describe('Hue Plugin', () => {
       plugin.install(mockCore);
       
       // 等待事件绑定完成
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const hueElement = container.querySelector('.ew-color-picker-slider') as HTMLElement;
       const hueBar = hueElement.querySelector('.ew-color-picker-slider-bar') as HTMLElement;
@@ -121,6 +123,9 @@ describe('Hue Plugin', () => {
       });
       
       hueBar.dispatchEvent(mouseEvent);
+      
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       expect(mockCore.setColor).toHaveBeenCalled();
     });

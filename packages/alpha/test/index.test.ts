@@ -61,7 +61,7 @@ describe('Alpha Plugin', () => {
       plugin.install(mockCore);
       
       // 等待事件绑定完成
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha') as HTMLElement;
       expect(alphaElement).toBeTruthy();
@@ -92,6 +92,9 @@ describe('Alpha Plugin', () => {
       
       alphaBar.dispatchEvent(mouseEvent);
       
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
       // Should emit color change event
       expect(mockCore.setColor).toHaveBeenCalled();
     });
@@ -101,7 +104,7 @@ describe('Alpha Plugin', () => {
       plugin.install(mockCore);
       
       // 等待事件绑定完成
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha') as HTMLElement;
       const alphaBar = alphaElement.querySelector('.ew-color-picker-alpha-slider-bar') as HTMLElement;
@@ -127,6 +130,9 @@ describe('Alpha Plugin', () => {
       });
       
       alphaBar.dispatchEvent(mouseEvent);
+      
+      // 等待事件处理完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       expect(mockCore.setColor).toHaveBeenCalled();
     });
