@@ -31,7 +31,7 @@ export default defineConfig({
       '@ew-color-picker/input-number': resolve(__dirname, './packages/input-number/src'),
       '@ew-color-picker/button': resolve(__dirname, './packages/button/src'),
       '@ew-color-picker/predefine': resolve(__dirname, './packages/predefine/src'),
-      '@ew-color-picker/colorMode': resolve(__dirname, './packages/colorMode/src'),
+      '@ew-color-picker/color-mode': resolve(__dirname, './packages/color-mode/src'),
       '@ew-color-picker/box': resolve(__dirname, './packages/box/src'),
       '@ew-color-picker/console': resolve(__dirname, './packages/console/src'),
       '@ew-color-picker/icon': resolve(__dirname, './packages/icon/src'),

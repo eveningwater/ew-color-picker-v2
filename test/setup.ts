@@ -29,4 +29,41 @@ afterAll(() => {
   console.warn = originalConsole.warn;
   console.error = originalConsole.error;
   console.log = originalConsole.log;
-}); 
+});
+
+// 创建通用的 mockCore 工厂函数
+export function createMockCore(container: HTMLElement, options: any = {}) {
+  return {
+    container,
+    options: {
+      showBox: true,
+      showPanel: true,
+      showConsole: true,
+      showHue: true,
+      showInput: true,
+      showInputNumber: true,
+      showPredefine: true,
+      showColorMode: true,
+      defaultColor: '#ff0000',
+      ...options
+    },
+    on: vi.fn(),
+    emit: vi.fn(),
+    getColor: vi.fn(() => '#ff0000'),
+    setColor: vi.fn(),
+    getMountPoint: vi.fn((name: string) => {
+      if (name === 'root') {
+        return container;
+      }
+      if (name === 'panelContainer') {
+        return container;
+      }
+      if (name === 'bottomRow') {
+        return container;
+      }
+      return null;
+    }),
+    destroy: vi.fn(),
+    trigger: vi.fn()
+  };
+} 

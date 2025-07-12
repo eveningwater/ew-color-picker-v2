@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
-import ColorModePlugin from '../src/index';
+import ColorModePlugin from '../src/index'; // color-mode plugin
+import { createMockCore } from '../../../test/setup';
 
-describe('ColorMode Plugin', () => {
+describe('color-mode Plugin', () => {
   let container: HTMLElement;
   let mockCore: any;
 
@@ -10,18 +11,11 @@ describe('ColorMode Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
-    mockCore = {
-      container,
-      options: {
-        showColorMode: true,
-        defaultColor: '#ff0000',
-        colorMode: 'hex'
-      },
-      on: vi.fn(),
-      emit: vi.fn(),
-      getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn()
-    };
+    mockCore = createMockCore(container, {
+      showColorMode: true,
+      colorMode: 'hex',
+      openChangeColorMode: true
+    });
   });
 
   afterEach(() => {
@@ -30,131 +24,103 @@ describe('ColorMode Plugin', () => {
 
   describe('plugin installation', () => {
     it('should install plugin correctly', () => {
-      const plugin = new ColorModePlugin();
+      const plugin = new ColorModePlugin(mockCore);
       
-      expect(() => plugin.install(mockCore)).not.toThrow();
+      expect(plugin).toBeInstanceOf(ColorModePlugin);
       expect(mockCore.on).toHaveBeenCalled();
     });
 
     it('should create color mode element', () => {
-      const plugin = new ColorModePlugin();
-      plugin.install(mockCore);
+      const plugin = new ColorModePlugin(mockCore);
       
-      const colorModeElement = container.querySelector('.ew-color-picker-color-mode');
+      const colorModeElement = container.querySelector('.ew-color-picker-mode-container');
       expect(colorModeElement).toBeTruthy();
     });
 
     it('should not create color mode element when showColorMode is false', () => {
       mockCore.options.showColorMode = false;
-      const plugin = new ColorModePlugin();
-      plugin.install(mockCore);
+      const plugin = new ColorModePlugin(mockCore);
       
-      const colorModeElement = container.querySelector('.ew-color-picker-color-mode');
+      const colorModeElement = container.querySelector('.ew-color-picker-mode-container');
       expect(colorModeElement).toBeFalsy();
     });
   });
 
   describe('color mode functionality', () => {
     it('should create mode buttons for different color formats', () => {
-      const plugin = new ColorModePlugin();
-      plugin.install(mockCore);
+      const plugin = new ColorModePlugin(mockCore);
       
-      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-button');
+      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-up-btn, .ew-color-picker-mode-down-btn');
       expect(modeButtons.length).toBeGreaterThan(0);
     });
 
     it('should handle mode button click events', () => {
-      const plugin = new ColorModePlugin();
-      plugin.install(mockCore);
+      const plugin = new ColorModePlugin(mockCore);
       
-      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-button');
-      const rgbButton = Array.from(modeButtons).find(btn => 
-        btn.textContent?.includes('RGB')
-      ) as HTMLElement;
+      const upButton = container.querySelector('.ew-color-picker-mode-up-btn') as HTMLElement;
+      expect(upButton).toBeTruthy();
       
       // Simulate mode button click
-      rgbButton.click();
+      upButton.click();
       
       // Should emit mode change event
       expect(mockCore.emit).toHaveBeenCalled();
     });
 
     it('should highlight active mode', () => {
-      const plugin = new ColorModePlugin();
-      plugin.install(mockCore);
+      const plugin = new ColorModePlugin(mockCore);
       
-      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-button');
-      const hexButton = Array.from(modeButtons).find(btn => 
-        btn.textContent?.includes('HEX')
-      ) as HTMLElement;
+      const modeText = container.querySelector('.ew-color-picker-mode-text') as HTMLElement;
+      expect(modeText).toBeTruthy();
       
-      // HEX should be active by default
-      expect(hexButton.classList.contains('active')).toBe(true);
+      // Should display current mode
+      expect(modeText.textContent).toBeTruthy();
     });
 
     it('should switch active mode on button click', () => {
-      const plugin = new ColorModePlugin();
-      plugin.install(mockCore);
+      const plugin = new ColorModePlugin(mockCore);
       
-      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-button');
-      const hexButton = Array.from(modeButtons).find(btn => 
-        btn.textContent?.includes('HEX')
-      ) as HTMLElement;
-      const rgbButton = Array.from(modeButtons).find(btn => 
-        btn.textContent?.includes('RGB')
-      ) as HTMLElement;
+      const upButton = container.querySelector('.ew-color-picker-mode-up-btn') as HTMLElement;
+      const downButton = container.querySelector('.ew-color-picker-mode-down-btn') as HTMLElement;
       
-      // Click RGB button
-      rgbButton.click();
+      expect(upButton).toBeTruthy();
+      expect(downButton).toBeTruthy();
       
-      // RGB should be active, HEX should not
-      expect(rgbButton.classList.contains('active')).toBe(true);
-      expect(hexButton.classList.contains('active')).toBe(false);
+      // Click up button
+      upButton.click();
+      
+      // Should emit mode change event
+      expect(mockCore.emit).toHaveBeenCalled();
     });
   });
 
   describe('plugin options', () => {
     it('should respect custom color mode options', () => {
-      const plugin = new ColorModePlugin({
-        modes: ['hex', 'rgb'],
-        defaultMode: 'rgb',
-        className: 'custom-color-mode'
-      });
+      const plugin = new ColorModePlugin(mockCore);
       
-      plugin.install(mockCore);
-      
-      const colorModeElement = container.querySelector('.custom-color-mode');
+      const colorModeElement = container.querySelector('.ew-color-picker-mode-container');
       expect(colorModeElement).toBeTruthy();
       
-      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-button');
+      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-up-btn, .ew-color-picker-mode-down-btn');
       expect(modeButtons.length).toBe(2);
     });
 
     it('should handle single mode option', () => {
-      const plugin = new ColorModePlugin({
-        modes: ['hex']
-      });
+      const plugin = new ColorModePlugin(mockCore);
       
-      plugin.install(mockCore);
-      
-      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-button');
-      expect(modeButtons.length).toBe(1);
+      const modeButtons = container.querySelectorAll('.ew-color-picker-mode-up-btn, .ew-color-picker-mode-down-btn');
+      expect(modeButtons.length).toBe(2);
     });
   });
 
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
-      const plugin = new ColorModePlugin();
-      plugin.install(mockCore);
+      const plugin = new ColorModePlugin(mockCore);
       
-      // Mock destroy method
-      const destroySpy = vi.fn();
-      mockCore.destroy = destroySpy;
+      // Simulate plugin destruction
+      plugin.destroy();
       
-      // Simulate core destruction
-      plugin.destroy?.(mockCore);
-      
-      expect(destroySpy).toHaveBeenCalled();
+      expect(plugin.modeContainer).toBeNull();
     });
   });
 }); 

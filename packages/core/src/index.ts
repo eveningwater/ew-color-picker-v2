@@ -98,7 +98,7 @@ export enum PluginMountOrder {
   INPUT = 5,         // 输入框 - 颜色值输入
   BUTTON = 6,        // 按钮 - 确定/清除按钮
   PREDEFINE = 7,     // 预定义颜色 - 预设颜色列表
-  COLORMODE = 8,     // 颜色模式切换 - 最后（在按钮区域）
+  COLOR_MODE = 8,     // 颜色模式切换 - 最后（在按钮区域）
 }
 
 // 默认插件配置
@@ -109,7 +109,7 @@ const DEFAULT_PLUGINS = {
   ewColorPickerInput: true,
   ewColorPickerButton: true,
   ewColorPickerPredefine: true,
-  ewColorPickerColorMode: true,
+  ewColorPickerColorMode: true, // 保持插件名不变，便于兼容
   ewColorPickerHue: true,
   ewColorPickerAlpha: true,
 } as const;
@@ -124,7 +124,7 @@ const MOUNT_ORDER_MAP: Record<string, number> = {
   'ewColorPickerInput': PluginMountOrder.INPUT,
   'ewColorPickerButton': PluginMountOrder.BUTTON,
   'ewColorPickerPredefine': PluginMountOrder.PREDEFINE,
-  'ewColorPickerColorMode': PluginMountOrder.COLORMODE,
+  'ewColorPickerColorMode': PluginMountOrder.COLOR_MODE,
 };
 
 // 应用顺序映射
@@ -415,7 +415,7 @@ export default class ewColorPicker extends EventEmitter {
       button: ['ewColorPickerButton'],
       // predefine 插件依赖
       predefine: ['ewColorPickerPredefine'],
-      // colorMode 插件依赖
+      // color-mode 插件依赖
       colorMode: ['ewColorPickerColorMode'],
       // box 插件依赖
       box: ['ewColorPickerBox'],
@@ -469,12 +469,12 @@ export default class ewColorPicker extends EventEmitter {
 
     // 检查颜色模式切换配置
     if (this.options.openChangeColorMode && !ewColorPicker.pluginsMap['ewColorPickerColorMode']) {
-      warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerColorMode plugin is not injected. Please use ewColorPicker.use(ColorModePlugin) to register the plugin.');
+      warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerColorMode plugin is not injected. 请使用 ewColorPicker.use(ColorModePlugin) 注册 color-mode 插件。');
     }
 
     // 检查颜色模式切换配置下的 input-number 插件依赖
     if (this.options.openChangeColorMode && !ewColorPicker.pluginsMap['ewColorPickerInputNumber']) {
-      warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerInputNumber plugin is not injected. ColorMode plugin requires InputNumber plugin for color value input. Please use ewColorPicker.use(InputNumberPlugin) to register the plugin.');
+      warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerInputNumber plugin is not injected. color-mode 插件依赖 InputNumber 插件。请使用 ewColorPicker.use(InputNumberPlugin) 注册。');
     }
 
     // 检查盒子配置

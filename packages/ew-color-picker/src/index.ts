@@ -7,9 +7,9 @@ import Input from "@ew-color-picker/input";
 import Button from "@ew-color-picker/button";
 import Predefine from "@ew-color-picker/predefine";
 import Console from "@ew-color-picker/console";
-import ColorMode from "@ew-color-picker/colorMode";
+import ColorMode from "@ew-color-picker/color-mode";
 
-// 注册插件
+// 注册插件（color-mode）
 Core.use(Console);
 Core.use(Box);
 Core.use(Panel);
