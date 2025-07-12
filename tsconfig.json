@@ -21,6 +21,6 @@
     "typeRoots": ["node_modules/@types"],
     "importHelpers": true
   },
-  "include": ["packages/*/src","./global.d.ts"],
+  "include": ["packages/*/src"],
   "exclude": ["packages/*/src/**/__tests__", "packages/*/src/**/__mocks__"]
 }
