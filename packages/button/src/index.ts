@@ -93,15 +93,15 @@ export default class ewColorPickerButtonPlugin {
       this.clearButton = create<HTMLButtonElement>('button');
       addClass(this.clearButton, 'ew-color-picker-clear-btn ew-color-picker-drop-btn');
       this.setClearText(this.options.clearText || '清空');
-      btnGroup.appendChild(this.clearButton);
+      insertNode(btnGroup, this.clearButton);
     }
     
-    // 渲染确定按钮
+    // 渲染确认按钮
     if (this.options.hasSure) {
       this.sureButton = create<HTMLButtonElement>('button');
       addClass(this.sureButton, 'ew-color-picker-sure-btn ew-color-picker-drop-btn');
-      this.setSureText(this.options.sureText || '确定');
-      btnGroup.appendChild(this.sureButton);
+      this.setSureText(this.options.sureText || '确认');
+      insertNode(btnGroup, this.sureButton);
     }
     
     // 根据当前颜色模式调整按钮组样式

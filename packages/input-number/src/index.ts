@@ -12,6 +12,8 @@ import {
   warn,
   extend,
   $,
+  removeElement,
+  insertNode,
 } from "@ew-color-picker/utils";
 import { upArrowIcon, downArrowIcon } from "@ew-color-picker/icon";
 
@@ -99,10 +101,10 @@ export default class InputNumber {
     this.downButton.innerHTML = downArrowIcon('ew-input-number__icon', 12);
     
     // 组装DOM结构
-    buttonContainer.appendChild(this.upButton);
-    buttonContainer.appendChild(this.downButton);
-    this.container.appendChild(this.input);
-    this.container.appendChild(buttonContainer);
+    insertNode(buttonContainer, this.upButton);
+    insertNode(buttonContainer, this.downButton);
+    insertNode(this.container, this.input);
+    insertNode(this.container, buttonContainer);
     
     // 设置样式
     this.setStyles();
@@ -306,7 +308,7 @@ export default class InputNumber {
   }
 
   public destroy() {
-    // 移除事件监听
+    // 清理事件监听器
     off(this.input, 'input', this.handleInput.bind(this));
     off(this.input, 'blur', this.handleBlur.bind(this) as EventListener);
     off(this.input, 'focus', this.handleFocus.bind(this) as EventListener);
@@ -315,9 +317,15 @@ export default class InputNumber {
     off(this.downButton, 'click', this.handleDownClick.bind(this));
     off(this.container, 'wheel', this.handleWheel.bind(this) as EventListener);
     
-    // 清理DOM
+    // 移除DOM元素
     if (this.container.parentNode) {
-      this.container.parentNode.removeChild(this.container);
+      removeElement(this.container);
     }
+    
+    // 清理引用
+    this.container = null as any;
+    this.input = null as any;
+    this.upButton = null as any;
+    this.downButton = null as any;
   }
 } 

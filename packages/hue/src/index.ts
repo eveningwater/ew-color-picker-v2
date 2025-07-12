@@ -1,4 +1,4 @@
-import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, warn, create, extend, off, $, throttle, getRect } from "@ew-color-picker/utils";
+import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, warn, create, extend, off, $, throttle, getRect, removeElement } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
 import ewColorPicker, { ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -44,7 +44,7 @@ export default class ewColorPickerHuePlugin {
     }
     // 移除旧的 hue 条
     const oldHue = $('.ew-color-picker-slider.ew-color-picker-is-vertical, .ew-color-picker-slider.ew-color-picker-is-horizontal', panelContainer);
-    if (oldHue) panelContainer.removeChild(oldHue);
+    if (oldHue) removeElement(oldHue);
     // 创建 hue 条
     const hueSlider = create('div');
     addClass(hueSlider, 'ew-color-picker-slider ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical'));
@@ -52,14 +52,14 @@ export default class ewColorPickerHuePlugin {
     addClass(this.hueBar, 'ew-color-picker-slider-bar');
     this.hueThumb = create('div');
     addClass(this.hueThumb, 'ew-color-picker-slider-thumb');
-    this.hueBar.appendChild(this.hueThumb);
-    hueSlider.appendChild(this.hueBar);
+    insertNode(this.hueBar, this.hueThumb);
+    insertNode(hueSlider, this.hueBar);
     // 插入到 bottom-row 之前
     const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
     if (bottomRow && bottomRow.parentNode) {
       bottomRow.parentNode.insertBefore(hueSlider, bottomRow);
     } else {
-      panelContainer.appendChild(hueSlider);
+      insertNode(panelContainer, hueSlider);
     }
     // 设置初始 thumb 位置
     const currentColor = this.ewColorPicker.getColor() || '#ff0000';

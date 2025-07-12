@@ -15,6 +15,8 @@ import {
   debounce,
   extend,
   off,
+  isString,
+  removeElement,
 } from "@ew-color-picker/utils";
 import { 
   colorRgbaToHsva, 
@@ -140,20 +142,11 @@ export default class ewColorPickerColorModePlugin {
     });
     this.downButton.innerHTML = downArrowIcon('', 16);
 
-    // 组装容器
-    this.modeContainer.appendChild(this.upButton);
-    this.modeContainer.appendChild(this.modeText);
-    this.modeContainer.appendChild(this.downButton);
-
-    // 查找底部行容器，将模式容器插入到其之前
-    const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
-    if (bottomRow) {
-      // 如果底部行存在，插入到其之前
-      panelContainer.insertBefore(this.modeContainer, bottomRow);
-    } else {
-      // 如果底部行不存在，直接插入到面板容器底部
-      panelContainer.appendChild(this.modeContainer);
-    }
+    // 组装模式切换器
+    insertNode(this.modeContainer, this.upButton);
+    insertNode(this.modeContainer, this.modeText);
+    insertNode(this.modeContainer, this.downButton);
+    insertNode(panelContainer, this.modeContainer);
   }
 
   updateModeDisplay() {
@@ -281,7 +274,7 @@ export default class ewColorPickerColorModePlugin {
       const lab = create('div');
       addClass(lab, 'ew-color-picker-input-label');
       lab.textContent = label;
-      col.appendChild(lab);
+      insertNode(col, lab);
       // input
       let input: HTMLElement;
       if (this.currentMode === 'rgb') {
@@ -327,10 +320,10 @@ export default class ewColorPickerColorModePlugin {
         input = create<HTMLInputElement>('input');
         setAttr(input, { type: 'text', placeholder: 'Unknown' });
       }
-      col.appendChild(input);
-      group.appendChild(col);
+      insertNode(col, input);
+      insertNode(group, col);
     });
-    container.appendChild(group);
+    insertNode(container, group);
   }
 
   updateInputValues(color: string) {
@@ -474,7 +467,7 @@ export default class ewColorPickerColorModePlugin {
     });
 
     // 插入到容器中
-    inputContainer.appendChild(input);
+    insertNode(inputContainer, input);
 
     // 设置当前颜色值，如果没有则使用默认颜色
     let currentColor = this.ewColorPicker.getColor();
@@ -556,9 +549,9 @@ export default class ewColorPickerColorModePlugin {
       off(this.downButton, 'mouseleave', this.handleDownButtonLeave.bind(this));
     }
 
-    // 移除DOM元素
+    // 移除模式切换器
     if (this.modeContainer && this.modeContainer.parentNode) {
-      this.modeContainer.parentNode.removeChild(this.modeContainer);
+      removeElement(this.modeContainer);
     }
 
     // 清理引用

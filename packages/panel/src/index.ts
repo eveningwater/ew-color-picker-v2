@@ -13,6 +13,7 @@ import {
   removeNode,
   create,
   addClass,
+  insertNode,
 } from "@ew-color-picker/utils";
 import {
   colorRgbaToHsva,
@@ -109,35 +110,33 @@ export default class ewColorPickerPanelPlugin {
     this.panel.style.setProperty('--panel-width', panelWidth + 'px');
     this.panel.style.setProperty('--panel-height', this.panelHeight + 'px');
 
-    panelContainer.appendChild(this.panel);
+    // 组装面板结构
+    insertNode(panelContainer, this.panel);
+    
+    // 创建颜色面板
+    this.whitePanel = create('div');
+    addClass(this.whitePanel, 'ew-color-picker-white');
+    insertNode(this.panel, this.whitePanel);
+    
+    this.blackPanel = create('div');
+    addClass(this.blackPanel, 'ew-color-picker-black');
+    insertNode(this.panel, this.blackPanel);
+    
+    // 创建光标
+    this.cursor = create('div');
+    addClass(this.cursor, 'ew-color-picker-cursor');
+    insertNode(this.panel, this.cursor);
+    
+    // 创建底部行容器
+    const bottomRow = create('div');
+    addClass(bottomRow, 'ew-color-picker-bottom-row');
+    insertNode(panelContainer, bottomRow);
 
     // 使用 setTimeout 确保容器完全渲染后再计算尺寸
     setTimeout(() => {
       this.calculateContainerSize();
       this.handleAutoPosition();
     }, 0);
-
-    // 渲染白色和黑色渐变层
-    this.whitePanel = create("div");
-    addClass(this.whitePanel, "ew-color-picker-white-panel");
-    this.panel.appendChild(this.whitePanel);
-    
-    this.blackPanel = create("div");
-    addClass(this.blackPanel, "ew-color-picker-black-panel");
-    this.panel.appendChild(this.blackPanel);
-    
-    // 渲染光标
-    this.cursor = create("div");
-    addClass(this.cursor, "ew-color-picker-panel-cursor");
-    this.panel.appendChild(this.cursor);
-
-    // 创建底部行容器（只插入一次）
-    let bottomRow = $(".ew-color-picker-bottom-row", panelContainer);
-    if (!bottomRow) {
-      bottomRow = create("div");
-      addClass(bottomRow, "ew-color-picker-bottom-row");
-      panelContainer.appendChild(bottomRow);
-    }
 
     // 设置初始色相底色
     this.updateHueBg();

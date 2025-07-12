@@ -13,6 +13,8 @@ import {
   isObject,
   debounce,
   off,
+  insertNode,
+  ApplyOrder,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorToRgba, isValidColor, isAlphaColor } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -68,7 +70,7 @@ export default class ewColorPickerPredefinePlugin {
       this.container = create('div');
       addClass(this.container, 'ew-color-picker-predefine-container');
       // 直接插入到面板容器底部
-      panelContainer.appendChild(this.container);
+      insertNode(panelContainer, this.container);
     }
     
     // 清空旧内容
@@ -81,13 +83,12 @@ export default class ewColorPickerPredefinePlugin {
         const color = isString(colorData) ? colorData : colorData.color;
         const disabled = isObject(colorData) ? colorData.disabled : false;
         const item = create('div');
-        addClass(item, 'ew-color-picker-predefine-color' + (disabled ? ' ew-color-picker-predefine-color-disabled' : '') + (isAlphaColor(color) ? ' ew-color-picker-has-alpha' : ''));
-        item.tabIndex = index;
+        addClass(item, 'ew-color-picker-predefine-item');
         const colorItem = create('div');
         addClass(colorItem, 'ew-color-picker-predefine-color-item');
         setStyle(colorItem, 'backgroundColor', color);
-        item.appendChild(colorItem);
-        this.container!.appendChild(item);
+        insertNode(item, colorItem);
+        insertNode(this.container!, item);
         this.predefineItems.push(item);
       });
     }

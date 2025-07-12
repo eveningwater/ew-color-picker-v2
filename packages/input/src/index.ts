@@ -15,6 +15,7 @@ import {
   debounce,
   extend,
   off,
+  removeElement,
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorToRgba, isValidColor } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -53,7 +54,7 @@ export default class ewColorPickerInputPlugin {
     } else {
       // 如果禁用了输入框，移除DOM
       if (this.input && this.input.parentNode) {
-        this.input.parentNode.removeChild(this.input);
+        removeElement(this.input);
         this.input = null;
       }
     }
@@ -98,7 +99,7 @@ export default class ewColorPickerInputPlugin {
       } else {
         // 如果没有按钮组，直接插入到 bottomRow
         insertNode(bottomRow, inputContainer);
-    }
+      }
     }
     
     // 查找已存在的 input 元素，避免重复插入
@@ -113,9 +114,9 @@ export default class ewColorPickerInputPlugin {
           placeholder: '请输入颜色值'
         });
         
-        // 插入到 input 容器中
-        inputContainer.appendChild(this.input);
-    }
+        // 组装DOM结构
+        insertNode(inputContainer, this.input);
+      }
     }
     
     // 设置当前值

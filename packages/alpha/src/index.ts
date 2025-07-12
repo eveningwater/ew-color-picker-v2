@@ -1,4 +1,4 @@
-import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off, getRect, throttle } from "@ew-color-picker/utils";
+import { on, setStyle, addClass, removeClass, hasClass, isFunction, insertNode, ApplyOrder, extend, warn, create, $, off, getRect, throttle, removeElement } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorHsvaToRgba } from "@ew-color-picker/utils";
 import ewColorPicker,{ ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -44,7 +44,7 @@ export default class ewColorPickerAlphaPlugin {
     }
     // 移除旧的 alpha 条
     const oldAlpha = $('.ew-color-picker-slider.ew-alpha', panelContainer);
-    if (oldAlpha) panelContainer.removeChild(oldAlpha);
+    if (oldAlpha) removeElement(oldAlpha);
     // 创建 alpha 条
     const alphaSlider = create('div');
     addClass(alphaSlider, 'ew-color-picker-slider ew-alpha ' + (this.isHorizontal ? 'ew-color-picker-is-horizontal' : 'ew-color-picker-is-vertical'));
@@ -53,21 +53,21 @@ export default class ewColorPickerAlphaPlugin {
     // 背景层
     const alphaWrapper = create('div');
     addClass(alphaWrapper, 'ew-color-picker-alpha-slider-wrapper');
-    this.alphaBar.appendChild(alphaWrapper);
+    insertNode(this.alphaBar, alphaWrapper);
     const alphaBg = create('div');
     addClass(alphaBg, 'ew-color-picker-alpha-slider-bg');
-    this.alphaBar.appendChild(alphaBg);
+    insertNode(this.alphaBar, alphaBg);
     this.alphaThumb = create('div');
     addClass(this.alphaThumb, 'ew-color-picker-alpha-slider-thumb');
-    this.alphaBar.appendChild(this.alphaThumb);
-    alphaSlider.appendChild(this.alphaBar);
+    insertNode(this.alphaBar, this.alphaThumb);
+    insertNode(alphaSlider, this.alphaBar);
 
     // 插入到 bottom-row 之前
     const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
     if (bottomRow && bottomRow.parentNode) {
       bottomRow.parentNode.insertBefore(alphaSlider, bottomRow);
     } else {
-      panelContainer.appendChild(alphaSlider);
+      insertNode(panelContainer, alphaSlider);
     }
 
     // 设置初始 thumb 位置
@@ -88,7 +88,7 @@ export default class ewColorPickerAlphaPlugin {
 
   handleAlphaSliderClick(event: MouseEvent) {
     if (!this.alphaBar) return;
-    const rect = this.alphaBar.getBoundingClientRect();
+    const rect = getRect(this.alphaBar);
     const isHorizontal = this.isHorizontal;
     let alpha: number;
     if (isHorizontal) {
@@ -106,7 +106,7 @@ export default class ewColorPickerAlphaPlugin {
     const slider = this.alphaBar;
     const isHorizontal = this.isHorizontal;
     const moveHandler = (e: MouseEvent) => {
-      const rect = slider.getBoundingClientRect();
+      const rect = getRect(slider);
       let alpha: number;
       if (isHorizontal) {
         const x = e.clientX - rect.left;
