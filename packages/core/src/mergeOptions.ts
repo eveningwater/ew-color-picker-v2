@@ -123,13 +123,24 @@ export default class ewColorPickerMergeOptions
     }
     // 处理对象配置的情况
     else if (isShallowObject(options)) {
-      const { el, ...other } = options as ewColorPickerOptions;
-      console.log('[ewColorPicker merge] options:', options, 'el:', el);
-      result = extend({}, defaultConfig, {
-        el: checkContainer(el),
-        ...other,
-        ...pluginNameProp,
-      });
+      // 检查是否包含 el 属性
+      if ('el' in (options as any)) {
+        const { el, ...other } = options as ewColorPickerOptions;
+        console.log('[ewColorPicker merge] options with el:', options, 'el:', el);
+        result = extend({}, defaultConfig, {
+          el: checkContainer(el),
+          ...other,
+          ...pluginNameProp,
+        });
+      } else {
+        // 如果没有 el 属性，说明第一个参数是容器，第二个参数是选项
+        console.log('[ewColorPicker merge] options without el:', options);
+        result = extend({}, defaultConfig, {
+          el: document.body, // 这里会被后续的 pluginNameProp 覆盖
+          ...(options as Record<string, any>),
+          ...pluginNameProp,
+        });
+      }
     }
     // 处理空值或未定义的情况
     else {

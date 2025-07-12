@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test defaultColor Merge</title>
+</head>
+<body>
+    <div id="container"></div>
+    
+    <script type="module">
+        import EWColorPicker from './packages/ew-color-picker/dist/index.esm.js';
+        
+        const container = document.getElementById('container');
+        
+        // Test with custom defaultColor
+        const colorPicker = new EWColorPicker(container, {
+            defaultColor: '#ff0000',
+            showAlpha: true,
+            showHue: true,
+            showPanel: true
+        });
+        
+        console.log('ColorPicker options:', colorPicker.options);
+        console.log('defaultColor:', colorPicker.options.defaultColor);
+        console.log('Expected: #ff0000, Actual:', colorPicker.options.defaultColor);
+        
+        // Test without custom defaultColor
+        const container2 = document.createElement('div');
+        document.body.appendChild(container2);
+        
+        const colorPicker2 = new EWColorPicker(container2, {
+            showAlpha: true
+        });
+        
+        console.log('ColorPicker2 defaultColor:', colorPicker2.options.defaultColor);
+        console.log('Expected: #000000 (default), Actual:', colorPicker2.options.defaultColor);
+    </script>
+</body>
+</html> 

@@ -197,11 +197,24 @@ export default class ewColorPicker extends EventEmitter {
     return ewColorPicker;
   }
 
-  constructor(options?: ewColorPickerConstructorOptions | string) {
+  constructor(options?: ewColorPickerConstructorOptions | string | HTMLElement, secondOptions?: Record<string, any>) {
     super(EVENT_TYPES);
     
+    // 处理 new EWColorPicker(container, options) 的调用方式
+    let finalOptions: ewColorPickerConstructorOptions | string;
+    if (options instanceof HTMLElement && secondOptions) {
+      // 第一个参数是容器，第二个参数是选项
+      finalOptions = {
+        el: options,
+        ...secondOptions
+      };
+    } else {
+      // 第一个参数是选项或字符串选择器
+      finalOptions = options as ewColorPickerConstructorOptions | string;
+    }
+    
     // 初始化配置
-    this.options = new ewColorPickerMergeOptions().bindOptions(options, DEFAULT_PLUGINS);
+    this.options = new ewColorPickerMergeOptions().bindOptions(finalOptions, DEFAULT_PLUGINS);
     
     // 确保 defaultColor 有默认值（只有在未定义、null或空字符串时才设置）
     if (this.options.defaultColor === undefined || this.options.defaultColor === null || this.options.defaultColor === '') {
