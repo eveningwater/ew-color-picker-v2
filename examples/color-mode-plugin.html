@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EW Color Picker - Color Mode 插件示例</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../packages/style/dist/index.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .demo-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+        }
+        .demo-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .demo-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .color-picker-container {
+            display: inline-block;
+            margin: 10px;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .color-preview {
+            width: 200px;
+            height: 60px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 10px 0;
+            background: var(--current-color);
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .control-group {
+            margin: 10px 0;
+        }
+        .control-group label {
+            display: inline-block;
+            width: 120px;
+            font-weight: 500;
+        }
+        .control-group select {
+            padding: 5px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 150px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .mode-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .mode-value {
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .mode-description {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 6px;
+        }
+        .mode-example {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .mode-example h4 {
+            margin: 0 0 5px 0;
+            color: #007bff;
+        }
+        .mode-example code {
+            background: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>EW Color Picker - Color Mode 插件示例</h1>
+        
+        <div class="demo-item">
+            <div class="demo-title">颜色模式切换 - 基础功能</div>
+            <div class="demo-description">
+                Color Mode 插件提供了颜色格式切换功能，支持 HEX、RGB、HSL 三种颜色模式。
+                用户可以通过上下箭头按钮在不同模式间切换，每种模式都有对应的输入框格式。
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label>启用模式切换:</label>
+                    <input type="checkbox" id="openChangeColorMode" checked>
+                </div>
+                <div class="control-group">
+                    <label>默认模式:</label>
+                    <select id="defaultMode">
+                        <option value="hex">HEX</option>
+                        <option value="rgb">RGB</option>
+                        <option value="hsl">HSL</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="colorPicker1"></div>
+            <div class="color-preview" id="colorPreview1"></div>
+            <div class="mode-info" id="modeInfo1">
+                当前模式: <span class="mode-value">HEX</span>
+            </div>
+            <div class="result" id="result1">选择的颜色: 无</div>
+        </div>
+
+        <div class="demo-item">
+            <div class="demo-title">不同默认模式</div>
+            <div class="demo-description">
+                展示不同默认模式下的颜色选择器。
+            </div>
+            
+            <div id="colorPicker2"></div>
+            <div class="mode-info" id="modeInfo2">
+                当前模式: <span class="mode-value">RGB</span>
+            </div>
+            <div class="result" id="result2">选择的颜色: 无</div>
+        </div>
+
+        <div class="demo-item">
+            <div class="demo-title">禁用模式切换</div>
+            <div class="demo-description">
+                当 openChangeColorMode 设置为 false 时，模式切换功能将被禁用。
+            </div>
+            
+            <div id="colorPicker3"></div>
+            <div class="result" id="result3">选择的颜色: 无</div>
+        </div>
+
+        <div class="demo-item">
+            <div class="demo-title">颜色模式说明</div>
+            <div class="demo-description">
+                三种颜色模式的特点和用途：
+            </div>
+            <div class="mode-description">
+                <div class="mode-example">
+                    <h4>HEX 模式</h4>
+                    <p>十六进制颜色格式，最常用的网页颜色表示方法。</p>
+                    <code>#ff0000</code> (红色) | <code>#00ff00</code> (绿色) | <code>#0000ff</code> (蓝色)
+                </div>
+                <div class="mode-example">
+                    <h4>RGB 模式</h4>
+                    <p>红绿蓝三原色格式，每个分量范围 0-255。</p>
+                    <code>rgb(255, 0, 0)</code> (红色) | <code>rgb(0, 255, 0)</code> (绿色) | <code>rgb(0, 0, 255)</code> (蓝色)
+                </div>
+                <div class="mode-example">
+                    <h4>HSL 模式</h4>
+                    <p>色相、饱和度、明度格式，更符合人类感知。</p>
+                    <code>hsl(0, 100%, 50%)</code> (红色) | <code>hsl(120, 100%, 50%)</code> (绿色) | <code>hsl(240, 100%, 50%)</code> (蓝色)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入主包 -->
+    <script src="../packages/ewColorPicker/dist/index.js"></script>
+
+    <script>
+        // 基础配置
+        const baseOptions = {
+            hasBox: true,
+            hasPanel: true,
+            hasInput: true,
+            hasClear: true,
+            hasSure: true,
+            hue: true,
+            alpha: true,
+            predefineColor: [],
+            isClickOutside: true,
+            autoPanelPosition: true,
+            panelPlacement: 'bottom-start'
+        };
+
+        // 基础模式切换
+        const colorPicker1 = new ewColorPicker({
+            el: '#colorPicker1',
+            ...baseOptions,
+            openChangeColorMode: true,
+            defaultMode: 'hex'
+        });
+
+        // RGB 默认模式
+        const colorPicker2 = new ewColorPicker({
+            el: '#colorPicker2',
+            ...baseOptions,
+            openChangeColorMode: true,
+            defaultMode: 'rgb'
+        });
+
+        // 禁用模式切换
+        const colorPicker3 = new ewColorPicker({
+            el: '#colorPicker3',
+            ...baseOptions,
+            openChangeColorMode: false
+        });
+
+        // 事件监听
+        colorPicker1.on('change', function(color) {
+            document.getElementById('result1').textContent = '选择的颜色: ' + color;
+            document.getElementById('colorPreview1').style.setProperty('--current-color', color);
+        });
+
+        colorPicker1.on('modeChange', function(mode) {
+            const modeNames = { hex: 'HEX', rgb: 'RGB', hsl: 'HSL' };
+            document.getElementById('modeInfo1').innerHTML = 
+                `当前模式: <span class="mode-value">${modeNames[mode]}</span>`;
+        });
+
+        colorPicker2.on('change', function(color) {
+            document.getElementById('result2').textContent = '选择的颜色: ' + color;
+        });
+
+        colorPicker2.on('modeChange', function(mode) {
+            const modeNames = { hex: 'HEX', rgb: 'RGB', hsl: 'HSL' };
+            document.getElementById('modeInfo2').innerHTML = 
+                `当前模式: <span class="mode-value">${modeNames[mode]}</span>`;
+        });
+
+        colorPicker3.on('change', function(color) {
+            document.getElementById('result3').textContent = '选择的颜色: ' + color;
+        });
+
+        // 控制切换
+        document.getElementById('openChangeColorMode').addEventListener('change', function(e) {
+            colorPicker1.updateOptions({ openChangeColorMode: e.target.checked });
+        });
+
+        document.getElementById('defaultMode').addEventListener('change', function(e) {
+            colorPicker1.updateOptions({ defaultMode: e.target.value });
+        });
+
+        // 初始化颜色
+        colorPicker1.setColor('#ff6b6b');
+        colorPicker2.setColor('#4ecdc4');
+        colorPicker3.setColor('#45b7d1');
+    </script>
+</body>
+</html> 

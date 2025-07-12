@@ -108,7 +108,7 @@ export default class ewColorPickerColorModePlugin {
 
   run() {
     // 检查是否显示颜色模式
-    if (this.options.showColorMode === false) {
+    if (this.options.ewColorPickerColorMode === false) {
       return;
     }
     

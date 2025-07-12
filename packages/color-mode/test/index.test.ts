@@ -50,7 +50,7 @@ describe('color-mode Plugin', () => {
     });
 
     it('should not create color mode element when showColorMode is false', () => {
-      mockCore.options.showColorMode = false;
+      mockCore.options.ewColorPickerColorMode = false;
       const plugin = new ColorModePlugin(mockCore);
       
       const colorModeElement = container.querySelector('.ew-color-picker-mode-container');

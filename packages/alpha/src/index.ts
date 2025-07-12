@@ -23,7 +23,7 @@ export default class ewColorPickerAlphaPlugin {
     this.throttledUpdateAlpha = throttle(this.updateAlpha.bind(this), 16); // 60fps
     
     // 注册事件监听器
-    if (this.ewColorPicker.on && typeof this.ewColorPicker.on === 'function') {
+    if (isFunction(this.ewColorPicker.on)) {
       this.ewColorPicker.on('change', (color: string) => {
         // 当颜色改变时，更新 alpha 滑块位置
         const hsva = colorRgbaToHsva(color);
@@ -43,7 +43,7 @@ export default class ewColorPickerAlphaPlugin {
 
   run() {
     // 检查是否显示 alpha 滑块
-    if (this.options.showAlpha === false) {
+    if (!this.options.alpha) {
       return;
     }
     
@@ -172,8 +172,8 @@ export default class ewColorPickerAlphaPlugin {
     if (this.alphaBar) {
       off(this.alphaBar, 'click', this.handleAlphaSliderClick.bind(this) as EventListener);
       off(this.alphaBar, 'mousedown', this.handleAlphaSliderMouseDown.bind(this) as EventListener);
+      removeElement(this.alphaBar);
     }
-    
     // 清理DOM引用
     this.alphaBar = null;
     this.alphaThumb = null;
@@ -185,7 +185,7 @@ export default class ewColorPickerAlphaPlugin {
     this.handleOptions();
     
     // 注册事件监听器
-    if (core.on && typeof core.on === 'function') {
+    if (isFunction(core.on)) {
       core.on('change', (color: string) => {
         // 当颜色改变时，更新 alpha 滑块位置
         const hsva = colorRgbaToHsva(color);

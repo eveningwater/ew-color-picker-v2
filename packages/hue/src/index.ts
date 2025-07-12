@@ -33,7 +33,7 @@ export default class ewColorPickerHuePlugin {
 
   run() {
     // 检查是否显示 hue 滑块
-    if (this.options.showHue === false) {
+    if (this.options.ewColorPickerHue === false) {
       return;
     }
     

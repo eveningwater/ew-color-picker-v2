@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EW Color Picker - Panel 插件示例</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../packages/style/dist/index.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .demo-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+        }
+        .demo-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .demo-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .color-picker-container {
+            display: inline-block;
+            margin: 10px;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .color-preview {
+            width: 200px;
+            height: 60px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 10px 0;
+            background: var(--current-color);
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .control-group {
+            margin: 10px 0;
+        }
+        .control-group label {
+            display: inline-block;
+            width: 120px;
+            font-weight: 500;
+        }
+        .control-group select {
+            padding: 5px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 150px;
+        }
+        .panel-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e8;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .panel-value {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        .panel-placement-demo {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 6px;
+            border: 2px dashed #ccc;
+        }
+        .placement-item {
+            margin: 10px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .placement-item:hover {
+            background: #e3f2fd;
+        }
+        .placement-item.active {
+            background: #1976d2;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>EW Color Picker - Panel 插件示例</h1>
+        
+        <div class="demo-item">
+            <div class="demo-title">颜色面板 - 基础功能</div>
+            <div class="demo-description">
+                Panel 插件提供了完整的颜色选择面板，包括饱和度/明度选择区域。
+                用户可以在面板上点击或拖拽来选择颜色，面板会根据当前色相显示相应的颜色渐变。
+            </div>
+            
+            <div id="colorPicker1"></div>
+            <div class="color-preview" id="colorPreview1"></div>
+            <div class="panel-info" id="panelInfo1">
+                饱和度: <span class="panel-value">100%</span> | 明度: <span class="panel-value">100%</span>
+            </div>
+            <div class="result" id="result1">选择的颜色: 无</div>
+        </div>
+
+        <div class="demo-item">
+            <div class="demo-title">面板位置控制</div>
+            <div class="demo-description">
+                面板可以相对于触发元素自动定位，支持多种位置选项。
+            </div>
+            
+            <div class="panel-placement-demo">
+                <h4>选择面板位置:</h4>
+                <div class="placement-item" data-placement="bottom">bottom (底部)</div>
+                <div class="placement-item" data-placement="top">top (顶部)</div>
+                <div class="placement-item" data-placement="left">left (左侧)</div>
+                <div class="placement-item" data-placement="right">right (右侧)</div>
+                <div class="placement-item" data-placement="bottom-start">bottom-start (底部左对齐)</div>
+                <div class="placement-item" data-placement="bottom-end">bottom-end (底部右对齐)</div>
+                <div class="placement-item" data-placement="top-start">top-start (顶部左对齐)</div>
+                <div class="placement-item" data-placement="top-end">top-end (顶部右对齐)</div>
+            </div>
+            
+            <div id="colorPicker2"></div>
+            <div class="result" id="result2">选择的颜色: 无</div>
+        </div>
+
+        <div class="demo-item">
+            <div class="demo-title">禁用面板功能</div>
+            <div class="demo-description">
+                当 showPanel 设置为 false 时，颜色面板将被隐藏。
+            </div>
+            
+            <div id="colorPicker3"></div>
+            <div class="result" id="result3">选择的颜色: 无</div>
+        </div>
+
+        <div class="demo-item">
+            <div class="demo-title">面板功能说明</div>
+            <div class="demo-description">
+                颜色面板的功能特点：
+            </div>
+            <div class="panel-info">
+                <strong>饱和度 (Saturation)</strong>: 控制颜色的纯度，从灰色(0%)到纯色(100%)<br>
+                <strong>明度 (Value/Brightness)</strong>: 控制颜色的亮度，从黑色(0%)到白色(100%)<br>
+                <strong>自动定位</strong>: 面板会根据视口边界自动调整位置<br>
+                <strong>响应式</strong>: 支持触摸和鼠标操作<br>
+                <strong>实时预览</strong>: 选择过程中实时显示颜色变化
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入主包 -->
+    <script src="../packages/ewColorPicker/dist/index.js"></script>
+
+    <script>
+        // 基础配置
+        const baseOptions = {
+            hasBox: true,
+            hasPanel: true,
+            hasInput: true,
+            hasClear: true,
+            hasSure: true,
+            hue: true,
+            alpha: true,
+            predefineColor: [],
+            isClickOutside: true,
+            openChangeColorMode: true,
+            autoPanelPosition: true,
+            panelPlacement: 'bottom-start'
+        };
+
+        // 基础面板
+        const colorPicker1 = new ewColorPicker({
+            el: '#colorPicker1',
+            ...baseOptions,
+            showPanel: true
+        });
+
+        // 位置控制面板
+        const colorPicker2 = new ewColorPicker({
+            el: '#colorPicker2',
+            ...baseOptions,
+            showPanel: true,
+            autoPanelPosition: true
+        });
+
+        // 禁用面板
+        const colorPicker3 = new ewColorPicker({
+            el: '#colorPicker3',
+            ...baseOptions,
+            showPanel: false
+        });
+
+        // 事件监听
+        colorPicker1.on('change', function(color) {
+            document.getElementById('result1').textContent = '选择的颜色: ' + color;
+            document.getElementById('colorPreview1').style.setProperty('--current-color', color);
+            
+            // 更新面板信息
+            const hsva = colorPicker1.hsvaColor;
+            const saturation = Math.round(hsva.s);
+            const value = Math.round(hsva.v);
+            document.getElementById('panelInfo1').innerHTML = 
+                `饱和度: <span class="panel-value">${saturation}%</span> | 明度: <span class="panel-value">${value}%</span>`;
+        });
+
+        colorPicker2.on('change', function(color) {
+            document.getElementById('result2').textContent = '选择的颜色: ' + color;
+        });
+
+        colorPicker3.on('change', function(color) {
+            document.getElementById('result3').textContent = '选择的颜色: ' + color;
+        });
+
+        // 面板位置切换
+        document.querySelectorAll('.placement-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除其他活跃状态
+                document.querySelectorAll('.placement-item').forEach(el => el.classList.remove('active'));
+                // 添加当前活跃状态
+                this.classList.add('active');
+                
+                const placement = this.dataset.placement;
+                colorPicker2.updateOptions({ panelPlacement: placement });
+            });
+        });
+
+        // 初始化
+        colorPicker1.setColor('#ff6b6b');
+        colorPicker2.setColor('#4ecdc4');
+        colorPicker3.setColor('#45b7d1');
+        
+        // 设置默认活跃位置
+        document.querySelector('[data-placement="bottom"]').classList.add('active');
+    </script>
+</body>
+</html> 

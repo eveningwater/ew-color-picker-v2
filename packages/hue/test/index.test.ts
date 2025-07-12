@@ -39,7 +39,7 @@ describe('Hue Plugin', () => {
     });
 
     it('should not create hue element when showHue is false', () => {
-      mockCore.options.showHue = false;
+      mockCore.options.ewColorPickerHue = false;
       const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       

@@ -50,7 +50,7 @@ describe('Panel Plugin', () => {
     });
 
     it('should not create panel element when showPanel is false', () => {
-      mockCore.options.showPanel = false;
+      mockCore.options.ewColorPickerPanel = false;
       const plugin = new PanelPlugin(mockCore);
       
       const panelElement = container.querySelector('.ew-color-picker-panel');

@@ -73,7 +73,7 @@ export default class ewColorPickerPanelPlugin {
 
   run() {
     // 检查是否显示面板
-    if (this.options.showPanel === false) {
+    if (this.options.ewColorPickerPanel === false) {
       return;
     }
     

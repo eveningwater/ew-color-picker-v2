@@ -13,7 +13,7 @@ describe('Alpha Plugin', () => {
     
     // 使用通用的 mockCore 工厂函数
     mockCore = createMockCore(container, {
-        showAlpha: true,
+        alpha: true,
       defaultColor: '#ff0000',
       alphaDirection: 'vertical'
     });
@@ -46,7 +46,7 @@ describe('Alpha Plugin', () => {
     });
 
     it('should not create alpha element when showAlpha is false', () => {
-      mockCore.options.showAlpha = false;
+      mockCore.options.alpha = false;
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       

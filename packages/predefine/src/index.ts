@@ -54,7 +54,7 @@ export default class ewColorPickerPredefinePlugin {
 
   run() {
     // 检查是否显示预定义颜色
-    if (this.options.showPredefine === false) {
+    if (this.options.ewColorPickerPredefine === false) {
       return;
     }
     

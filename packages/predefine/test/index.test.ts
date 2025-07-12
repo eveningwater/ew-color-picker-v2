@@ -54,7 +54,7 @@ describe('Predefine Plugin', () => {
     });
 
     it('should not create predefine element when showPredefine is false', () => {
-      mockCore.options.showPredefine = false;
+      mockCore.options.ewColorPickerPredefine = false;
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
