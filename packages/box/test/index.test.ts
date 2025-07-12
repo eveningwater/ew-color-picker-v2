@@ -79,8 +79,8 @@ describe('Box Plugin', () => {
       // Simulate color change
       mockCore.getColor = vi.fn(() => '#00ff00');
       
-      // 触发 change 事件
-      mockCore.emit('change');
+      // 触发 change 事件，传递新颜色参数
+      mockCore.emit('change', '#00ff00');
       
       // Box should reflect new color
       const bg = boxElement.style.backgroundColor;

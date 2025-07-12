@@ -18,6 +18,7 @@ export interface MockCore {
   // 颜色相关方法
   getColor: () => string;
   setColor: (color: string) => void;
+  updateColor: (color: string) => void;
   
   // 事件相关方法
   on: (event: string, handler: Function) => void;
@@ -86,6 +87,9 @@ export function createMockCore(container: HTMLElement, options: any = {}): MockC
       mockCore.options.defaultColor = color;
       // 触发 change 事件
       mockCore.emit('change', color);
+    }),
+    updateColor: vi.fn((color: string) => {
+      mockCore.setColor(color);
     }),
     
     // 事件相关方法
