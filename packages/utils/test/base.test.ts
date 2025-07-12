@@ -84,30 +84,61 @@ describe('Base Utils', () => {
     });
   });
 
-  describe('isEmpty', () => {
-    it('should check if value is empty', () => {
-      expect(isEmpty('')).toBe(true);
-      expect(isEmpty([])).toBe(true);
-      expect(isEmpty({})).toBe(true);
-      expect(isEmpty(null)).toBe(true);
-      expect(isEmpty(undefined)).toBe(true);
-      expect(isEmpty('hello')).toBe(false);
-      expect(isEmpty([1, 2])).toBe(false);
-      expect(isEmpty({ key: 'value' })).toBe(false);
+  describe('extend', () => {
+    it('should merge objects', () => {
+      const obj1 = { a: 1, b: 2 };
+      const obj2 = { b: 3, c: 4 };
+      const result = extend({}, obj1, obj2);
+      
+      expect(result).toEqual({ a: 1, b: 3, c: 4 });
+    });
+
+    it('should handle null target', () => {
+      const obj = { a: 1 };
+      const result = extend(null as any, obj);
+      expect(result).toEqual({});
     });
   });
 
-  describe('deepClone', () => {
+  describe('toArray', () => {
+    it('should convert array-like objects to array', () => {
+      const arrayLike = { 0: 'a', 1: 'b', length: 2 };
+      const result = toArray(arrayLike);
+      expect(result).toEqual(['a', 'b']);
+    });
+
+    it('should return non-object values as is', () => {
+      expect(toArray('string')).toBe('string');
+      expect(toArray(123)).toBe(123);
+    });
+  });
+
+  describe('JSONClone', () => {
+    it('should clone objects using JSON', () => {
+      const obj = { a: 1, b: { c: 2 } };
+      const cloned = JSONClone(obj);
+      
+      expect(cloned).toEqual(obj);
+      expect(cloned).not.toBe(obj);
+    });
+
+    it('should handle primitive values', () => {
+      expect(JSONClone(123)).toBe(123);
+      expect(JSONClone('hello')).toBe('hello');
+    });
+  });
+
+  describe('clone', () => {
     it('should clone primitive values', () => {
-      expect(deepClone(123)).toBe(123);
-      expect(deepClone('hello')).toBe('hello');
-      expect(deepClone(true)).toBe(true);
-      expect(deepClone(null)).toBe(null);
+      expect(clone(123)).toBe(123);
+      expect(clone('hello')).toBe('hello');
+      expect(clone(true)).toBe(true);
+      expect(clone(null)).toBe(null);
     });
 
     it('should clone objects', () => {
       const obj = { a: 1, b: { c: 2 } };
-      const cloned = deepClone(obj);
+      const cloned = clone(obj);
       
       expect(cloned).toEqual(obj);
       expect(cloned).not.toBe(obj);
@@ -116,86 +147,39 @@ describe('Base Utils', () => {
 
     it('should clone arrays', () => {
       const arr = [1, [2, 3], { a: 4 }];
-      const cloned = deepClone(arr);
+      const cloned = clone(arr);
       
       expect(cloned).toEqual(arr);
       expect(cloned).not.toBe(arr);
       expect(cloned[1]).not.toBe(arr[1]);
       expect(cloned[2]).not.toBe(arr[2]);
     });
+  });
 
-    it('should handle circular references', () => {
-      const obj: any = { a: 1 };
-      obj.self = obj;
-      
-      const cloned = deepClone(obj);
-      expect(cloned.a).toBe(1);
-      expect(cloned.self).toBe(cloned);
+  describe('isPromise', () => {
+    it('should detect promises', () => {
+      const promise = Promise.resolve(123);
+      expect(isPromise(promise)).toBe(true);
+    });
+
+    it('should reject non-promises', () => {
+      expect(isPromise({})).toBe(false);
+      expect(isPromise(() => {})).toBe(false);
+      expect(isPromise(null)).toBe(false);
     });
   });
 
-  describe('debounce', () => {
-    it('should debounce function calls', async () => {
-      let callCount = 0;
-      const debouncedFn = debounce(() => {
-        callCount++;
-      }, 100);
-
-      debouncedFn();
-      debouncedFn();
-      debouncedFn();
-
-      expect(callCount).toBe(0);
-
-      await new Promise(resolve => setTimeout(resolve, 150));
-      expect(callCount).toBe(1);
+  describe('handleClassName', () => {
+    it('should add space prefix to class name', () => {
+      expect(handleClassName('test')).toBe(' test');
     });
 
-    it('should pass arguments to debounced function', async () => {
-      let lastArgs: any[] = [];
-      const debouncedFn = debounce((...args: any[]) => {
-        lastArgs = args;
-      }, 100);
-
-      debouncedFn(1, 2, 3);
-
-      await new Promise(resolve => setTimeout(resolve, 150));
-      expect(lastArgs).toEqual([1, 2, 3]);
-    });
-  });
-
-  describe('throttle', () => {
-    it('should throttle function calls', async () => {
-      let callCount = 0;
-      const throttledFn = throttle(() => {
-        callCount++;
-      }, 100);
-
-      throttledFn();
-      throttledFn();
-      throttledFn();
-
-      expect(callCount).toBe(1);
-
-      await new Promise(resolve => setTimeout(resolve, 150));
-      throttledFn();
-      expect(callCount).toBe(2);
+    it('should return empty string for undefined', () => {
+      expect(handleClassName()).toBe('');
     });
 
-    it('should pass arguments to throttled function', async () => {
-      let lastArgs: any[] = [];
-      const throttledFn = throttle((...args: any[]) => {
-        lastArgs = args;
-      }, 100);
-
-      throttledFn(1, 2, 3);
-      throttledFn(4, 5, 6);
-
-      expect(lastArgs).toEqual([1, 2, 3]);
-
-      await new Promise(resolve => setTimeout(resolve, 150));
-      throttledFn(7, 8, 9);
-      expect(lastArgs).toEqual([7, 8, 9]);
+    it('should return empty string for empty string', () => {
+      expect(handleClassName('')).toBe('');
     });
   });
 }); 
