@@ -37,6 +37,8 @@ describe('Input Plugin', () => {
       emit: vi.fn(),
       getColor: vi.fn(() => '#ff0000'),
       setColor: vi.fn(),
+      destroy: vi.fn(),
+      trigger: vi.fn()
     };
   });
 

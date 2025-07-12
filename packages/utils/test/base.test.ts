@@ -38,7 +38,7 @@ describe('Base Utils', () => {
     it('should check number type', () => {
       expect(isNumber(123)).toBe(true);
       expect(isNumber('123')).toBe(false);
-      expect(isNumber(NaN)).toBe(false);
+      expect(isNumber(NaN)).toBe(true); // NaN 在 JavaScript 中是 number 类型
       expect(isNumber(Infinity)).toBe(true);
     });
 

@@ -12,25 +12,39 @@ export const classnames = (...args: ArgumentArray) => {
       continue;
     }
     if (typeof arg === "string" || typeof arg === "number") {
-      classes.push(arg);
+      const trimmed = String(arg).trim();
+      if (trimmed) {
+        classes.push(trimmed);
+      }
     } else if (Array.isArray(arg)) {
       if (arg.length) {
         const __class = classnames.apply(null, arg);
         if (__class) {
-          classes.push(__class);
+          const trimmed = __class.trim();
+          if (trimmed) {
+            classes.push(trimmed);
+          }
         }
       }
     } else if (typeof arg === "object") {
       if (arg.toString === Object.prototype.toString) {
         for (let key in arg) {
           if (_hasOwn.call(arg, key) && arg[key]) {
-            classes.push(key);
+            const trimmed = key.trim();
+            if (trimmed) {
+              classes.push(trimmed);
+            }
           }
         }
       } else {
-        classes.push(String(arg));
+        const trimmed = String(arg).trim();
+        if (trimmed) {
+          classes.push(trimmed);
+        }
       }
     }
   }
-  return classes.join(" ");
+  // 去重并返回
+  const uniqueClasses = Array.from(new Set(classes));
+  return uniqueClasses.join(" ");
 };

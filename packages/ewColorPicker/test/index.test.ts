@@ -23,7 +23,7 @@ describe('EWColorPicker', () => {
       colorPicker = new EWColorPicker(container);
       
       expect(colorPicker).toBeInstanceOf(EWColorPicker);
-      expect(colorPicker.container).toBe(container);
+      expect(colorPicker.wrapper).toBe(container);
       expect(colorPicker.options).toBeDefined();
     });
 

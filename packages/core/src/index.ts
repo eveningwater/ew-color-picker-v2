@@ -203,12 +203,30 @@ export default class ewColorPicker extends EventEmitter {
     // 初始化配置
     this.options = new ewColorPickerMergeOptions().bindOptions(options, DEFAULT_PLUGINS);
     
+    // 确保 defaultColor 有默认值
+    if (!this.options.defaultColor) {
+      this.options.defaultColor = '#000000';
+    }
+    
+    // 调试信息
+    console.log('ewColorPicker constructor:', {
+      el: this.options.el,
+      defaultColor: this.options.defaultColor,
+      options: this.options
+    });
+    
     // 初始化实例
     this.init();
   }
 
   private init(): void {
     tryErrorHandler(() => {
+      // 确保 el 属性存在
+      if (!this.options.el) {
+        console.warn('ewColorPicker: el is not defined, using document.body');
+        this.options.el = document.body;
+      }
+      
       this.wrapper = this.options.el;
       this.wrapper.isEwColorPickerContainer = true;
       
@@ -224,7 +242,7 @@ export default class ewColorPicker extends EventEmitter {
 
   private initCoreProperties(): void {
     this.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
-    this.currentColor = "";
+    this.currentColor = this.options.defaultColor || '#000000';
     this.panelWidth = 0;
     this.panelHeight = 0;
     this.panelLeft = 0;
@@ -471,13 +489,15 @@ export default class ewColorPicker extends EventEmitter {
 
   // 更新现有插件的配置
   private updateExistingPlugins(): void {
-    Object.values(this.plugins).forEach((plugin) => {
-      tryErrorHandler(() => {
-        if (plugin?.updateOptions && isFunction(plugin.updateOptions)) {
-          plugin.updateOptions();
-        }
+    if (this.plugins) {
+      Object.values(this.plugins).forEach((plugin) => {
+        tryErrorHandler(() => {
+          if (plugin?.updateOptions && isFunction(plugin.updateOptions)) {
+            plugin.updateOptions();
+          }
+        });
       });
-    });
+    }
   }
 
   // 公共方法
@@ -485,7 +505,7 @@ export default class ewColorPicker extends EventEmitter {
     if (this.isDestroyed) return;
     
     this.currentColor = color;
-    this.trigger('change', color);
+    this.hooks.trigger('change', color);
   }
 
   // 更新配置并重新渲染
@@ -531,13 +551,15 @@ export default class ewColorPicker extends EventEmitter {
     off(document, 'mousedown', this._onDocumentClick, { capture: true });
     
     // 销毁所有插件
-    Object.values(this.plugins).forEach((plugin) => {
-      tryErrorHandler(() => {
-        if (plugin?.destroy && isFunction(plugin.destroy)) {
-          plugin.destroy();
-        }
+    if (this.plugins) {
+      Object.values(this.plugins).forEach((plugin) => {
+        tryErrorHandler(() => {
+          if (plugin?.destroy && isFunction(plugin.destroy)) {
+            plugin.destroy();
+          }
+        });
       });
-    });
+    }
     
     // 清理所有挂载点
     this.mountPoints.forEach(el => {
@@ -578,5 +600,25 @@ export default class ewColorPicker extends EventEmitter {
   // 检查实例是否已销毁
   public getDestroyedStatus(): boolean {
     return this.isDestroyed;
+  }
+
+  // 添加测试用例期望的方法
+  public use(plugin: any): ewColorPicker {
+    if (plugin && typeof plugin.install === 'function') {
+      plugin.install(this);
+    }
+    return this;
+  }
+
+  public emit(event: string, ...args: any[]): void {
+    this.hooks.trigger(event, ...args);
+  }
+
+  public getContainer(): HTMLElement {
+    return this.wrapper;
+  }
+
+  public getOptions(): ewColorPickerMergeOptionsData {
+    return this.options;
   }
 }

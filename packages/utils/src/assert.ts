@@ -55,7 +55,7 @@ type AssertRes = {
 
 const noop = () => { };
 
-const assert: AssertRes = {
+const assertObj: AssertRes = {
     log: noop,
     warn: noop,
     error: noop
@@ -63,7 +63,7 @@ const assert: AssertRes = {
 
 // 为每个方法添加样式，只在开发环境中启用
 assertLists.forEach(key => {
-  assert[key] = <T>(...v: T[]) => {
+  assertObj[key] = <T>(...v: T[]) => {
     if (__DEV__) {
       const formattedArgs = formatMessage(key, ...v);
       console[key](...formattedArgs);
@@ -71,6 +71,13 @@ assertLists.forEach(key => {
   };
 });
 
-export const warn = assert.warn;
-export const error = assert.error;
-export const log = assert.log;
+export const warn = assertObj.warn;
+export const error = assertObj.error;
+export const log = assertObj.log;
+
+// 简单的断言函数
+export const assert = (condition: boolean, message?: string): void => {
+  if (!condition) {
+    throw new Error(message || 'Assertion failed');
+  }
+};

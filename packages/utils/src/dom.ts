@@ -131,7 +131,10 @@ export const insertNode = (el: HTMLElement, node: Node, oldNode?: Node | null, b
     el?.appendChild(node);
   }
 };
-export const checkContainer = (el: string | HTMLElement): HTMLElement => {
+export const checkContainer = (el: string | HTMLElement | undefined): HTMLElement => {
+  if (!el) {
+    return document.body;
+  }
   if (isString(el)) {
     const element = $(el);
     if (!element) {

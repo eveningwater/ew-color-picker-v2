@@ -10,7 +10,11 @@ describe('Assert Utils', () => {
 
       warn('Test warning message');
 
-      expect(mockWarn).toHaveBeenCalledWith('[ewColorPicker warning]: Test warning message');
+      expect(mockWarn).toHaveBeenCalled();
+      const callArgs = mockWarn.mock.calls[0];
+      expect(callArgs[0]).toContain('⚠️ [ewColorPicker WARN]');
+      expect(callArgs[1]).toContain('color: #FF9800');
+      expect(callArgs[2]).toBe('Test warning message');
 
       console.warn = originalWarn;
     });
@@ -24,7 +28,11 @@ describe('Assert Utils', () => {
 
       error('Test error message');
 
-      expect(mockError).toHaveBeenCalledWith('[ewColorPicker error]: Test error message');
+      expect(mockError).toHaveBeenCalled();
+      const callArgs = mockError.mock.calls[0];
+      expect(callArgs[0]).toContain('❌ [ewColorPicker ERROR]');
+      expect(callArgs[1]).toContain('color: #F44336');
+      expect(callArgs[2]).toBe('Test error message');
 
       console.error = originalError;
     });

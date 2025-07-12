@@ -124,6 +124,7 @@ export default class ewColorPickerMergeOptions
     // 处理对象配置的情况
     else if (isShallowObject(options)) {
       const { el, ...other } = options as ewColorPickerOptions;
+      console.log('[ewColorPicker merge] options:', options, 'el:', el);
       result = extend(defaultConfig, {
         el: checkContainer(el),
         ...other,

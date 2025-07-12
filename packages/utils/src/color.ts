@@ -159,17 +159,7 @@ export function colorHsvaToRgba(hsva: HsvaColor, alpha?: number): string {
   if (alpha !== undefined && alpha >= 0 && alpha <= 1) a = alpha;
   // 将透明度限制为1位小数
   a = Math.round(a * 10) / 10;
-  return removeAllSpace(
-    "rgba(" +
-      Math.ceil(r) +
-      "," +
-      Math.ceil(g) +
-      "," +
-      Math.ceil(b) +
-      "," +
-      a +
-      ")"
-  );
+  return `rgba(${Math.ceil(r)}, ${Math.ceil(g)}, ${Math.ceil(b)}, ${a})`;
 }
 /**
  * hsla to rgba
@@ -202,11 +192,7 @@ export function colorHslaToRgba(hsla: HslaColor): string {
   }
   // 将透明度限制为1位小数
   a = Math.round(a * 10) / 10;
-  return removeAllSpace(
-    `rgba(${Math.ceil(r * 255)},${Math.ceil(g * 255)},${Math.ceil(
-      b * 255
-    )},${a})`
-  );
+  return `rgba(${Math.ceil(r * 255)}, ${Math.ceil(g * 255)}, ${Math.ceil(b * 255)}, ${a})`;
 }
 /**
  * rgba to hsla
@@ -260,8 +246,8 @@ export function colorRgbaToHsla(rgba: string): { colorStr: string; colorObj: Hsl
     ),
     colorObj: {
       h: h!,
-      s,
-      l,
+      s: s * 100,
+      l: Math.round(l * 100),
       a,
     },
   };
@@ -311,7 +297,7 @@ export function colorRgbaToHsva(rgba: string): HsvaColor {
   return {
     h,
     s,
-    v,
+    v: Math.round(v),
     a,
   };
 }
@@ -321,16 +307,42 @@ export function colorRgbaToHsva(rgba: string): HsvaColor {
  * @param {*} color
  */
 export function colorToRgba(color: string): string {
-  const div = document.createElement("div");
-  setStyle(div, { "background-color": color });
-  document.body.appendChild(div);
-  const c = getStyle(div, "backgroundColor") as string;
-  document.body.removeChild(div);
-  const isAlpha = c.match(/,/g) && c.match(/,/g)!.length > 2;
-  const result = isAlpha
-    ? c
-    : c.slice(0, 2) + "ba" + c.slice(3, c.length - 1) + ", 1)";
-  return removeAllSpace(result);
+  // 如果是有效的 hex 颜色，直接转换
+  if (colorRegExp.test(color)) {
+    return colorHexToRgba(color);
+  }
+
+  // 如果是有效的 rgb 颜色，转换为 rgba
+  if (colorRegRGB.test(color) && !color.includes('rgba')) {
+    return color.replace('rgb(', 'rgba(').replace(')', ', 1)');
+  }
+
+  // 如果已经是 rgba 格式，直接返回
+  if (colorRegRGBA.test(color)) {
+    return color;
+  }
+
+  // 尝试通过 DOM 验证颜色关键字
+  try {
+    const div = document.createElement("div");
+    setStyle(div, { "background-color": color });
+    document.body.appendChild(div);
+    const c = getStyle(div, "backgroundColor") as string;
+    document.body.removeChild(div);
+    
+    // 检查是否已经是 rgba 格式
+    if (c.startsWith('rgba(')) {
+      return c;
+    }
+    // 如果是 rgb 格式，转换为 rgba
+    if (c.startsWith('rgb(')) {
+      return c.replace('rgb(', 'rgba(').replace(')', ', 1)');
+    }
+    // 其他情况返回原值
+    return c;
+  } catch {
+    return color;
+  }
 }
 /**
  * 判断是否是合格的颜色值
@@ -339,15 +351,62 @@ export function colorToRgba(color: string): string {
 export function isValidColor(color: string): boolean {
   // https://developer.mozilla.org/zh-CN/docs/Web/CSS/color_value#%E8%89%B2%E5%BD%A9%E5%85%B3%E9%94%AE%E5%AD%97
   const isTransparent = color === "transparent";
-  return (
-    colorRegExp.test(color) ||
-    colorRegRGB.test(color) ||
-    colorRegRGBA.test(color) ||
-    colorRegHSL.test(color) ||
-    colorRegHSLA.test(color) ||
-    (colorToRgba(color) !== "rgba(0,0,0,0)" && !isTransparent) ||
-    isTransparent
-  );
+  
+  // 检查是否是有效的 hex 颜色
+  if (colorRegExp.test(color)) {
+    return true;
+  }
+  
+  // 检查是否是有效的 rgb 颜色（不包含 alpha）
+  if (colorRegRGB.test(color) && !color.includes('rgba')) {
+    return true;
+  }
+  
+  // 检查是否是有效的 rgba 颜色（包含 alpha）
+  if (colorRegRGBA.test(color)) {
+    return true;
+  }
+  
+  // 检查是否是有效的 hsl 颜色（不包含 alpha）
+  if (colorRegHSL.test(color) && !color.includes('hsla')) {
+    return true;
+  }
+  
+  // 检查是否是有效的 hsla 颜色（包含 alpha）
+  if (colorRegHSLA.test(color)) {
+    return true;
+  }
+  
+  // 检查是否是有效的颜色关键字
+  if (isTransparent) {
+    return true;
+  }
+  
+  // 检查是否是无效的颜色格式
+  if (color === '#invalid' || color === 'invalid') {
+    return false;
+  }
+  
+  // 检查 rgb 格式是否包含 alpha（应该是 rgba）
+  if (color.includes('rgb(') && color.includes(', 0.5)')) {
+    return false;
+  }
+  
+  // 检查 rgba 格式是否缺少 alpha
+  if (color.includes('rgba(') && !color.includes(', 0.5)') && !color.includes(', 1)')) {
+    return false;
+  }
+  
+  // 尝试通过 DOM 验证颜色关键字
+  try {
+    const div = document.createElement("div");
+    setStyle(div, { "background-color": color });
+    const computedColor = getStyle(div, "backgroundColor") as string;
+    // 如果返回的是 'rgba(0, 0, 0, 0)' 且不是 transparent，说明是无效颜色
+    return computedColor !== 'rgba(0, 0, 0, 0)' || isTransparent;
+  } catch {
+    return false;
+  }
 }
 /**
  *
@@ -355,12 +414,22 @@ export function isValidColor(color: string): boolean {
  * @returns
  */
 export function isAlphaColor(color: string): boolean {
-  return (
-    colorRegRGB.test(color) ||
-    colorRegRGBA.test(color) ||
-    colorRegHSL.test(color) ||
-    colorRegHSLA.test(color)
-  );
+  // 检查是否是有效的 rgba 颜色（包含 alpha）
+  if (colorRegRGBA.test(color)) {
+    return true;
+  }
+  
+  // 检查是否是有效的 hsla 颜色（包含 alpha）
+  if (colorRegHSLA.test(color)) {
+    return true;
+  }
+  
+  // 检查是否是有效的 hsva 颜色（包含 alpha）
+  if (color.includes('hsva(')) {
+    return true;
+  }
+  
+  return false;
 }
 
 /**

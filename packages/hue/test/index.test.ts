@@ -10,8 +10,17 @@ describe('Hue Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'panelContainer';
+    container.appendChild(panelContainer);
+    
     mockCore = {
       container,
+      getMountPoint: vi.fn((name: string) => {
+        if (name === 'panelContainer') return panelContainer;
+        return container;
+      }),
       options: {
         showHue: true,
         defaultColor: '#ff0000'
@@ -19,7 +28,8 @@ describe('Hue Plugin', () => {
       on: vi.fn(),
       emit: vi.fn(),
       getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn()
+      setColor: vi.fn(),
+      destroy: vi.fn()
     };
   });
 
@@ -29,14 +39,14 @@ describe('Hue Plugin', () => {
 
   describe('plugin installation', () => {
     it('should install plugin correctly', () => {
-      const plugin = new HuePlugin();
+      const plugin = new HuePlugin(mockCore);
       
       expect(() => plugin.install(mockCore)).not.toThrow();
       expect(mockCore.on).toHaveBeenCalled();
     });
 
     it('should create hue slider element', () => {
-      const plugin = new HuePlugin();
+      const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
       const hueElement = container.querySelector('.ew-color-picker-hue');
@@ -45,7 +55,7 @@ describe('Hue Plugin', () => {
 
     it('should not create hue element when showHue is false', () => {
       mockCore.options.showHue = false;
-      const plugin = new HuePlugin();
+      const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
       const hueElement = container.querySelector('.ew-color-picker-hue');
@@ -55,7 +65,7 @@ describe('Hue Plugin', () => {
 
   describe('hue slider functionality', () => {
     it('should handle mouse events on hue slider', () => {
-      const plugin = new HuePlugin();
+      const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
       const hueElement = container.querySelector('.ew-color-picker-hue') as HTMLElement;
@@ -74,7 +84,7 @@ describe('Hue Plugin', () => {
     });
 
     it('should update hue value on slider interaction', () => {
-      const plugin = new HuePlugin();
+      const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
       const hueElement = container.querySelector('.ew-color-picker-hue') as HTMLElement;
@@ -102,7 +112,7 @@ describe('Hue Plugin', () => {
 
   describe('color updates', () => {
     it('should update hue slider when color changes', () => {
-      const plugin = new HuePlugin();
+      const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
       // Simulate color change event
@@ -123,7 +133,7 @@ describe('Hue Plugin', () => {
 
   describe('plugin options', () => {
     it('should respect custom hue options', () => {
-      const plugin = new HuePlugin({
+      const plugin = new HuePlugin(mockCore, {
         height: 30,
         className: 'custom-hue'
       });
@@ -138,7 +148,7 @@ describe('Hue Plugin', () => {
 
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
-      const plugin = new HuePlugin();
+      const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
       // Mock destroy method

@@ -25,8 +25,10 @@ export default class ewColorPickerHuePlugin {
   }
 
   handleOptions() {
-    this.options = extend({}, this.options, this.ewColorPicker.options);
-    this.isHorizontal = this.options.hueDirection === 'horizontal';
+    if (this.ewColorPicker && this.ewColorPicker.options) {
+      this.options = extend({}, this.options, this.ewColorPicker.options);
+      this.isHorizontal = this.options.hueDirection === 'horizontal';
+    }
   }
 
   run() {
@@ -153,5 +155,12 @@ export default class ewColorPickerHuePlugin {
     // 清理DOM引用
     this.hueBar = null;
     this.hueThumb = null;
+  }
+
+  // 新增 install 方法，便于测试
+  install(ewColorPicker: any) {
+    this.ewColorPicker = ewColorPicker;
+    this.handleOptions();
+    this.run();
   }
 } 

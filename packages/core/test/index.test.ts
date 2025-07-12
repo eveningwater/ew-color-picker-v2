@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
-import { EWColorPickerCore } from '../src/index';
+import ewColorPicker from '../src/index';
 
-describe('EWColorPickerCore', () => {
+describe('ewColorPicker', () => {
   let container: HTMLElement;
-  let core: EWColorPickerCore;
+  let core: ewColorPicker;
 
   beforeEach(() => {
     container = create('div');
@@ -20,21 +20,22 @@ describe('EWColorPickerCore', () => {
 
   describe('initialization', () => {
     it('should create core instance with default options', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       
-      expect(core).toBeInstanceOf(EWColorPickerCore);
-      expect(core.container).toBe(container);
+      expect(core).toBeInstanceOf(ewColorPicker);
+      expect(core.wrapper).toBe(container);
       expect(core.options).toBeDefined();
     });
 
     it('should create core instance with custom options', () => {
       const options = {
+        el: container,
         defaultColor: '#ff0000',
         showAlpha: true,
         showHue: true
       };
       
-      core = new EWColorPickerCore(container, options);
+      core = new ewColorPicker(options);
       
       expect(core.options.defaultColor).toBe('#ff0000');
       expect(core.options.showAlpha).toBe(true);
@@ -44,7 +45,7 @@ describe('EWColorPickerCore', () => {
 
   describe('plugin management', () => {
     it('should register plugins', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       
       const mockPlugin = {
         name: 'test-plugin',
@@ -62,9 +63,8 @@ describe('EWColorPickerCore', () => {
         install: vi.fn()
       };
       
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       core.use(mockPlugin);
-      core.init();
       
       expect(mockPlugin.install).toHaveBeenCalled();
     });
@@ -72,7 +72,7 @@ describe('EWColorPickerCore', () => {
 
   describe('color management', () => {
     it('should set and get color', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       
       core.setColor('#00ff00');
       const color = core.getColor();
@@ -81,10 +81,10 @@ describe('EWColorPickerCore', () => {
     });
 
     it('should emit color change events', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       let eventEmitted = false;
       
-      core.on('change', () => {
+      core.hooks.on('change', () => {
         eventEmitted = true;
       });
       
@@ -96,21 +96,19 @@ describe('EWColorPickerCore', () => {
 
   describe('lifecycle methods', () => {
     it('should initialize properly', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       
-      expect(() => core.init()).not.toThrow();
+      expect(core).toBeDefined();
     });
 
     it('should destroy properly', () => {
-      core = new EWColorPickerCore(container);
-      core.init();
+      core = new ewColorPicker({ el: container });
       
       expect(() => core.destroy()).not.toThrow();
     });
 
     it('should handle multiple destroy calls', () => {
-      core = new EWColorPickerCore(container);
-      core.init();
+      core = new ewColorPicker({ el: container });
       core.destroy();
       
       expect(() => core.destroy()).not.toThrow();
@@ -119,10 +117,10 @@ describe('EWColorPickerCore', () => {
 
   describe('event handling', () => {
     it('should register event listeners', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       let eventHandled = false;
       
-      core.on('test-event', () => {
+      core.hooks.on('test-event', () => {
         eventHandled = true;
       });
       
@@ -132,15 +130,15 @@ describe('EWColorPickerCore', () => {
     });
 
     it('should remove event listeners', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       let eventHandled = false;
       
       const handler = () => {
         eventHandled = true;
       };
       
-      core.on('test-event', handler);
-      core.off('test-event', handler);
+      core.hooks.on('test-event', handler);
+      core.hooks.off('test-event', handler);
       core.emit('test-event');
       
       expect(eventHandled).toBe(false);
@@ -149,20 +147,20 @@ describe('EWColorPickerCore', () => {
 
   describe('utility methods', () => {
     it('should get container element', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       
       expect(core.getContainer()).toBe(container);
     });
 
     it('should get current options', () => {
-      const options = { defaultColor: '#ff0000' };
-      core = new EWColorPickerCore(container, options);
+      const options = { el: container, defaultColor: '#ff0000' };
+      core = new ewColorPicker(options);
       
       expect(core.getOptions()).toEqual(expect.objectContaining(options));
     });
 
     it('should update options', () => {
-      core = new EWColorPickerCore(container);
+      core = new ewColorPicker({ el: container });
       const newOptions = { showAlpha: true };
       
       core.updateOptions(newOptions);
