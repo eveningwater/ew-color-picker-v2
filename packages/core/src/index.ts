@@ -25,6 +25,7 @@ import {
   colorRgbaToHsva,
   colorHsvaToRgba,
   colorRgbaToHex,
+  colorToRgba,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -226,10 +227,8 @@ export default class ewColorPicker extends EventEmitter {
     // 初始化配置
     this.options = new ewColorPickerMergeOptions().bindOptions(finalOptions, DEFAULT_PLUGINS);
     
-    // 确保 defaultColor 有默认值（只有在未定义、null或空字符串时才设置）
-    if (this.options.defaultColor === undefined || this.options.defaultColor === null || this.options.defaultColor === '') {
-      this.options.defaultColor = '#000000';
-    }
+    // 不设置默认颜色，让用户决定是否传递 defaultColor
+    // 只有在打开面板时才需要默认颜色
     
     // 初始化实例
     this.init();
@@ -256,24 +255,28 @@ export default class ewColorPicker extends EventEmitter {
   private initCoreProperties(): void {
     this.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
     
-    // 根据配置正确设置默认颜色格式
-    let defaultColor = this.options.defaultColor || '#ff0000';
-    
-    // 如果开启了 alpha 配置，需要转换为 rgba 格式
-    if (this.options.alpha) {
-      // 如果默认颜色是 hex 格式，转换为 rgba
-      if (defaultColor.startsWith('#')) {
-        const hsva = colorRgbaToHsva(defaultColor);
-        defaultColor = colorHsvaToRgba(hsva);
+    // 如果没有设置默认颜色，则不设置 currentColor
+    if (this.options.defaultColor) {
+      let defaultColor = this.options.defaultColor;
+      
+      // 如果开启了 alpha 配置，需要转换为 rgba 格式
+      if (this.options.alpha) {
+        // 如果默认颜色是 hex 格式，先转换为 rgba 格式
+        if (defaultColor.startsWith('#')) {
+          defaultColor = colorToRgba(defaultColor);
+        }
+      } else {
+        // 如果没有开启 alpha，确保是 hex 格式
+        if (defaultColor.startsWith('rgba')) {
+          defaultColor = colorRgbaToHex(defaultColor);
+        }
       }
+      
+      this.currentColor = defaultColor;
     } else {
-      // 如果没有开启 alpha，确保是 hex 格式
-      if (defaultColor.startsWith('rgba')) {
-        defaultColor = colorRgbaToHex(defaultColor);
-      }
+      // 没有默认颜色时，设置为空字符串
+      this.currentColor = '';
     }
-    
-    this.currentColor = defaultColor;
     this.panelWidth = 0;
     this.panelHeight = 0;
     this.panelLeft = 0;
@@ -322,6 +325,19 @@ export default class ewColorPicker extends EventEmitter {
     
     const panelContainer = this.mountPoints.get('panelContainer');
     if (!panelContainer) return;
+
+    // 如果当前没有颜色，设置默认的红色
+    if (!this.currentColor) {
+      let defaultColor = '#ff0000';
+      
+      // 如果开启了 alpha 配置，转换为 rgba 格式
+      if (this.options.alpha) {
+        defaultColor = colorToRgba(defaultColor);
+      }
+      
+      this.currentColor = defaultColor;
+      this.hsvaColor = colorRgbaToHsva(defaultColor);
+    }
 
     const type = animationType || getAnimationType(this);
     const time = duration || this.options.pickerAnimationTime || DEFAULT_ANIMATION_TIME;
@@ -617,7 +633,16 @@ export default class ewColorPicker extends EventEmitter {
   }
 
   public setColor(color: string): void {
-    this.updateColor(color);
+    // 更新当前颜色
+    this.currentColor = color;
+    
+    // 更新 HSVA 颜色值
+    if (color) {
+      this.hsvaColor = colorRgbaToHsva(color);
+    }
+    
+    // 触发颜色变化事件
+    this.trigger('change', color);
   }
 
   public getColor(): string {

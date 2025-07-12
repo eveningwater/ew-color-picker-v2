@@ -60,6 +60,18 @@ export default class ewColorPickerPanelPlugin {
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
+    
+    // 注册颜色变化事件监听器
+    if (this.ewColorPicker.on && typeof this.ewColorPicker.on === 'function') {
+      this.ewColorPicker.on('change', (color: string) => {
+        // 当颜色改变时，更新面板光标位置
+        if (color && this.panel) {
+          const hsva = colorRgbaToHsva(color);
+          this.updateCursorPosition(hsva.s, hsva.v);
+        }
+      });
+    }
+    
     this.run();
   }
 
@@ -147,8 +159,16 @@ export default class ewColorPickerPanelPlugin {
 
     // 设置初始色相底色
     this.updateHueBg();
-    // 设置初始光标位置
-    this.updateCursorPosition(100, 100);
+    
+    // 根据当前颜色设置初始光标位置
+    const currentColor = this.ewColorPicker.getColor();
+    if (currentColor) {
+      const hsva = colorRgbaToHsva(currentColor);
+      this.updateCursorPosition(hsva.s, hsva.v);
+    } else {
+      // 默认位置（红色，饱和度和明度都是100%）
+      this.updateCursorPosition(100, 100);
+    }
   }
 
   bindEvents() {
@@ -241,8 +261,17 @@ export default class ewColorPickerPanelPlugin {
 
   updateHueBg(hue?: number) {
     if (this.panel) {
-      // 如果传入了 hue 参数，使用传入的值；否则默认使用红色 (h=0)
-      const targetHue = hue !== undefined ? hue : 0;
+      // 如果传入了 hue 参数，使用传入的值；否则使用当前的 hue 值
+      let targetHue = hue;
+      if (targetHue === undefined) {
+        const currentColor = this.ewColorPicker.getColor();
+        if (currentColor) {
+          const hsva = colorRgbaToHsva(currentColor);
+          targetHue = hsva.h;
+        } else {
+          targetHue = 0; // 默认红色
+        }
+      }
       const hueColor = colorHsvaToRgba({ h: targetHue, s: 100, v: 100, a: 1 });
       setStyle(this.panel, {
         background: hueColor,

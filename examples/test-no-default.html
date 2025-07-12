@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试无默认颜色</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../packages/style/dist/index.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .test-description {
+            margin-bottom: 15px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .color-picker-container {
+            display: inline-block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>测试无默认颜色行为</h1>
+        
+        <div class="test-item">
+            <div class="test-title">1. 无默认颜色（不传递 defaultColor）</div>
+            <div class="test-description">
+                不传递 defaultColor 参数，颜色盒子应该没有背景色，显示关闭图标。
+                点击打开面板后，面板会显示默认的红色。
+            </div>
+            <div class="color-picker-container">
+                <div id="colorPicker1"></div>
+            </div>
+            <div class="result" id="result1">选择的颜色: 无</div>
+        </div>
+
+        <div class="test-item">
+            <div class="test-title">2. 有默认颜色（传递 defaultColor）</div>
+            <div class="test-description">
+                传递 defaultColor: '#00ff00'，颜色盒子应该显示绿色背景。
+            </div>
+            <div class="color-picker-container">
+                <div id="colorPicker2"></div>
+            </div>
+            <div class="result" id="result2">选择的颜色: #00ff00</div>
+        </div>
+
+        <div class="test-item">
+            <div class="test-title">3. 测试结果</div>
+            <div class="test-description">
+                观察两个颜色选择器的行为差异：
+                <ul>
+                    <li>第一个：盒子无背景色，点击后面板显示红色</li>
+                    <li>第二个：盒子有绿色背景，点击后面板显示绿色</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入主包 -->
+    <script src="../packages/ew-color-picker/dist/index.js"></script>
+
+    <script>
+        const options = {
+            hasBox: true,
+            hasPanel: true,
+            hasInput: true,
+            hasClear: true,
+            hasSure: true,
+            hue: true,
+            alpha: true,
+            predefineColor: [],
+            alphaDirection: 'horizontal',
+            isClickOutside: true,
+            openChangeColorMode: true,
+            autoPanelPosition: true,
+            panelPlacement: 'bottom-start'
+        };
+
+        // 1. 无默认颜色
+        const colorPicker1 = new ewColorPicker({
+            el: '#colorPicker1',
+            ...options,
+            // 不传递 defaultColor
+        });
+
+        colorPicker1.on('change', function(color) {
+            document.getElementById('result1').textContent = '选择的颜色: ' + color;
+        });
+
+        // 2. 有默认颜色
+        const colorPicker2 = new ewColorPicker({
+            el: '#colorPicker2',
+            ...options,
+            defaultColor: '#00ff00'  // 传递默认颜色
+        });
+
+        colorPicker2.on('change', function(color) {
+            document.getElementById('result2').textContent = '选择的颜色: ' + color;
+        });
+
+        // 监听面板打开事件
+        colorPicker1.on('toggle', function(flag) {
+            if (flag) {
+                console.log('🎯 面板1打开，当前颜色:', colorPicker1.getColor());
+            }
+        });
+
+        colorPicker2.on('toggle', function(flag) {
+            if (flag) {
+                console.log('🎯 面板2打开，当前颜色:', colorPicker2.getColor());
+            }
+        });
+    </script>
+</body>
+</html> 

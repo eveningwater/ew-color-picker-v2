@@ -51,8 +51,9 @@ export default class ewColorPickerBoxPlugin {
   
   updateChildren() {
     if (this.box) {
-      const { defaultColor } = this.options;
-      this.hasColor = !!defaultColor;
+      // 使用 currentColor 而不是 defaultColor 来判断是否有颜色
+      const currentColor = this.ewColorPicker.currentColor;
+      this.hasColor = !!currentColor;
       this.box.replaceChildren(createByTemplate(getBoxChildren(this.hasColor, this.options)));
     }
   }
@@ -70,9 +71,8 @@ export default class ewColorPickerBoxPlugin {
       this.render();
     } else {
       if (keys.includes("defaultColor")) {
-        const { defaultColor } = this.options;
         this.updateChildren();
-        this.setBoxBgColor(defaultColor);
+        this.setBoxBgColor(this.ewColorPicker.currentColor);
       }
       if (keys.includes("size")) {
         this.setBoxSize();
@@ -84,7 +84,7 @@ export default class ewColorPickerBoxPlugin {
   }
   
   render() {
-    const { defaultColor, className, style, showBox } = this.options;
+    const { className, style, showBox } = this.options;
     
     // 检查是否显示盒子
     if (showBox === false) {
@@ -111,7 +111,7 @@ export default class ewColorPickerBoxPlugin {
     // 渲染内容
     this.updateChildren();
     this.setBoxSize();
-    this.setBoxBgColor(defaultColor);
+    this.setBoxBgColor(this.ewColorPicker.currentColor);
     this.setBoxState();
     this.bindHandler();
   }
