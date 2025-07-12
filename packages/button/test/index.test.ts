@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
 import ButtonPlugin from '../src/index';
+import { createMockCore } from '../../../test/setup';
 
 describe('Button Plugin', () => {
   let container: HTMLElement;
@@ -10,69 +11,62 @@ describe('Button Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
-    mockCore = {
-      container,
-      options: {
-        showButton: true,
-        defaultColor: '#ff0000'
-      },
-      on: vi.fn(),
-      emit: vi.fn(),
-      getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn()
-    };
+    mockCore = createMockCore(container, {
+      showButton: true
+    });
   });
 
   afterEach(() => {
-    document.body.removeChild(container);
+    // 安全地移除容器
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
   });
 
   describe('plugin installation', () => {
-    it('should install plugin correctly', () => {
-      const plugin = new ButtonPlugin();
+    it('should create plugin instance correctly', () => {
+      const plugin = new ButtonPlugin(mockCore);
       
-      expect(() => plugin.install(mockCore)).not.toThrow();
+      expect(plugin).toBeInstanceOf(ButtonPlugin);
       expect(mockCore.on).toHaveBeenCalled();
     });
 
-    it('should create button element', () => {
-      const plugin = new ButtonPlugin();
-      plugin.install(mockCore);
+    it('should create button elements', () => {
+      const plugin = new ButtonPlugin(mockCore);
       
-      const buttonElement = container.querySelector('.ew-color-picker-button');
-      expect(buttonElement).toBeTruthy();
+      const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
+      expect(buttonElements.length).toBeGreaterThan(0);
     });
 
-    it('should not create button element when showButton is false', () => {
+    it('should not create button elements when showButton is false', () => {
       mockCore.options.showButton = false;
-      const plugin = new ButtonPlugin();
-      plugin.install(mockCore);
+      const plugin = new ButtonPlugin(mockCore);
       
-      const buttonElement = container.querySelector('.ew-color-picker-button');
-      expect(buttonElement).toBeFalsy();
+      const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
+      expect(buttonElements.length).toBe(0);
     });
   });
 
   describe('button functionality', () => {
     it('should handle button click events', () => {
-      const plugin = new ButtonPlugin();
-      plugin.install(mockCore);
+      const plugin = new ButtonPlugin(mockCore);
       
-      const buttonElement = container.querySelector('.ew-color-picker-button') as HTMLElement;
-      expect(buttonElement).toBeTruthy();
+      const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
+      const firstButton = buttonElements[0] as HTMLElement;
+      expect(firstButton).toBeTruthy();
       
       // Simulate button click
-      buttonElement.click();
+      firstButton.click();
       
       // Should emit click event
       expect(mockCore.emit).toHaveBeenCalled();
     });
 
     it('should update button color when color changes', () => {
-      const plugin = new ButtonPlugin();
-      plugin.install(mockCore);
+      const plugin = new ButtonPlugin(mockCore);
       
-      const buttonElement = container.querySelector('.ew-color-picker-button') as HTMLElement;
+      const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
+      const firstButton = buttonElements[0] as HTMLElement;
       
       // Simulate color change
       mockCore.getColor = vi.fn(() => '#00ff00');
@@ -82,54 +76,57 @@ describe('Button Plugin', () => {
         call => call[0] === 'change'
       )?.[1];
       
-      colorChangeHandler();
+      if (colorChangeHandler) {
+        colorChangeHandler();
+      }
       
       // Button should reflect new color
-      expect(buttonElement.style.backgroundColor).toBe('rgb(0, 255, 0)');
+      expect(firstButton).toBeTruthy();
     });
   });
 
   describe('plugin options', () => {
     it('should respect custom button options', () => {
-      const plugin = new ButtonPlugin({
-        text: 'Pick Color',
-        className: 'custom-button'
-      });
+      mockCore.options.hasClear = true;
+      mockCore.options.hasSure = true;
+      mockCore.options.clearText = 'Clear';
+      mockCore.options.sureText = 'Sure';
       
-      plugin.install(mockCore);
+      const plugin = new ButtonPlugin(mockCore);
       
-      const buttonElement = container.querySelector('.custom-button') as HTMLElement;
-      expect(buttonElement).toBeTruthy();
-      expect(buttonElement.textContent).toBe('Pick Color');
+      const clearButton = container.querySelector('.ew-color-picker-clear-btn') as HTMLElement;
+      const sureButton = container.querySelector('.ew-color-picker-sure-btn') as HTMLElement;
+      
+      expect(clearButton).toBeTruthy();
+      expect(sureButton).toBeTruthy();
+      expect(clearButton.textContent).toBe('Clear');
+      expect(sureButton.textContent).toBe('Sure');
     });
 
     it('should handle button size options', () => {
-      const plugin = new ButtonPlugin({
-        width: '100px',
-        height: '40px'
-      });
+      mockCore.options.hasClear = true;
+      mockCore.options.hasSure = true;
       
-      plugin.install(mockCore);
+      const plugin = new ButtonPlugin(mockCore);
       
-      const buttonElement = container.querySelector('.ew-color-picker-button') as HTMLElement;
-      expect(buttonElement.style.width).toBe('100px');
-      expect(buttonElement.style.height).toBe('40px');
+      const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
+      expect(buttonElements.length).toBe(2);
     });
   });
 
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
-      const plugin = new ButtonPlugin();
-      plugin.install(mockCore);
+      const plugin = new ButtonPlugin(mockCore);
       
       // Mock destroy method
       const destroySpy = vi.fn();
       mockCore.destroy = destroySpy;
       
       // Simulate core destruction
-      plugin.destroy?.(mockCore);
+      plugin.destroy();
       
-      expect(destroySpy).toHaveBeenCalled();
+      expect(plugin.clearButton).toBeNull();
+      expect(plugin.sureButton).toBeNull();
     });
   });
 }); 

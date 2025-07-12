@@ -331,6 +331,11 @@ export default class InputNumber {
     this.ewColorPicker = core;
     this.handleOptions?.();
     
+    // 检查是否显示数字输入框
+    if (this.ewColorPicker.options?.showInputNumber === false) {
+      return;
+    }
+    
     // 注册事件监听器
     if (core.on && typeof core.on === 'function') {
       core.on('change', (color: string) => {

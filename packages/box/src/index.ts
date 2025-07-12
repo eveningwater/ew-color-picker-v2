@@ -75,7 +75,12 @@ export default class ewColorPickerBoxPlugin {
   }
   
   render() {
-    const { defaultColor, className, style } = this.options;
+    const { defaultColor, className, style, showBox } = this.options;
+    
+    // 检查是否显示盒子
+    if (showBox === false) {
+      return;
+    }
     
     // 直接使用主容器
     const rootElement = this.ewColorPicker.getMountPoint("root");

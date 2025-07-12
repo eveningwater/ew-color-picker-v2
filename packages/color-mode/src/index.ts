@@ -38,6 +38,7 @@ export interface ColorModeOptions {
   defaultMode?: ColorMode;
   changeMode?: Function;
   alpha?: boolean; // 是否支持 alpha 通道
+  showColorMode?: boolean; // 是否显示颜色模式切换器
 }
 
 export default class ewColorPickerColorModePlugin {
@@ -106,6 +107,11 @@ export default class ewColorPickerColorModePlugin {
   }
 
   run() {
+    // 检查是否显示颜色模式
+    if (this.options.showColorMode === false) {
+      return;
+    }
+    
     if (this.options.openChangeColorMode) {
       this.render();
       this.bindEvents();

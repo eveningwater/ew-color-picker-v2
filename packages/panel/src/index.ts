@@ -72,6 +72,11 @@ export default class ewColorPickerPanelPlugin {
   }
 
   run() {
+    // 检查是否显示面板
+    if (this.options.showPanel === false) {
+      return;
+    }
+    
     this.render();
     // 延迟绑定事件，确保DOM完全渲染
     setTimeout(() => {

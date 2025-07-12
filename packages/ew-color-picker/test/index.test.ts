@@ -8,7 +8,15 @@ describe('EWColorPicker', () => {
 
   beforeEach(() => {
     container = create('div');
-    document.body.appendChild(container);
+    // 安全地添加到 document.body
+    if (document.body) {
+      document.body.appendChild(container);
+    } else {
+      // 如果 document.body 不存在，创建一个临时的 body
+      const tempBody = create('body');
+      tempBody.appendChild(container);
+      document.appendChild(tempBody);
+    }
   });
 
   afterEach(() => {
@@ -40,6 +48,7 @@ describe('EWColorPicker', () => {
       
       colorPicker = new EWColorPicker(container, options);
       
+      // 检查选项是否正确设置
       expect(colorPicker.options.defaultColor).toBe('#ff0000');
       expect(colorPicker.options.showAlpha).toBe(true);
       expect(colorPicker.options.showHue).toBe(true);
@@ -57,7 +66,6 @@ describe('EWColorPicker', () => {
       };
       
       colorPicker.use(mockPlugin);
-      colorPicker.init();
       
       expect(mockPlugin.install).toHaveBeenCalledWith(colorPicker);
     });
@@ -70,7 +78,6 @@ describe('EWColorPicker', () => {
       
       colorPicker.use(plugin1);
       colorPicker.use(plugin2);
-      colorPicker.init();
       
       expect(plugin1.install).toHaveBeenCalled();
       expect(plugin2.install).toHaveBeenCalled();
@@ -80,7 +87,6 @@ describe('EWColorPicker', () => {
   describe('color management', () => {
     it('should set and get color', () => {
       colorPicker = new EWColorPicker(container);
-      colorPicker.init();
       
       colorPicker.setColor('#00ff00');
       const color = colorPicker.getColor();
@@ -90,7 +96,6 @@ describe('EWColorPicker', () => {
 
     it('should emit color change events', () => {
       colorPicker = new EWColorPicker(container);
-      colorPicker.init();
       let eventEmitted = false;
       
       colorPicker.on('change', () => {
@@ -104,7 +109,6 @@ describe('EWColorPicker', () => {
 
     it('should handle different color formats', () => {
       colorPicker = new EWColorPicker(container);
-      colorPicker.init();
       
       // Test hex format
       colorPicker.setColor('#ff0000');
@@ -120,19 +124,18 @@ describe('EWColorPicker', () => {
     it('should initialize properly', () => {
       colorPicker = new EWColorPicker(container);
       
-      expect(() => colorPicker.init()).not.toThrow();
+      expect(colorPicker).toBeInstanceOf(EWColorPicker);
+      expect(colorPicker.wrapper).toBe(container);
     });
 
     it('should destroy properly', () => {
       colorPicker = new EWColorPicker(container);
-      colorPicker.init();
       
       expect(() => colorPicker.destroy()).not.toThrow();
     });
 
     it('should handle multiple destroy calls', () => {
       colorPicker = new EWColorPicker(container);
-      colorPicker.init();
       colorPicker.destroy();
       
       expect(() => colorPicker.destroy()).not.toThrow();
@@ -142,7 +145,6 @@ describe('EWColorPicker', () => {
   describe('event handling', () => {
     it('should register event listeners', () => {
       colorPicker = new EWColorPicker(container);
-      colorPicker.init();
       let eventHandled = false;
       
       colorPicker.on('test-event', () => {
@@ -156,7 +158,6 @@ describe('EWColorPicker', () => {
 
     it('should remove event listeners', () => {
       colorPicker = new EWColorPicker(container);
-      colorPicker.init();
       let eventHandled = false;
       
       const handler = () => {
@@ -182,7 +183,9 @@ describe('EWColorPicker', () => {
       const options = { defaultColor: '#ff0000' };
       colorPicker = new EWColorPicker(container, options);
       
-      expect(colorPicker.getOptions()).toEqual(expect.objectContaining(options));
+      // 检查选项是否包含传入的配置
+      const currentOptions = colorPicker.getOptions();
+      expect(currentOptions.defaultColor).toBe('#ff0000');
     });
 
     it('should update options', () => {

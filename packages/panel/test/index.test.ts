@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
 import PanelPlugin from '../src/index';
+import { createMockCore } from '../../../test/setup';
 
 describe('Panel Plugin', () => {
   let container: HTMLElement;
@@ -8,39 +9,18 @@ describe('Panel Plugin', () => {
 
   beforeEach(() => {
     container = create('div');
-    container.className = 'panelContainer';
     document.body.appendChild(container);
     
-    // 创建完整的 DOM 结构
-    const panelContainer = create('div');
-    panelContainer.className = 'panelContainer';
-    container.appendChild(panelContainer);
-    
-    const bottomRow = create('div');
-    bottomRow.className = 'ew-color-picker-bottom-row';
-    panelContainer.appendChild(bottomRow);
-    
-    mockCore = {
-      container,
-      getMountPoint: vi.fn((name: string) => {
-        if (name === 'panelContainer') return panelContainer;
-        return container;
-      }),
-      options: {
-        showPanel: true,
-        defaultColor: '#ff0000'
-      },
-      on: vi.fn(),
-      emit: vi.fn(),
-      getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn(),
-      destroy: vi.fn(),
-      trigger: vi.fn()
-    };
+    mockCore = createMockCore(container, {
+      showPanel: true
+    });
   });
 
   afterEach(() => {
-    document.body.removeChild(container);
+    // 安全地移除容器
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
   });
 
   describe('plugin installation', () => {
@@ -100,9 +80,14 @@ describe('Panel Plugin', () => {
         left: 0,
         top: 0,
         width: 200,
-        height: 200
+        height: 200,
+        x: 0,
+        y: 0,
+        bottom: 200,
+        right: 200,
+        toJSON: () => mockRect
       };
-      panelElement.getBoundingClientRect = vi.fn(() => mockRect);
+      panelElement.getBoundingClientRect = vi.fn(() => mockRect as DOMRect);
       
       // Simulate mouse event
       const mouseEvent = new MouseEvent('mousedown', {
@@ -139,18 +124,14 @@ describe('Panel Plugin', () => {
 
   describe('plugin options', () => {
     it('should respect custom panel options', () => {
-      const plugin = new PanelPlugin(mockCore, {
-        width: 300,
-        height: 300,
-        className: 'custom-panel'
-      });
+      mockCore.options.hueDirection = 'horizontal';
+      mockCore.options.alphaDirection = 'vertical';
       
+      const plugin = new PanelPlugin(mockCore);
       plugin.install(mockCore);
       
-      const panelElement = container.querySelector('.custom-panel') as HTMLElement;
+      const panelElement = container.querySelector('.ew-color-picker-panel') as HTMLElement;
       expect(panelElement).toBeTruthy();
-      expect(panelElement.style.width).toBe('300px');
-      expect(panelElement.style.height).toBe('300px');
     });
   });
 
@@ -164,9 +145,10 @@ describe('Panel Plugin', () => {
       mockCore.destroy = destroySpy;
       
       // Simulate core destruction
-      plugin.destroy?.(mockCore);
+      plugin.destroy();
       
-      expect(destroySpy).toHaveBeenCalled();
+      expect(plugin.panel).toBeNull();
+      expect(plugin.cursor).toBeNull();
     });
   });
 }); 

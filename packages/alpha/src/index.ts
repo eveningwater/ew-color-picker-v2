@@ -25,11 +25,18 @@ export default class ewColorPickerAlphaPlugin {
   }
 
   handleOptions() {
-    this.options = extend({}, this.options, this.ewColorPicker.options);
-    this.isHorizontal = this.options.alphaDirection === 'horizontal';
+    if (this.ewColorPicker && this.ewColorPicker.options) {
+      this.options = extend({}, this.options, this.ewColorPicker.options);
+      this.isHorizontal = this.options.alphaDirection === 'horizontal';
+    }
   }
 
   run() {
+    // 检查是否显示 alpha 滑块
+    if (this.options.showAlpha === false) {
+      return;
+    }
+    
     this.render();
     setTimeout(() => {
       this.bindEvents();
@@ -160,5 +167,22 @@ export default class ewColorPickerAlphaPlugin {
     // 清理DOM引用
     this.alphaBar = null;
     this.alphaThumb = null;
+  }
+
+  // 新增 install 方法，便于测试
+  install(core: any) {
+    this.ewColorPicker = core;
+    this.handleOptions();
+    
+    // 注册事件监听器
+    if (core.on && typeof core.on === 'function') {
+      core.on('change', (color: string) => {
+        // 当颜色改变时，更新 alpha 滑块位置
+        const hsva = colorRgbaToHsva(color);
+        this.updateAlphaThumbPosition(hsva.a);
+      });
+    }
+    
+    this.run?.();
   }
 } 

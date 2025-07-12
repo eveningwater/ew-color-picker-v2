@@ -257,6 +257,11 @@ export function colorRgbaToHsla(rgba: string): { colorStr: string; colorObj: Hsl
  * @param {*} rgba
  */
 export function colorRgbaToHsva(rgba: string): HsvaColor {
+  // 处理 undefined 或 null 值
+  if (!rgba || typeof rgba !== 'string') {
+    return { h: 0, s: 100, v: 100, a: 1 };
+  }
+  
   const rgbaArr = rgba
     .slice(rgba.indexOf("(") + 1, rgba.lastIndexOf(")"))
     .split(",");

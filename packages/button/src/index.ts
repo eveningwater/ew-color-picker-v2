@@ -25,6 +25,7 @@ export interface ButtonOptions {
   sureText?: string;
   clear?: Function;
   sure?: Function;
+  showButton?: boolean;
 }
 
 export default class ewColorPickerButtonPlugin {
@@ -57,6 +58,11 @@ export default class ewColorPickerButtonPlugin {
   }
 
   run() {
+    // 检查是否显示按钮
+    if (this.options.showButton === false) {
+      return;
+    }
+    
     this.render();
     this.bindEvents();
   }

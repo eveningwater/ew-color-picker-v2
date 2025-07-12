@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
 import HuePlugin from '../src/index';
+import { createMockCore } from '../../../test/setup';
 
 describe('Hue Plugin', () => {
   let container: HTMLElement;
@@ -10,31 +11,16 @@ describe('Hue Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
-    // 创建完整的 DOM 结构
-    const panelContainer = create('div');
-    panelContainer.className = 'panelContainer';
-    container.appendChild(panelContainer);
-    
-    mockCore = {
-      container,
-      getMountPoint: vi.fn((name: string) => {
-        if (name === 'panelContainer') return panelContainer;
-        return container;
-      }),
-      options: {
-        showHue: true,
-        defaultColor: '#ff0000'
-      },
-      on: vi.fn(),
-      emit: vi.fn(),
-      getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn(),
-      destroy: vi.fn()
-    };
+    mockCore = createMockCore(container, {
+      showHue: true
+    });
   });
 
   afterEach(() => {
-    document.body.removeChild(container);
+    // 安全地移除容器
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
   });
 
   describe('plugin installation', () => {
@@ -49,7 +35,7 @@ describe('Hue Plugin', () => {
       const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
-      const hueElement = container.querySelector('.ew-color-picker-hue');
+      const hueElement = container.querySelector('.ew-color-picker-slider');
       expect(hueElement).toBeTruthy();
     });
 
@@ -58,7 +44,7 @@ describe('Hue Plugin', () => {
       const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
-      const hueElement = container.querySelector('.ew-color-picker-hue');
+      const hueElement = container.querySelector('.ew-color-picker-slider');
       expect(hueElement).toBeFalsy();
     });
   });
@@ -68,7 +54,7 @@ describe('Hue Plugin', () => {
       const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
-      const hueElement = container.querySelector('.ew-color-picker-hue') as HTMLElement;
+      const hueElement = container.querySelector('.ew-color-picker-slider') as HTMLElement;
       expect(hueElement).toBeTruthy();
       
       // Simulate mouse down event
@@ -87,16 +73,21 @@ describe('Hue Plugin', () => {
       const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
-      const hueElement = container.querySelector('.ew-color-picker-hue') as HTMLElement;
+      const hueElement = container.querySelector('.ew-color-picker-slider') as HTMLElement;
       
       // Mock getBoundingClientRect
       const mockRect = {
         left: 0,
         top: 0,
         width: 200,
-        height: 20
+        height: 20,
+        x: 0,
+        y: 0,
+        bottom: 20,
+        right: 200,
+        toJSON: () => mockRect
       };
-      hueElement.getBoundingClientRect = vi.fn(() => mockRect);
+      hueElement.getBoundingClientRect = vi.fn(() => mockRect as DOMRect);
       
       // Simulate mouse event at 50% position
       const mouseEvent = new MouseEvent('mousedown', {
@@ -126,23 +117,21 @@ describe('Hue Plugin', () => {
       colorChangeHandler();
       
       // Should update the hue slider
-      const hueElement = container.querySelector('.ew-color-picker-hue');
+      const hueElement = container.querySelector('.ew-color-picker-slider');
       expect(hueElement).toBeTruthy();
     });
   });
 
   describe('plugin options', () => {
     it('should respect custom hue options', () => {
-      const plugin = new HuePlugin(mockCore, {
-        height: 30,
-        className: 'custom-hue'
-      });
+      mockCore.options.hueDirection = 'horizontal';
       
+      const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
-      const hueElement = container.querySelector('.custom-hue') as HTMLElement;
+      const hueElement = container.querySelector('.ew-color-picker-slider') as HTMLElement;
       expect(hueElement).toBeTruthy();
-      expect(hueElement.style.height).toBe('30px');
+      expect(hueElement.classList.contains('ew-color-picker-is-horizontal')).toBe(true);
     });
   });
 
@@ -156,9 +145,10 @@ describe('Hue Plugin', () => {
       mockCore.destroy = destroySpy;
       
       // Simulate core destruction
-      plugin.destroy?.(mockCore);
+      plugin.destroy();
       
-      expect(destroySpy).toHaveBeenCalled();
+      expect(plugin.hueBar).toBeNull();
+      expect(plugin.hueThumb).toBeNull();
     });
   });
 }); 

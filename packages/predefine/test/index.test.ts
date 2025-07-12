@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
 import PredefinePlugin from '../src/index';
+import { createMockCore } from '../../../test/setup';
 
 describe('Predefine Plugin', () => {
   let container: HTMLElement;
@@ -8,40 +9,19 @@ describe('Predefine Plugin', () => {
 
   beforeEach(() => {
     container = create('div');
-    container.className = 'panelContainer';
     document.body.appendChild(container);
     
-    // 创建完整的 DOM 结构
-    const panelContainer = create('div');
-    panelContainer.className = 'panelContainer';
-    container.appendChild(panelContainer);
-    
-    const bottomRow = create('div');
-    bottomRow.className = 'ew-color-picker-bottom-row';
-    panelContainer.appendChild(bottomRow);
-    
-    mockCore = {
-      container,
-      getMountPoint: vi.fn((name: string) => {
-        if (name === 'panelContainer') return panelContainer;
-        return container;
-      }),
-      options: {
-        showPredefine: true,
-        defaultColor: '#ff0000',
-        predefineColors: ['#ff0000', '#00ff00', '#0000ff']
-      },
-      on: vi.fn(),
-      emit: vi.fn(),
-      getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn(),
-      destroy: vi.fn(),
-      trigger: vi.fn()
-    };
+    mockCore = createMockCore(container, {
+      showPredefine: true,
+      predefineColors: ['#ff0000', '#00ff00', '#0000ff']
+    });
   });
 
   afterEach(() => {
-    document.body.removeChild(container);
+    // 安全地移除容器
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
   });
 
   describe('plugin installation', () => {
@@ -56,16 +36,16 @@ describe('Predefine Plugin', () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
-      const predefineElement = container.querySelector('.ew-color-picker-predefine');
+      const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeTruthy();
     });
 
     it('should not create predefine element when showPredefine is false', () => {
       mockCore.options.showPredefine = false;
-      const plugin = new PredefinePlugin();
+      const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
-      const predefineElement = container.querySelector('.ew-color-picker-predefine');
+      const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeFalsy();
     });
   });
@@ -75,7 +55,7 @@ describe('Predefine Plugin', () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
-      const swatches = container.querySelectorAll('.ew-color-picker-predefine-swatch');
+      const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(3);
     });
 
@@ -83,7 +63,7 @@ describe('Predefine Plugin', () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
-      const firstSwatch = container.querySelector('.ew-color-picker-predefine-swatch') as HTMLElement;
+      const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
       
       // Simulate swatch click
@@ -97,41 +77,38 @@ describe('Predefine Plugin', () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
-      const firstSwatch = container.querySelector('.ew-color-picker-predefine-swatch') as HTMLElement;
+      const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
       
       // Click first swatch
       firstSwatch.click();
       
       // Should have active class
-      expect(firstSwatch.classList.contains('active')).toBe(true);
+      expect(firstSwatch.classList.contains('ew-color-picker-predefine-color-active')).toBe(true);
     });
   });
 
   describe('plugin options', () => {
     it('should respect custom predefine options', () => {
-      const plugin = new PredefinePlugin(mockCore, {
-        className: 'custom-predefine',
-        colors: ['#ff0000', '#00ff00']
-      });
+      mockCore.options.predefineColor = ['#ff0000', '#00ff00'];
       
+      const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
-      const predefineElement = container.querySelector('.custom-predefine');
+      const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeTruthy();
       
-      const swatches = container.querySelectorAll('.ew-color-picker-predefine-swatch');
+      const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(2);
     });
 
     it('should handle empty color array', () => {
-      const plugin = new PredefinePlugin({
-        colors: []
-      });
+      mockCore.options.predefineColor = [];
       
+      const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
-      const swatches = container.querySelectorAll('.ew-color-picker-predefine-swatch');
+      const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(0);
     });
   });
@@ -146,9 +123,10 @@ describe('Predefine Plugin', () => {
       mockCore.destroy = destroySpy;
       
       // Simulate core destruction
-      plugin.destroy?.(mockCore);
+      plugin.destroy();
       
-      expect(destroySpy).toHaveBeenCalled();
+      expect(plugin.predefineItems).toEqual([]);
+      expect(plugin.container).toBeNull();
     });
   });
 }); 

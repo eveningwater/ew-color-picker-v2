@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
 import AlphaPlugin from '../src/index';
 
@@ -19,7 +19,18 @@ describe('Alpha Plugin', () => {
       on: vi.fn(),
       emit: vi.fn(),
       getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn()
+      setColor: vi.fn(),
+      getMountPoint: vi.fn((name: string) => {
+        if (name === 'panelContainer') {
+          const panelContainer = container.querySelector('.ew-color-picker-panel-container') || create('div');
+          panelContainer.className = 'ew-color-picker-panel-container';
+          if (!container.querySelector('.ew-color-picker-panel-container')) {
+            container.appendChild(panelContainer);
+          }
+          return panelContainer;
+        }
+        return container;
+      })
     };
   });
 
@@ -29,14 +40,14 @@ describe('Alpha Plugin', () => {
 
   describe('plugin installation', () => {
     it('should install plugin correctly', () => {
-      const plugin = new AlphaPlugin();
+      const plugin = new AlphaPlugin(mockCore);
       
       expect(() => plugin.install(mockCore)).not.toThrow();
       expect(mockCore.on).toHaveBeenCalled();
     });
 
     it('should create alpha slider element', () => {
-      const plugin = new AlphaPlugin();
+      const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
       const alphaElement = container.querySelector('.ew-color-picker-alpha');
@@ -45,7 +56,7 @@ describe('Alpha Plugin', () => {
 
     it('should not create alpha element when showAlpha is false', () => {
       mockCore.options.showAlpha = false;
-      const plugin = new AlphaPlugin();
+      const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
       const alphaElement = container.querySelector('.ew-color-picker-alpha');
@@ -55,7 +66,7 @@ describe('Alpha Plugin', () => {
 
   describe('alpha slider functionality', () => {
     it('should handle mouse events on alpha slider', () => {
-      const plugin = new AlphaPlugin();
+      const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
       const alphaElement = container.querySelector('.ew-color-picker-alpha') as HTMLElement;
@@ -74,7 +85,7 @@ describe('Alpha Plugin', () => {
     });
 
     it('should update alpha value on slider interaction', () => {
-      const plugin = new AlphaPlugin();
+      const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
       const alphaElement = container.querySelector('.ew-color-picker-alpha') as HTMLElement;
@@ -84,8 +95,13 @@ describe('Alpha Plugin', () => {
         left: 0,
         top: 0,
         width: 200,
-        height: 20
-      };
+        height: 20,
+        x: 0,
+        y: 0,
+        bottom: 20,
+        right: 200,
+        toJSON: () => mockRect
+      } as DOMRect;
       alphaElement.getBoundingClientRect = vi.fn(() => mockRect);
       
       // Simulate mouse event at 50% position
@@ -102,7 +118,7 @@ describe('Alpha Plugin', () => {
 
   describe('color updates', () => {
     it('should update alpha slider when color changes', () => {
-      const plugin = new AlphaPlugin();
+      const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
       // Simulate color change event
@@ -123,22 +139,21 @@ describe('Alpha Plugin', () => {
 
   describe('plugin options', () => {
     it('should respect custom alpha options', () => {
-      const plugin = new AlphaPlugin({
-        height: 30,
-        className: 'custom-alpha'
-      });
+      // Update mockCore options to include alpha options
+      mockCore.options.alphaDirection = 'horizontal';
+      const plugin = new AlphaPlugin(mockCore);
       
       plugin.install(mockCore);
       
-      const alphaElement = container.querySelector('.custom-alpha') as HTMLElement;
+      const alphaElement = container.querySelector('.ew-color-picker-alpha') as HTMLElement;
       expect(alphaElement).toBeTruthy();
-      expect(alphaElement.style.height).toBe('30px');
+      expect(alphaElement.classList.contains('ew-color-picker-is-horizontal')).toBe(true);
     });
   });
 
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
-      const plugin = new AlphaPlugin();
+      const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
       // Mock destroy method
@@ -146,7 +161,7 @@ describe('Alpha Plugin', () => {
       mockCore.destroy = destroySpy;
       
       // Simulate core destruction
-      plugin.destroy?.(mockCore);
+      plugin.destroy?.();
       
       expect(destroySpy).toHaveBeenCalled();
     });

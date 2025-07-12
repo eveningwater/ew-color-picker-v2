@@ -27,6 +27,7 @@ export interface PredefineColor {
 export interface PredefineOptions {
   predefineColor?: string[] | PredefineColor[];
   changeColor?: Function;
+  showPredefine?: boolean;
 }
 
 export default class ewColorPickerPredefinePlugin {
@@ -52,6 +53,11 @@ export default class ewColorPickerPredefinePlugin {
   }
 
   run() {
+    // 检查是否显示预定义颜色
+    if (this.options.showPredefine === false) {
+      return;
+    }
+    
     if (this.options.predefineColor && this.options.predefineColor.length > 0) {
       this.render();
       this.bindEvents();

@@ -116,7 +116,7 @@ export default class ewColorPickerMergeOptions
     // 处理字符串选择器的情况
     if (isString(options)) {
       const el = checkContainer(options as string);
-      result = extend(defaultConfig, {
+      result = extend({}, defaultConfig, {
         el,
         ...pluginNameProp,
       });
@@ -125,7 +125,7 @@ export default class ewColorPickerMergeOptions
     else if (isShallowObject(options)) {
       const { el, ...other } = options as ewColorPickerOptions;
       console.log('[ewColorPicker merge] options:', options, 'el:', el);
-      result = extend(defaultConfig, {
+      result = extend({}, defaultConfig, {
         el: checkContainer(el),
         ...other,
         ...pluginNameProp,
@@ -133,8 +133,7 @@ export default class ewColorPickerMergeOptions
     }
     // 处理空值或未定义的情况
     else {
-      result = extend({
-        ...defaultConfig,
+      result = extend({}, defaultConfig, {
         el: document.body,
         ...pluginNameProp,
       });

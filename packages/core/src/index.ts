@@ -203,17 +203,10 @@ export default class ewColorPicker extends EventEmitter {
     // 初始化配置
     this.options = new ewColorPickerMergeOptions().bindOptions(options, DEFAULT_PLUGINS);
     
-    // 确保 defaultColor 有默认值
-    if (!this.options.defaultColor) {
+    // 确保 defaultColor 有默认值（只有在未定义、null或空字符串时才设置）
+    if (this.options.defaultColor === undefined || this.options.defaultColor === null || this.options.defaultColor === '') {
       this.options.defaultColor = '#000000';
     }
-    
-    // 调试信息
-    console.log('ewColorPicker constructor:', {
-      el: this.options.el,
-      defaultColor: this.options.defaultColor,
-      options: this.options
-    });
     
     // 初始化实例
     this.init();
@@ -613,6 +606,16 @@ export default class ewColorPicker extends EventEmitter {
 
   public emit(event: string, ...args: any[]): void {
     this.hooks.trigger(event, ...args);
+  }
+
+  public on(type: string, fn: Function, context?: Object): this {
+    this.hooks.on(type, fn, context);
+    return this;
+  }
+
+  public off(type?: string, fn?: Function): this | undefined {
+    this.hooks.off(type, fn);
+    return this;
   }
 
   public getContainer(): HTMLElement {
