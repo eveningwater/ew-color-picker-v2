@@ -205,12 +205,19 @@ export default class ewColorPicker extends EventEmitter {
     
     // 处理 new EWColorPicker(container, options) 的调用方式
     let finalOptions: ewColorPickerConstructorOptions | string;
-    if (options instanceof HTMLElement && secondOptions) {
-      // 第一个参数是容器，第二个参数是选项
-      finalOptions = {
-        el: options,
-        ...secondOptions
-      };
+    if (options instanceof HTMLElement) {
+      if (secondOptions) {
+        // 第一个参数是容器，第二个参数是选项
+        finalOptions = {
+          el: options,
+          ...secondOptions
+        };
+      } else {
+        // 只有一个参数，且是 HTMLElement，将其作为容器
+        finalOptions = {
+          el: options
+        };
+      }
     } else {
       // 第一个参数是选项或字符串选择器
       finalOptions = options as ewColorPickerConstructorOptions | string;
@@ -518,13 +525,13 @@ export default class ewColorPicker extends EventEmitter {
   // 更新现有插件的配置
   private updateExistingPlugins(): void {
     if (this.plugins) {
-      Object.values(this.plugins).forEach((plugin) => {
-        tryErrorHandler(() => {
-          if (plugin?.updateOptions && isFunction(plugin.updateOptions)) {
-            plugin.updateOptions();
-          }
-        });
+    Object.values(this.plugins).forEach((plugin) => {
+      tryErrorHandler(() => {
+        if (plugin?.updateOptions && isFunction(plugin.updateOptions)) {
+          plugin.updateOptions();
+        }
       });
+    });
     }
   }
 
@@ -580,13 +587,13 @@ export default class ewColorPicker extends EventEmitter {
     
     // 销毁所有插件
     if (this.plugins) {
-      Object.values(this.plugins).forEach((plugin) => {
-        tryErrorHandler(() => {
-          if (plugin?.destroy && isFunction(plugin.destroy)) {
-            plugin.destroy();
-          }
-        });
+    Object.values(this.plugins).forEach((plugin) => {
+      tryErrorHandler(() => {
+        if (plugin?.destroy && isFunction(plugin.destroy)) {
+          plugin.destroy();
+        }
       });
+    });
     }
     
     // 清理所有挂载点

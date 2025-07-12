@@ -27,7 +27,7 @@ export default class ewColorPickerHuePlugin {
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
       this.options = extend(this.options, this.ewColorPicker.options);
-      this.isHorizontal = this.options.hueDirection === 'horizontal';
+    this.isHorizontal = this.options.hueDirection === 'horizontal';
     }
   }
 
@@ -146,7 +146,7 @@ export default class ewColorPickerHuePlugin {
     
     // 检查转换结果是否有效
     if (newColor && !newColor.includes('NaN')) {
-      this.ewColorPicker.setColor(newColor);
+    this.ewColorPicker.setColor(newColor);
     } else {
       // 如果转换结果无效，使用默认颜色
       const fallbackColor = this.ewColorPicker.options.alpha ? 

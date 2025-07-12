@@ -71,7 +71,7 @@ describe('Console Plugin', () => {
       )?.[1];
       
       if (colorChangeHandler) {
-        colorChangeHandler();
+      colorChangeHandler();
       }
       
       // Console plugin should handle color change

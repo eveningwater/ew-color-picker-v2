@@ -224,6 +224,13 @@ export default class ewColorPickerButtonPlugin {
       removeClass(bottomRow, 'ew-color-picker-bottom-row-multi');
     }
   }
+
+  // 新增 install 方法，便于测试
+  install(core: any) {
+    this.ewColorPicker = core;
+    this.handleOptions();
+    this.run?.();
+  }
 }
 
 declare module "@ew-color-picker/core" {

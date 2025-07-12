@@ -8,24 +8,16 @@ describe('EWColorPicker', () => {
 
   beforeEach(() => {
     container = create('div');
-    // 安全地添加到 document.body
-    if (document.body) {
-      document.body.appendChild(container);
-    } else {
-      // 如果 document.body 不存在，创建一个临时的 body
-      const tempBody = create('body');
-      tempBody.appendChild(container);
-      document.appendChild(tempBody);
-    }
+    // 不添加到 document.body，保持独立的容器
   });
 
   afterEach(() => {
     if (colorPicker) {
       colorPicker.destroy();
     }
-    // 安全地移除容器
-    if (container && container.parentNode) {
-      container.parentNode.removeChild(container);
+    // 清理容器
+    if (container) {
+      container.innerHTML = '';
     }
   });
 
@@ -178,8 +170,11 @@ describe('EWColorPicker', () => {
     it('should get container element', () => {
       colorPicker = new EWColorPicker(container);
       
-      // getContainer() 应该返回传入的容器元素
+      // getContainer() 应该返回传入的原始容器元素
       expect(colorPicker.getContainer()).toBe(container);
+      // wrapper 是创建的主容器，应该包含在原始容器内
+      expect(colorPicker.wrapper.parentNode).toBe(container);
+      expect(colorPicker.wrapper.classList.contains('ew-color-picker')).toBe(true);
     });
 
     it('should get current options', () => {

@@ -25,8 +25,8 @@ describe('Box Plugin', () => {
     
     // 使用 mockCore 工厂函数创建完整的 mock 对象
     mockCore = createMockCore(container, {
-      showBox: true,
-      defaultColor: '#ff0000'
+        showBox: true,
+        defaultColor: '#ff0000'
     });
   });
 
@@ -95,8 +95,8 @@ describe('Box Plugin', () => {
       // Simulate box click
       boxElement.click();
       
-      // Should emit click event
-      expect(mockCore.emit).toHaveBeenCalled();
+      // Should call showPanel or hidePanel
+      expect(mockCore.showPanel).toHaveBeenCalled();
     });
   });
 

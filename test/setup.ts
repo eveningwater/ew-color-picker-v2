@@ -14,7 +14,7 @@ globalThis.__DEV__ = true;
 afterEach(() => {
   // 确保 document.body 存在
   if (typeof document !== 'undefined' && document.body) {
-    document.body.innerHTML = '';
+  document.body.innerHTML = '';
   }
 });
 
@@ -30,7 +30,7 @@ afterAll(() => {
   console.warn = originalConsole.warn;
   console.error = originalConsole.error;
   console.log = originalConsole.log;
-});
+}); 
 
 // 创建通用的 mockCore 工厂函数
 export function createMockCore(container: HTMLElement, options: any = {}) {

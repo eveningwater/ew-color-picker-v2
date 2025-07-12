@@ -25,7 +25,7 @@ describe('Button Plugin', () => {
     panelContainer.appendChild(bottomRow);
     
     mockCore = createMockCore(container, {
-      showButton: true,
+        showButton: true,
       hasClear: true,
       hasSure: true
     });
@@ -41,6 +41,7 @@ describe('Button Plugin', () => {
   describe('plugin installation', () => {
     it('should create plugin instance correctly', () => {
       const plugin = new ButtonPlugin(mockCore);
+      plugin.install(mockCore);
       
       expect(plugin).toBeInstanceOf(ButtonPlugin);
       expect(mockCore.on).toHaveBeenCalled();
@@ -48,6 +49,7 @@ describe('Button Plugin', () => {
 
     it('should create button elements', () => {
       const plugin = new ButtonPlugin(mockCore);
+      plugin.install(mockCore);
       
       const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
       expect(buttonElements.length).toBeGreaterThan(0);
@@ -56,6 +58,7 @@ describe('Button Plugin', () => {
     it('should not create button elements when showButton is false', () => {
       mockCore.options.showButton = false;
       const plugin = new ButtonPlugin(mockCore);
+      plugin.install(mockCore);
       
       const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
       expect(buttonElements.length).toBe(0);
@@ -63,8 +66,9 @@ describe('Button Plugin', () => {
   });
 
   describe('button functionality', () => {
-    it('should handle button click events', () => {
+    it('should handle button click events', async () => {
       const plugin = new ButtonPlugin(mockCore);
+      plugin.install(mockCore);
       
       const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
       const firstButton = buttonElements[0] as HTMLElement;
@@ -73,12 +77,16 @@ describe('Button Plugin', () => {
       // Simulate button click
       firstButton.click();
       
-      // Should emit click event
-      expect(mockCore.emit).toHaveBeenCalled();
+      // Wait for debounce delay (100ms)
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      // Should call trigger or hidePanel
+      expect(mockCore.trigger).toHaveBeenCalled();
     });
 
     it('should update button color when color changes', () => {
       const plugin = new ButtonPlugin(mockCore);
+      plugin.install(mockCore);
       
       const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
       const firstButton = buttonElements[0] as HTMLElement;
@@ -92,7 +100,7 @@ describe('Button Plugin', () => {
       )?.[1];
       
       if (colorChangeHandler) {
-        colorChangeHandler();
+      colorChangeHandler();
       }
       
       // Button should reflect new color
@@ -108,6 +116,7 @@ describe('Button Plugin', () => {
       mockCore.options.sureText = 'Sure';
       
       const plugin = new ButtonPlugin(mockCore);
+      plugin.install(mockCore);
       
       const clearButton = container.querySelector('.ew-color-picker-clear-btn') as HTMLElement;
       const sureButton = container.querySelector('.ew-color-picker-sure-btn') as HTMLElement;
@@ -123,6 +132,7 @@ describe('Button Plugin', () => {
       mockCore.options.hasSure = true;
       
       const plugin = new ButtonPlugin(mockCore);
+      plugin.install(mockCore);
       
       const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
       expect(buttonElements.length).toBe(2);
@@ -132,6 +142,7 @@ describe('Button Plugin', () => {
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
       const plugin = new ButtonPlugin(mockCore);
+      plugin.install(mockCore);
       
       // Mock destroy method
       const destroySpy = vi.fn();

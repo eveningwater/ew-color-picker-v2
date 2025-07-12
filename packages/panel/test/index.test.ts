@@ -56,11 +56,28 @@ describe('Panel Plugin', () => {
   });
 
   describe('panel functionality', () => {
-    it('should handle mouse events on panel', () => {
+    it('should handle mouse events on panel', async () => {
       const plugin = new PanelPlugin(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 20));
       
       const panelElement = container.querySelector('.ew-color-picker-panel') as HTMLElement;
       expect(panelElement).toBeTruthy();
+      
+      // Mock getBoundingClientRect
+      const mockRect = {
+        left: 0,
+        top: 0,
+        width: 285,
+        height: 180,
+        x: 0,
+        y: 0,
+        bottom: 180,
+        right: 285,
+        toJSON: () => mockRect
+      } as DOMRect;
+      panelElement.getBoundingClientRect = vi.fn(() => mockRect);
       
       // Simulate mouse down event
       const mouseEvent = new MouseEvent('mousedown', {
@@ -70,12 +87,15 @@ describe('Panel Plugin', () => {
       
       panelElement.dispatchEvent(mouseEvent);
       
-      // Should emit color change event
-      expect(mockCore.emit).toHaveBeenCalled();
+      // Should call setColor
+      expect(mockCore.setColor).toHaveBeenCalled();
     });
 
-    it('should update color on panel interaction', () => {
+    it('should update color on panel interaction', async () => {
       const plugin = new PanelPlugin(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 20));
       
       const panelElement = container.querySelector('.ew-color-picker-panel') as HTMLElement;
       
@@ -83,15 +103,15 @@ describe('Panel Plugin', () => {
       const mockRect = {
         left: 0,
         top: 0,
-        width: 200,
-        height: 200,
+        width: 285,
+        height: 180,
         x: 0,
         y: 0,
-        bottom: 200,
-        right: 200,
+        bottom: 180,
+        right: 285,
         toJSON: () => mockRect
-      };
-      panelElement.getBoundingClientRect = vi.fn(() => mockRect as DOMRect);
+      } as DOMRect;
+      panelElement.getBoundingClientRect = vi.fn(() => mockRect);
       
       // Simulate mouse event
       const mouseEvent = new MouseEvent('mousedown', {

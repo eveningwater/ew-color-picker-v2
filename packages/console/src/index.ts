@@ -22,7 +22,7 @@ export default class ewColorPickerConsolePlugin {
   }
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
-      this.options = extend(this.options, this.ewColorPicker.options);
+    this.options = extend(this.options, this.ewColorPicker.options);
     }
   }
   run() {

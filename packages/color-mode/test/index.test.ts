@@ -24,7 +24,7 @@ describe('color-mode Plugin', () => {
     panelContainer.appendChild(bottomRow);
     
     mockCore = createMockCore(container, {
-      showColorMode: true,
+        showColorMode: true,
       colorMode: 'hex',
       openChangeColorMode: true
     });
@@ -75,8 +75,8 @@ describe('color-mode Plugin', () => {
       // Simulate mode button click
       upButton.click();
       
-      // Should emit mode change event
-      expect(mockCore.emit).toHaveBeenCalled();
+      // Should call trigger or update mode
+      expect(mockCore.trigger).toHaveBeenCalled();
     });
 
     it('should highlight active mode', () => {
@@ -101,8 +101,8 @@ describe('color-mode Plugin', () => {
       // Click up button
       upButton.click();
       
-      // Should emit mode change event
-      expect(mockCore.emit).toHaveBeenCalled();
+      // Should call trigger or update mode
+      expect(mockCore.trigger).toHaveBeenCalled();
     });
   });
 

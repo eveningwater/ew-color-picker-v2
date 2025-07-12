@@ -38,14 +38,16 @@ describe('InputNumber Plugin', () => {
 
   describe('plugin installation', () => {
     it('should install plugin correctly', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       expect(plugin).toBeInstanceOf(InputNumberPlugin);
       expect(mockCore.on).toHaveBeenCalled();
     });
 
     it('should create input number elements', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       const inputElements = container.querySelectorAll('.ew-input-number');
       expect(inputElements.length).toBeGreaterThan(0);
@@ -53,7 +55,8 @@ describe('InputNumber Plugin', () => {
 
     it('should not create input number elements when showInputNumber is false', () => {
       mockCore.options.showInputNumber = false;
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       const inputElements = container.querySelectorAll('.ew-input-number');
       expect(inputElements.length).toBe(0);
@@ -62,65 +65,72 @@ describe('InputNumber Plugin', () => {
 
   describe('input number functionality', () => {
     it('should handle input change events', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       const inputElements = container.querySelectorAll('.ew-input-number__input');
       const firstInput = inputElements[0] as HTMLInputElement;
+      expect(firstInput).toBeTruthy();
       
       // Simulate input change
       firstInput.value = '255';
       firstInput.dispatchEvent(new Event('input'));
       
-      // Should emit color change event
-      expect(mockCore.emit).toHaveBeenCalled();
+      // Should call onChange callback
+      expect(plugin.getValue()).toBe(255);
     });
 
     it('should handle input blur events', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       const inputElements = container.querySelectorAll('.ew-input-number__input');
       const firstInput = inputElements[0] as HTMLInputElement;
+      expect(firstInput).toBeTruthy();
       
       // Simulate input blur
       firstInput.value = '255';
       firstInput.dispatchEvent(new Event('blur'));
       
-      expect(mockCore.setColor).toHaveBeenCalled();
+      expect(plugin.getValue()).toBe(255);
     });
 
     it('should validate numeric input', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       const inputElements = container.querySelectorAll('.ew-input-number__input');
       const firstInput = inputElements[0] as HTMLInputElement;
+      expect(firstInput).toBeTruthy();
       
       // Test valid numeric input
       firstInput.value = '255';
       firstInput.dispatchEvent(new Event('blur'));
       
-      expect(mockCore.setColor).toHaveBeenCalled();
+      expect(plugin.getValue()).toBe(255);
     });
 
     it('should handle invalid numeric input', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       const inputElements = container.querySelectorAll('.ew-input-number__input');
       const firstInput = inputElements[0] as HTMLInputElement;
+      expect(firstInput).toBeTruthy();
       
       // Test invalid input
       firstInput.value = 'abc';
       firstInput.dispatchEvent(new Event('blur'));
       
-      // Should not call setColor with invalid input
-      expect(mockCore.setColor).not.toHaveBeenCalledWith(expect.objectContaining({
-        r: NaN
-      }));
+      // Should not change value with invalid input
+      expect(plugin.getValue()).toBe(0);
     });
   });
 
   describe('color updates', () => {
     it('should update input numbers when color changes', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       // 触发 change 事件
       mockCore.emit('change');
@@ -133,21 +143,24 @@ describe('InputNumber Plugin', () => {
 
   describe('plugin options', () => {
     it('should respect custom input number options', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 100, min: 0, max: 255 });
+      plugin.install(mockCore);
       
       const inputElements = container.querySelectorAll('.ew-input-number');
       expect(inputElements.length).toBeGreaterThan(0);
+      expect(plugin.getValue()).toBe(100);
     });
   });
 
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
-      const plugin = new InputNumberPlugin();
+      const plugin = new InputNumberPlugin({ value: 0 });
+      plugin.install(mockCore);
       
       // Simulate plugin destruction
       plugin.destroy?.();
       
-      expect(plugin.getElement()).toBeTruthy();
+      expect(plugin.getElement()).toBeNull();
     });
   });
 }); 

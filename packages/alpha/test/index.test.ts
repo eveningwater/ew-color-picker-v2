@@ -13,7 +13,7 @@ describe('Alpha Plugin', () => {
     
     // 使用通用的 mockCore 工厂函数
     mockCore = createMockCore(container, {
-      showAlpha: true,
+        showAlpha: true,
       defaultColor: '#ff0000',
       alphaDirection: 'vertical'
     });
@@ -56,9 +56,12 @@ describe('Alpha Plugin', () => {
   });
 
   describe('alpha slider functionality', () => {
-    it('should handle mouse events on alpha slider', () => {
+    it('should handle mouse events on alpha slider', async () => {
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha') as HTMLElement;
       expect(alphaElement).toBeTruthy();
@@ -67,10 +70,24 @@ describe('Alpha Plugin', () => {
       const alphaBar = alphaElement.querySelector('.ew-color-picker-alpha-slider-bar') as HTMLElement;
       expect(alphaBar).toBeTruthy();
       
+      // Mock getBoundingClientRect
+      const mockRect = {
+        left: 0,
+        top: 0,
+        width: 200,
+        height: 20,
+        x: 0,
+        y: 0,
+        bottom: 20,
+        right: 200,
+        toJSON: () => mockRect
+      } as DOMRect;
+      alphaBar.getBoundingClientRect = vi.fn(() => mockRect);
+      
       // Simulate mouse down event
       const mouseEvent = new MouseEvent('mousedown', {
         clientX: 100,
-        clientY: 50
+        clientY: 10
       });
       
       alphaBar.dispatchEvent(mouseEvent);
@@ -79,9 +96,12 @@ describe('Alpha Plugin', () => {
       expect(mockCore.setColor).toHaveBeenCalled();
     });
 
-    it('should update alpha value on slider interaction', () => {
+    it('should update alpha value on slider interaction', async () => {
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha') as HTMLElement;
       const alphaBar = alphaElement.querySelector('.ew-color-picker-alpha-slider-bar') as HTMLElement;

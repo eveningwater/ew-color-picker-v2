@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
 import HuePlugin from '../src/index';
-import { createMockCore } from '../../../test/setup';
+import { createMockCore } from '../../../test/mockCore';
 
 describe('Hue Plugin', () => {
   let container: HTMLElement;
@@ -50,30 +50,19 @@ describe('Hue Plugin', () => {
   });
 
   describe('hue slider functionality', () => {
-    it('should handle mouse events on hue slider', () => {
+    it('should handle mouse events on hue slider', async () => {
       const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       const hueElement = container.querySelector('.ew-color-picker-slider') as HTMLElement;
       expect(hueElement).toBeTruthy();
       
-      // Simulate mouse down event
-      const mouseEvent = new MouseEvent('mousedown', {
-        clientX: 100,
-        clientY: 50
-      });
-      
-      hueElement.dispatchEvent(mouseEvent);
-      
-      // Should emit color change event
-      expect(mockCore.emit).toHaveBeenCalled();
-    });
-
-    it('should update hue value on slider interaction', () => {
-      const plugin = new HuePlugin(mockCore);
-      plugin.install(mockCore);
-      
-      const hueElement = container.querySelector('.ew-color-picker-slider') as HTMLElement;
+      // 获取 hue bar 元素
+      const hueBar = hueElement.querySelector('.ew-color-picker-slider-bar') as HTMLElement;
+      expect(hueBar).toBeTruthy();
       
       // Mock getBoundingClientRect
       const mockRect = {
@@ -86,8 +75,44 @@ describe('Hue Plugin', () => {
         bottom: 20,
         right: 200,
         toJSON: () => mockRect
-      };
-      hueElement.getBoundingClientRect = vi.fn(() => mockRect as DOMRect);
+      } as DOMRect;
+      hueBar.getBoundingClientRect = vi.fn(() => mockRect);
+      
+      // Simulate mouse down event
+      const mouseEvent = new MouseEvent('mousedown', {
+        clientX: 100,
+        clientY: 10
+      });
+      
+      hueBar.dispatchEvent(mouseEvent);
+      
+      // Should call setColor
+      expect(mockCore.setColor).toHaveBeenCalled();
+    });
+
+    it('should update hue value on slider interaction', async () => {
+      const plugin = new HuePlugin(mockCore);
+      plugin.install(mockCore);
+      
+      // 等待事件绑定完成
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      const hueElement = container.querySelector('.ew-color-picker-slider') as HTMLElement;
+      const hueBar = hueElement.querySelector('.ew-color-picker-slider-bar') as HTMLElement;
+      
+      // Mock getBoundingClientRect
+      const mockRect = {
+        left: 0,
+        top: 0,
+        width: 200,
+        height: 20,
+        x: 0,
+        y: 0,
+        bottom: 20,
+        right: 200,
+        toJSON: () => mockRect
+      } as DOMRect;
+      hueBar.getBoundingClientRect = vi.fn(() => mockRect);
       
       // Simulate mouse event at 50% position
       const mouseEvent = new MouseEvent('mousedown', {
@@ -95,7 +120,7 @@ describe('Hue Plugin', () => {
         clientY: 10
       });
       
-      hueElement.dispatchEvent(mouseEvent);
+      hueBar.dispatchEvent(mouseEvent);
       
       expect(mockCore.setColor).toHaveBeenCalled();
     });

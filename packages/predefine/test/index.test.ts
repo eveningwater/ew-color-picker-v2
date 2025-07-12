@@ -24,8 +24,8 @@ describe('Predefine Plugin', () => {
     panelContainer.appendChild(bottomRow);
     
     mockCore = createMockCore(container, {
-      showPredefine: true,
-      predefineColors: ['#ff0000', '#00ff00', '#0000ff']
+        showPredefine: true,
+        predefineColor: ['#ff0000', '#00ff00', '#0000ff']
     });
   });
 
@@ -39,6 +39,7 @@ describe('Predefine Plugin', () => {
   describe('plugin installation', () => {
     it('should install plugin correctly', () => {
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       expect(plugin).toBeInstanceOf(PredefinePlugin);
       expect(mockCore.on).toHaveBeenCalled();
@@ -46,6 +47,7 @@ describe('Predefine Plugin', () => {
 
     it('should create predefine element', () => {
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeTruthy();
@@ -54,6 +56,7 @@ describe('Predefine Plugin', () => {
     it('should not create predefine element when showPredefine is false', () => {
       mockCore.options.showPredefine = false;
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeFalsy();
@@ -63,6 +66,7 @@ describe('Predefine Plugin', () => {
   describe('predefine functionality', () => {
     it('should create color swatches for predefined colors', () => {
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(3);
@@ -70,6 +74,7 @@ describe('Predefine Plugin', () => {
 
     it('should handle color swatch click events', () => {
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
@@ -77,12 +82,13 @@ describe('Predefine Plugin', () => {
       // Simulate swatch click
       firstSwatch.click();
       
-      // Should emit color change event
+      // Should call setColor
       expect(mockCore.setColor).toHaveBeenCalled();
     });
 
     it('should highlight selected color', () => {
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
@@ -100,6 +106,7 @@ describe('Predefine Plugin', () => {
       mockCore.options.predefineColor = ['#ff0000', '#00ff00'];
       
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeTruthy();
@@ -112,6 +119,7 @@ describe('Predefine Plugin', () => {
       mockCore.options.predefineColor = [];
       
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(0);
@@ -121,6 +129,7 @@ describe('Predefine Plugin', () => {
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
       const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
       
       // Simulate plugin destruction
       plugin.destroy?.();

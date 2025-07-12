@@ -30,7 +30,7 @@ describe('Input Plugin', () => {
     // 使用 mockCore 工厂函数创建完整的 mock 对象
     mockCore = createMockCore(container, {
       hasInput: true,
-      defaultColor: '#ff0000'
+        defaultColor: '#ff0000'
     });
   });
 
@@ -73,8 +73,8 @@ describe('Input Plugin', () => {
       inputElement.value = '#00ff00';
       inputElement.dispatchEvent(new Event('input'));
       
-      // Should emit color change event
-      expect(mockCore.emit).toHaveBeenCalled();
+      // Should call setColor
+      expect(mockCore.setColor).toHaveBeenCalled();
     });
 
     it('should handle input blur events', () => {
