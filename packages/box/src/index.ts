@@ -29,6 +29,15 @@ export default class ewColorPickerBoxPlugin {
     this.box = null;
     this.hasColor = false;
     this.handleOptions();
+    
+    // 注册事件监听器
+    if (this.ewColorPicker.on && typeof this.ewColorPicker.on === 'function') {
+      this.ewColorPicker.on('change', (color: string) => {
+        // 当颜色改变时，更新盒子背景色
+        this.setBoxBgColor(color);
+      });
+    }
+    
     this.run();
   }
   

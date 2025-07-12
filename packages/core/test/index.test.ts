@@ -26,7 +26,8 @@ describe('ewColorPicker', () => {
       core = new ewColorPicker({ el: container });
       
       expect(core).toBeInstanceOf(ewColorPicker);
-      expect(core.wrapper).toBe(container);
+      expect(core.wrapper).toBeDefined(); // wrapper 是创建的主容器
+      expect(core.wrapper.classList.contains('ew-color-picker')).toBe(true);
       expect(core.options).toBeDefined();
     });
 

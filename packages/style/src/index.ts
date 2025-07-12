@@ -3,12 +3,33 @@
 
 let styleElement: HTMLStyleElement | null = null;
 let styleContent = '';
+const injectedStyles = new Map<string, HTMLStyleElement>();
 
 /**
  * 注入样式到页面
  * @param styles 样式内容
+ * @param id 样式元素的ID（可选）
  */
-export function injectStyles(styles?: string): void {
+export function injectStyles(styles?: string, id?: string): void {
+  // 如果提供了ID，使用ID管理样式
+  if (id) {
+    // 检查是否已经存在相同ID的样式
+    if (injectedStyles.has(id)) {
+      return; // 已经注入过了
+    }
+    
+    // 创建新的样式元素
+    const element = document.createElement('style');
+    element.id = id;
+    element.textContent = styles || '';
+    document.head.appendChild(element);
+    
+    // 存储引用
+    injectedStyles.set(id, element);
+    return;
+  }
+  
+  // 默认样式处理（保持向后兼容）
   if (styleElement) {
     return; // 已经注入过了
   }
@@ -277,11 +298,31 @@ export function injectStyles(styles?: string): void {
 
 /**
  * 移除注入的样式
+ * @param id 要移除的样式ID（可选）
  */
-export function removeStyles(): void {
-  if (styleElement && styleElement.parentNode) {
-    styleElement.parentNode.removeChild(styleElement);
-    styleElement = null;
+export function removeStyles(id?: string): void {
+  if (id) {
+    // 移除指定ID的样式
+    const element = injectedStyles.get(id);
+    if (element && element.parentNode) {
+      element.parentNode.removeChild(element);
+      injectedStyles.delete(id);
+    }
+  } else {
+    // 移除所有样式
+    // 移除默认样式
+    if (styleElement && styleElement.parentNode) {
+      styleElement.parentNode.removeChild(styleElement);
+      styleElement = null;
+    }
+    
+    // 移除所有带ID的样式
+    injectedStyles.forEach((element) => {
+      if (element && element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
+    });
+    injectedStyles.clear();
   }
 }
 

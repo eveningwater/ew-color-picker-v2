@@ -642,6 +642,17 @@ export default class ewColorPickerPanelPlugin {
       off(this.panel, "click", this.handlePanelClick as EventListener);
       off(this.panel, "mousedown", this.handlePanelMouseDown as EventListener);
     }
+    
+    // 清理DOM引用
+    this.panel = null;
+    this.cursor = null;
+    this.whitePanel = null;
+    this.blackPanel = null;
+    this.hueBar = null;
+    this.hueThumb = null;
+    this.alphaBar = null;
+    this.alphaThumb = null;
+    this.hueBg = null;
   }
 
   // 新增 install 方法，便于测试

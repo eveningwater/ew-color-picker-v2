@@ -34,7 +34,8 @@ describe('EWColorPicker', () => {
       colorPicker = new EWColorPicker(container);
       
       expect(colorPicker).toBeInstanceOf(EWColorPicker);
-      expect(colorPicker.wrapper).toBe(container);
+      expect(colorPicker.wrapper).toBeDefined(); // wrapper 是创建的主容器
+      expect(colorPicker.wrapper.classList.contains('ew-color-picker')).toBe(true);
       expect(colorPicker.options).toBeDefined();
     });
 
@@ -125,7 +126,8 @@ describe('EWColorPicker', () => {
       colorPicker = new EWColorPicker(container);
       
       expect(colorPicker).toBeInstanceOf(EWColorPicker);
-      expect(colorPicker.wrapper).toBe(container);
+      expect(colorPicker.wrapper).toBeDefined(); // wrapper 是创建的主容器
+      expect(colorPicker.wrapper.classList.contains('ew-color-picker')).toBe(true);
     });
 
     it('should destroy properly', () => {
@@ -176,6 +178,7 @@ describe('EWColorPicker', () => {
     it('should get container element', () => {
       colorPicker = new EWColorPicker(container);
       
+      // getContainer() 应该返回传入的容器元素
       expect(colorPicker.getContainer()).toBe(container);
     });
 

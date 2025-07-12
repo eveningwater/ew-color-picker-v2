@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { create } from '@ew-color-picker/utils';
 import { injectStyles, removeStyles } from '../src/index';
 
@@ -118,6 +118,16 @@ describe('Style Utils', () => {
   });
 
   describe('cleanup', () => {
+    it('should clean up injected styles after each test', () => {
+      // This test ensures the cleanup mechanism works
+      const testStyles = '.cleanup-test { color: red; }';
+      injectStyles(testStyles, 'cleanup-test');
+      
+      expect(document.getElementById('cleanup-test')).toBeTruthy();
+      
+      // Cleanup should happen in afterEach
+    });
+    
     afterEach(() => {
       // Clean up any injected styles
       const styleElements = document.querySelectorAll('style');

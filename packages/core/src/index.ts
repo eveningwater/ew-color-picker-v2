@@ -236,10 +236,6 @@ export default class ewColorPicker extends EventEmitter {
         this.options.el = document.body;
       }
       
-      // 设置 wrapper 为传入的容器元素
-      this.wrapper = this.options.el;
-      this.wrapper.isEwColorPickerContainer = true;
-      
       this.plugins = {};
       this.hooks = new EventEmitter([""]);
       this._color_picker_uid = this.generateUID();
@@ -290,7 +286,11 @@ export default class ewColorPicker extends EventEmitter {
       class: 'ew-color-picker',
       'data-uid': this._color_picker_uid
     });
-    insertNode(this.wrapper, rootElement);
+    insertNode(this.options.el, rootElement);
+
+    // 设置 wrapper 为创建的主容器
+    this.wrapper = rootElement;
+    this.wrapper.isEwColorPickerContainer = true;
 
     // 创建面板容器（默认隐藏）
     const panelContainer = create('div');
@@ -653,7 +653,7 @@ export default class ewColorPicker extends EventEmitter {
   }
 
   public getContainer(): HTMLElement {
-    return this.wrapper;
+    return this.options.el;
   }
 
   public getOptions(): ewColorPickerMergeOptionsData {

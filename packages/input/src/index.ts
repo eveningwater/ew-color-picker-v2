@@ -206,8 +206,8 @@ export default class ewColorPickerInputPlugin {
     // 更新HSV颜色
     this.ewColorPicker.hsvaColor = colorRgbaToHsva(rgbaColor);
     
-    // 更新当前颜色
-    this.ewColorPicker.updateColor(rgbaColor);
+    // 更新当前颜色并触发事件
+    this.ewColorPicker.setColor(rgbaColor);
     
     // 触发颜色改变回调
     if (isFunction(this.options.changeColor)) {

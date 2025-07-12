@@ -21,6 +21,16 @@ export default class ewColorPickerAlphaPlugin {
     this.handleOptions();
     // 初始化节流函数
     this.throttledUpdateAlpha = throttle(this.updateAlpha.bind(this), 16); // 60fps
+    
+    // 注册事件监听器
+    if (this.ewColorPicker.on && typeof this.ewColorPicker.on === 'function') {
+      this.ewColorPicker.on('change', (color: string) => {
+        // 当颜色改变时，更新 alpha 滑块位置
+        const hsva = colorRgbaToHsva(color);
+        this.updateAlphaThumbPosition(hsva.a);
+      });
+    }
+    
     this.run();
   }
 
