@@ -39,6 +39,10 @@ export default class InputNumber {
   // 防抖处理输入事件
   private debouncedOnChange: (value: number) => void;
 
+  ewColorPicker: any;
+  handleOptions?: () => void;
+  run?: () => void;
+
   constructor(options: InputNumberOptions = {}) {
     const defaultOptions: InputNumberOptions = {
       value: 0,
@@ -321,5 +325,11 @@ export default class InputNumber {
     this.input = null as any;
     this.upButton = null as any;
     this.downButton = null as any;
+  }
+
+  install(core: any) {
+    this.ewColorPicker = core;
+    this.handleOptions?.();
+    this.run?.();
   }
 }

@@ -158,9 +158,9 @@ export default class ewColorPickerHuePlugin {
   }
 
   // 新增 install 方法，便于测试
-  install(ewColorPicker: any) {
-    this.ewColorPicker = ewColorPicker;
+  install(core: any) {
+    this.ewColorPicker = core;
     this.handleOptions();
-    this.run();
+    this.run?.();
   }
 } 

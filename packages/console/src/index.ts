@@ -31,6 +31,11 @@ export default class ewColorPickerConsolePlugin {
       log(...tips);
     }
   }
+  install(core: any) {
+    this.ewColorPicker = core;
+    this.handleOptions();
+    this.run?.();
+  }
 }
 
 export type ewColorPickerConsolePluginOptions = {

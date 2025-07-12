@@ -71,6 +71,12 @@ export default class ewColorPickerColorModePlugin {
     this.run();
   }
 
+  install(core: any) {
+    this.ewColorPicker = core;
+    this.handleOptions();
+    this.run?.();
+  }
+
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
       this.options = extend({}, this.options, this.ewColorPicker.options);
