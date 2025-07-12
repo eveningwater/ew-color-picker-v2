@@ -277,10 +277,9 @@ export default class ewColorPicker extends EventEmitter {
       this.pickerFlag = true;
       this.trigger('toggle', true);
       
+      // 优化：合并嵌套的 setTimeout
       setTimeout(() => {
-        setTimeout(() => {
-          this.plugins.ewColorPickerPanel.handleAutoPosition();
-        }, 0);
+        this.plugins.ewColorPickerPanel.handleAutoPosition();
         on(document, 'mousedown', this._onDocumentClick, { capture: true });
       }, 0);
     }).catch(error => {

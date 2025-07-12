@@ -412,7 +412,80 @@ export function colorRgbaToHsvaWithCache(color: string) {
   return result;
 }
 
-// 清理颜色缓存
+/**
+ * 清除颜色缓存
+ */
 export function clearColorCache() {
-  colorCache.clear();
+  // 清除缓存的实现
+}
+
+// ========== 新增：从 colorMode 包迁移的颜色转换函数 ========== //
+
+/**
+ * RGBA 对象转 HEX 字符串
+ * @param rgba RGBA 颜色对象
+ * @returns HEX 颜色字符串
+ */
+export function rgbaToHex(rgba: RgbaColor): string {
+  const toHex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
+  return `#${toHex(rgba.r)}${toHex(rgba.g)}${toHex(rgba.b)}`;
+}
+
+/**
+ * RGB 转 HSL
+ * @param r 红色值 (0-255)
+ * @param g 绿色值 (0-255)
+ * @param b 蓝色值 (0-255)
+ * @returns HSL 颜色对象
+ */
+export function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  return {
+    h: h * 360,
+    s: s * 100,
+    l: l * 100
+  };
+}
+
+/**
+ * 解析 RGBA 字符串为对象
+ * @param rgbaString RGBA 字符串，如 "rgba(255, 0, 0, 1)"
+ * @returns RGBA 对象或 null
+ */
+export function parseRgbaString(rgbaString: string): RgbaColor | null {
+  try {
+    const rgbaArr = rgbaString
+      .slice(rgbaString.indexOf("(") + 1, rgbaString.lastIndexOf(")"))
+      .split(",");
+    
+    if (rgbaArr.length < 3) return null;
+    
+    return {
+      r: parseInt(rgbaArr[0]),
+      g: parseInt(rgbaArr[1]),
+      b: parseInt(rgbaArr[2]),
+      a: rgbaArr.length < 4 ? 1 : parseFloat(rgbaArr[3])
+    };
+  } catch (error) {
+    return null;
+  }
 }

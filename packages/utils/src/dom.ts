@@ -141,13 +141,10 @@ export const checkContainer = (el: string | HTMLElement): HTMLElement => {
   return el;
 };
 
-export const removeNode = (el: HTMLElement) => {
-  if (el?.parentElement) {
-    el?.parentElement?.removeChild(el);
-  } else {
-    el?.remove();
-  }
-};
+// 移除重复的 removeNode 函数，使用 removeElement 替代
+// export const removeNode = (el: HTMLElement) => { ... };
+// 将 removeNode 作为 removeElement 的别名
+export const removeNode = removeElement;
 
 export function getClientSize(el: HTMLElement) {
   return {

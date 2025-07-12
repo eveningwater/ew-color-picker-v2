@@ -755,6 +755,21 @@
   display: none;
 }
 
+// ========== ColorMode 包样式优化 ========== //
+.ew-color-picker-panel-container .ew-color-picker-bottom-row {
+  justify-content: center;
+}
+.ew-color-picker-panel-container .ew-color-picker-inputs-group {
+  display: flex;
+  width: 100%;
+  max-width: 320px;
+  min-width: 280px;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
 // ========== HSL 输入框统一样式优化（去掉 !important，提升权重） ========== //
 .ew-color-picker-panel-container .ew-color-picker-hsl-h-input,
 .ew-color-picker-panel-container .ew-color-picker-hsl-s-input,
