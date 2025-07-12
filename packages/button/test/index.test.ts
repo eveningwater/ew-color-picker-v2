@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
 import ButtonPlugin from '../src/index';
-import { createMockCore } from '../../../test/setup';
+import { createMockCore } from '../../../test/mockCore';
+
+function create(tag: string) {
+  return document.createElement(tag);
+}
 
 describe('Button Plugin', () => {
   let container: HTMLElement;
@@ -11,8 +14,20 @@ describe('Button Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'ew-color-picker-panel-container';
+    container.appendChild(panelContainer);
+    
+    // 创建 bottom-row 元素，ButtonPlugin 需要它来插入按钮
+    const bottomRow = create('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
+    
     mockCore = createMockCore(container, {
-      showButton: true
+      showButton: true,
+      hasClear: true,
+      hasSure: true
     });
   });
 

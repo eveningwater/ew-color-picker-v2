@@ -1,48 +1,28 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-function create(tag: string) {
-  return document.createElement(tag);
-}
 import AlphaPlugin from '../src/index';
+import { createMockCore } from '../../../test/mockCore';
 
 describe('Alpha Plugin', () => {
   let container: HTMLElement;
   let mockCore: any;
 
   beforeEach(() => {
-    container = create('div');
+    container = document.createElement('div');
+    container.className = 'ew-color-picker';
     document.body.appendChild(container);
     
+    // 使用通用的 mockCore 工厂函数
+    mockCore = createMockCore(container, {
+      showAlpha: true,
+      defaultColor: '#ff0000',
+      alphaDirection: 'vertical'
+    });
+    
     // 创建完整的 DOM 结构
-    const panelContainer = create('div');
-    panelContainer.className = 'ew-color-picker-panel-container';
-    container.appendChild(panelContainer);
-    
-    // 创建 bottom-row 元素，AlphaPlugin 需要它来插入 alpha 滑块
-    const bottomRow = create('div');
-    bottomRow.className = 'ew-color-picker-bottom-row';
-    panelContainer.appendChild(bottomRow);
-    
-    mockCore = {
-      container,
-      options: {
-        showAlpha: true,
-        defaultColor: '#ff0000',
-        alphaDirection: 'vertical'
-      },
-      on: vi.fn(),
-      emit: vi.fn(),
-      getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn(),
-      getMountPoint: vi.fn((name: string) => {
-        if (name === 'panelContainer') {
-          return panelContainer;
-        }
-        return container;
-      }),
-      // 添加其他可能需要的属性
-      wrapper: container,
-      destroy: vi.fn()
-    };
+    const panelContainer = mockCore.getMountPoint('panelContainer');
+    if (panelContainer) {
+      panelContainer.classList.remove('ew-color-picker-panel-container-hidden');
+    }
   });
 
   afterEach(() => {

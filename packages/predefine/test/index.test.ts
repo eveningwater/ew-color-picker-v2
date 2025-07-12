@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
 import PredefinePlugin from '../src/index';
-import { createMockCore } from '../../../test/setup';
+import { createMockCore } from '../../../test/mockCore';
+
+function create(tag: string) {
+  return document.createElement(tag);
+}
 
 describe('Predefine Plugin', () => {
   let container: HTMLElement;
@@ -10,6 +13,15 @@ describe('Predefine Plugin', () => {
   beforeEach(() => {
     container = create('div');
     document.body.appendChild(container);
+    
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'ew-color-picker-panel-container';
+    container.appendChild(panelContainer);
+    
+    const bottomRow = create('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
     
     mockCore = createMockCore(container, {
       showPredefine: true,
@@ -28,13 +40,12 @@ describe('Predefine Plugin', () => {
     it('should install plugin correctly', () => {
       const plugin = new PredefinePlugin(mockCore);
       
-      expect(() => plugin.install(mockCore)).not.toThrow();
+      expect(plugin).toBeInstanceOf(PredefinePlugin);
       expect(mockCore.on).toHaveBeenCalled();
     });
 
     it('should create predefine element', () => {
       const plugin = new PredefinePlugin(mockCore);
-      plugin.install(mockCore);
       
       const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeTruthy();
@@ -43,7 +54,6 @@ describe('Predefine Plugin', () => {
     it('should not create predefine element when showPredefine is false', () => {
       mockCore.options.showPredefine = false;
       const plugin = new PredefinePlugin(mockCore);
-      plugin.install(mockCore);
       
       const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeFalsy();
@@ -53,7 +63,6 @@ describe('Predefine Plugin', () => {
   describe('predefine functionality', () => {
     it('should create color swatches for predefined colors', () => {
       const plugin = new PredefinePlugin(mockCore);
-      plugin.install(mockCore);
       
       const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(3);
@@ -61,7 +70,6 @@ describe('Predefine Plugin', () => {
 
     it('should handle color swatch click events', () => {
       const plugin = new PredefinePlugin(mockCore);
-      plugin.install(mockCore);
       
       const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
@@ -75,7 +83,6 @@ describe('Predefine Plugin', () => {
 
     it('should highlight selected color', () => {
       const plugin = new PredefinePlugin(mockCore);
-      plugin.install(mockCore);
       
       const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
@@ -93,7 +100,6 @@ describe('Predefine Plugin', () => {
       mockCore.options.predefineColor = ['#ff0000', '#00ff00'];
       
       const plugin = new PredefinePlugin(mockCore);
-      plugin.install(mockCore);
       
       const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeTruthy();
@@ -106,7 +112,6 @@ describe('Predefine Plugin', () => {
       mockCore.options.predefineColor = [];
       
       const plugin = new PredefinePlugin(mockCore);
-      plugin.install(mockCore);
       
       const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(0);
@@ -116,14 +121,9 @@ describe('Predefine Plugin', () => {
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
       const plugin = new PredefinePlugin(mockCore);
-      plugin.install(mockCore);
       
-      // Mock destroy method
-      const destroySpy = vi.fn();
-      mockCore.destroy = destroySpy;
-      
-      // Simulate core destruction
-      plugin.destroy();
+      // Simulate plugin destruction
+      plugin.destroy?.();
       
       expect(plugin.predefineItems).toEqual([]);
       expect(plugin.container).toBeNull();

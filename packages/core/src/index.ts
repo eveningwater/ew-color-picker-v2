@@ -22,6 +22,9 @@ import {
   calculatePanelPosition,
   getRect,
   addClass,
+  colorRgbaToHsva,
+  colorHsvaToRgba,
+  colorRgbaToHex,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -249,7 +252,25 @@ export default class ewColorPicker extends EventEmitter {
 
   private initCoreProperties(): void {
     this.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
-    this.currentColor = this.options.defaultColor || '#000000';
+    
+    // 根据配置正确设置默认颜色格式
+    let defaultColor = this.options.defaultColor || '#ff0000';
+    
+    // 如果开启了 alpha 配置，需要转换为 rgba 格式
+    if (this.options.alpha) {
+      // 如果默认颜色是 hex 格式，转换为 rgba
+      if (defaultColor.startsWith('#')) {
+        const hsva = colorRgbaToHsva(defaultColor);
+        defaultColor = colorHsvaToRgba(hsva);
+      }
+    } else {
+      // 如果没有开启 alpha，确保是 hex 格式
+      if (defaultColor.startsWith('rgba')) {
+        defaultColor = colorRgbaToHex(defaultColor);
+      }
+    }
+    
+    this.currentColor = defaultColor;
     this.panelWidth = 0;
     this.panelHeight = 0;
     this.panelLeft = 0;

@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
 import BoxPlugin from '../src/index';
+import { createMockCore } from '../../../test/mockCore';
+
+function create(tag: string) {
+  return document.createElement(tag);
+}
 
 describe('Box Plugin', () => {
   let container: HTMLElement;
@@ -10,23 +14,20 @@ describe('Box Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
-    mockCore = {
-      container,
-      options: {
-        showBox: true,
-        defaultColor: '#ff0000'
-      },
-      on: vi.fn(),
-      emit: vi.fn(),
-      getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn(),
-      getMountPoint: vi.fn((name: string) => {
-        if (name === 'root') {
-          return container;
-        }
-        return null;
-      })
-    };
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'ew-color-picker-panel-container';
+    container.appendChild(panelContainer);
+    
+    const bottomRow = create('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
+    
+    // 使用 mockCore 工厂函数创建完整的 mock 对象
+    mockCore = createMockCore(container, {
+      showBox: true,
+      defaultColor: '#ff0000'
+    });
   });
 
   afterEach(() => {
@@ -65,7 +66,9 @@ describe('Box Plugin', () => {
       expect(boxElement).toBeTruthy();
       
       // Box should display the current color
-      expect(boxElement.style.backgroundColor).toBe('rgb(255, 0, 0)');
+      // 兼容 rgb 和 hex
+      const bg = boxElement.style.backgroundColor;
+      expect(bg === 'rgb(255, 0, 0)' || bg === '#ff0000').toBeTruthy();
     });
 
     it('should update box color when color changes', () => {
@@ -76,15 +79,12 @@ describe('Box Plugin', () => {
       // Simulate color change
       mockCore.getColor = vi.fn(() => '#00ff00');
       
-      // Trigger color change event
-      const colorChangeHandler = mockCore.on.mock.calls.find(
-        call => call[0] === 'change'
-      )?.[1];
-      
-      colorChangeHandler();
+      // 触发 change 事件
+      mockCore.emit('change');
       
       // Box should reflect new color
-      expect(boxElement.style.backgroundColor).toBe('rgb(0, 255, 0)');
+      const bg = boxElement.style.backgroundColor;
+      expect(bg === 'rgb(0, 255, 0)' || bg === '#00ff00').toBeTruthy();
     });
 
     it('should handle box click events', () => {

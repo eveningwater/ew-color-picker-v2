@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
 import ColorModePlugin from '../src/index'; // color-mode plugin
-import { createMockCore } from '../../../test/setup';
+import { createMockCore } from '../../../test/mockCore';
+
+function create(tag: string) {
+  return document.createElement(tag);
+}
 
 describe('color-mode Plugin', () => {
   let container: HTMLElement;
@@ -10,6 +13,15 @@ describe('color-mode Plugin', () => {
   beforeEach(() => {
     container = create('div');
     document.body.appendChild(container);
+    
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'ew-color-picker-panel-container';
+    container.appendChild(panelContainer);
+    
+    const bottomRow = create('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
     
     mockCore = createMockCore(container, {
       showColorMode: true,

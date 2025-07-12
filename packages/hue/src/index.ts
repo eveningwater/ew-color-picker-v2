@@ -122,16 +122,44 @@ export default class ewColorPickerHuePlugin {
   updateHue(hue: number) {
     // 只更新 hue，保持 s/v/a 不变
     let currentColor = this.ewColorPicker.getColor() || '#ff0000';
+    
+    // 确保 hue 值在有效范围内
+    const validHue = Math.max(0, Math.min(360, hue));
+    
+    // 获取当前的 HSVA 值
     const hsva = colorRgbaToHsva(currentColor);
-    hsva.h = hue;
+    
+    // 检查 HSVA 值是否有效
+    if (isNaN(hsva.h) || isNaN(hsva.s) || isNaN(hsva.v) || isNaN(hsva.a)) {
+      // 如果 HSVA 值无效，使用默认值
+      hsva.h = validHue;
+      hsva.s = 100;
+      hsva.v = 100;
+      hsva.a = 1;
+    } else {
+      // 只更新 hue 值
+      hsva.h = validHue;
+    }
+    
+    // 转换为新的颜色值
     const newColor = colorHsvaToRgba(hsva);
-    this.ewColorPicker.setColor(newColor);
-    this.updateHueThumbPosition(hue);
+    
+    // 检查转换结果是否有效
+    if (newColor && !newColor.includes('NaN')) {
+      this.ewColorPicker.setColor(newColor);
+    } else {
+      // 如果转换结果无效，使用默认颜色
+      const fallbackColor = this.ewColorPicker.options.alpha ? 
+        `rgba(255, 0, 0, 1)` : '#ff0000';
+      this.ewColorPicker.setColor(fallbackColor);
+    }
+    
+    this.updateHueThumbPosition(validHue);
 
     // 调用 panel 插件的 updateHueBg 方法，传入新的 hue 值
     const panelPlugin = this.ewColorPicker.plugins?.ewColorPickerPanel;
     if (panelPlugin && typeof panelPlugin.updateHueBg === 'function') {
-      panelPlugin.updateHueBg(hue);
+      panelPlugin.updateHueBg(validHue);
     }
   }
 
