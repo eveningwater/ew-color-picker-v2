@@ -115,16 +115,16 @@ export default class ewColorPickerPanelPlugin {
     
     // 创建颜色面板
     this.whitePanel = create('div');
-    addClass(this.whitePanel, 'ew-color-picker-white');
+    addClass(this.whitePanel, 'ew-color-picker-white-panel');
     insertNode(this.panel, this.whitePanel);
     
     this.blackPanel = create('div');
-    addClass(this.blackPanel, 'ew-color-picker-black');
+    addClass(this.blackPanel, 'ew-color-picker-black-panel');
     insertNode(this.panel, this.blackPanel);
     
     // 创建光标
     this.cursor = create('div');
-    addClass(this.cursor, 'ew-color-picker-cursor');
+    addClass(this.cursor, 'ew-color-picker-panel-cursor');
     insertNode(this.panel, this.cursor);
     
     // 创建底部行容器

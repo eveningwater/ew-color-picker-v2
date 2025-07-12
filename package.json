@@ -28,7 +28,11 @@
     "publish": "pnpm -r publish",
     "publicPublish": "pnpm -r publish --access public",
     "deploy": "npm run build:docs & gh-pages -d gh-pages",
-    "release-docs": "gh-pages -d gh-pages"
+    "release-docs": "gh-pages -d gh-pages",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "main": "packages/ewColorPicker/dist/index.js",
   "module": "packages/ewColorPicker/dist/index.esm.js",
@@ -49,8 +53,11 @@
   "devDependencies": {
     "@ew-color-picker/utils": "workspace:*",
     "@rollup/plugin-replace": "^5.0.7",
+    "@vitest/ui": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8",
     "chalk": "5.3.0",
     "execa": "9.1.0",
+    "happy-dom": "^14.12.10",
     "inquirer": "9.2.23",
     "ora": "8.0.1",
     "rimraf": "5.0.7",
@@ -62,6 +69,7 @@
     "sass": "^1.83.0",
     "tslib": "^2.6.0",
     "typescript": "5.4.5",
+    "vitest": "^2.1.8",
     "zlib": "1.0.5"
   }
 }
