@@ -1,6 +1,9 @@
 type ConsoleKey = keyof Pick<Console, 'warn' | 'error' | 'log'>;
 const assertLists: ConsoleKey[] = ['warn', 'error', 'log'];
 
+// 声明 __DEV__ 变量（由 rollup 插件替换）
+declare const __DEV__: boolean;
+
 // 样式配置
 const STYLES = {
   log: {
@@ -58,11 +61,13 @@ const assert: AssertRes = {
     error: noop
 };
 
-// 为每个方法添加样式
+// 为每个方法添加样式，只在开发环境中启用
 assertLists.forEach(key => {
   assert[key] = <T>(...v: T[]) => {
-    const formattedArgs = formatMessage(key, ...v);
-    console[key](...formattedArgs);
+    if (__DEV__) {
+      const formattedArgs = formatMessage(key, ...v);
+      console[key](...formattedArgs);
+    }
   };
 });
 
