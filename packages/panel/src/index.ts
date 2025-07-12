@@ -239,18 +239,11 @@ export default class ewColorPickerPanelPlugin {
     this.ewColorPicker.trigger("change", newColor);
   }
 
-  updateHueBg() {
+  updateHueBg(hue?: number) {
     if (this.panel) {
-      let hsva;
-      const currentColor = this.ewColorPicker.getColor();
-      if (!currentColor || currentColor.indexOf("NaN") !== -1) {
-        // 默认红色
-        hsva = { h: 0, s: 100, v: 100, a: 1 };
-      } else {
-        const temp = colorRgbaToHsva(currentColor);
-        hsva = { h: temp.h, s: 100, v: 100, a: 1 };
-      }
-      const hueColor = colorHsvaToRgba(hsva);
+      // 如果传入了 hue 参数，使用传入的值；否则默认使用红色 (h=0)
+      const targetHue = hue !== undefined ? hue : 0;
+      const hueColor = colorHsvaToRgba({ h: targetHue, s: 100, v: 100, a: 1 });
       setStyle(this.panel, {
         background: hueColor,
       });

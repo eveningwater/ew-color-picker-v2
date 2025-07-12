@@ -128,10 +128,10 @@ export default class ewColorPickerHuePlugin {
     this.ewColorPicker.setColor(newColor);
     this.updateHueThumbPosition(hue);
 
-    // 调用 panel 插件的 updateHueBg 方法
+    // 调用 panel 插件的 updateHueBg 方法，传入新的 hue 值
     const panelPlugin = this.ewColorPicker.plugins?.ewColorPickerPanel;
     if (panelPlugin && typeof panelPlugin.updateHueBg === 'function') {
-      panelPlugin.updateHueBg();
+      panelPlugin.updateHueBg(hue);
     }
   }
 

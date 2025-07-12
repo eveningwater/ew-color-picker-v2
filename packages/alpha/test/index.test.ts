@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
+function create(tag: string) {
+  return document.createElement(tag);
+}
 import AlphaPlugin from '../src/index';
 
 describe('Alpha Plugin', () => {
@@ -10,11 +12,22 @@ describe('Alpha Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'ew-color-picker-panel-container';
+    container.appendChild(panelContainer);
+    
+    // 创建 bottom-row 元素，AlphaPlugin 需要它来插入 alpha 滑块
+    const bottomRow = create('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
+    
     mockCore = {
       container,
       options: {
         showAlpha: true,
-        defaultColor: '#ff0000'
+        defaultColor: '#ff0000',
+        alphaDirection: 'vertical'
       },
       on: vi.fn(),
       emit: vi.fn(),
@@ -22,15 +35,13 @@ describe('Alpha Plugin', () => {
       setColor: vi.fn(),
       getMountPoint: vi.fn((name: string) => {
         if (name === 'panelContainer') {
-          const panelContainer = container.querySelector('.ew-color-picker-panel-container') || create('div');
-          panelContainer.className = 'ew-color-picker-panel-container';
-          if (!container.querySelector('.ew-color-picker-panel-container')) {
-            container.appendChild(panelContainer);
-          }
           return panelContainer;
         }
         return container;
-      })
+      }),
+      // 添加其他可能需要的属性
+      wrapper: container,
+      destroy: vi.fn()
     };
   });
 
@@ -50,7 +61,7 @@ describe('Alpha Plugin', () => {
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
-      const alphaElement = container.querySelector('.ew-color-picker-alpha');
+      const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha');
       expect(alphaElement).toBeTruthy();
     });
 
@@ -59,7 +70,7 @@ describe('Alpha Plugin', () => {
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
-      const alphaElement = container.querySelector('.ew-color-picker-alpha');
+      const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha');
       expect(alphaElement).toBeFalsy();
     });
   });
@@ -69,8 +80,12 @@ describe('Alpha Plugin', () => {
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
-      const alphaElement = container.querySelector('.ew-color-picker-alpha') as HTMLElement;
+      const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha') as HTMLElement;
       expect(alphaElement).toBeTruthy();
+      
+      // 获取 alpha bar 元素
+      const alphaBar = alphaElement.querySelector('.ew-color-picker-alpha-slider-bar') as HTMLElement;
+      expect(alphaBar).toBeTruthy();
       
       // Simulate mouse down event
       const mouseEvent = new MouseEvent('mousedown', {
@@ -78,17 +93,18 @@ describe('Alpha Plugin', () => {
         clientY: 50
       });
       
-      alphaElement.dispatchEvent(mouseEvent);
+      alphaBar.dispatchEvent(mouseEvent);
       
       // Should emit color change event
-      expect(mockCore.emit).toHaveBeenCalled();
+      expect(mockCore.setColor).toHaveBeenCalled();
     });
 
     it('should update alpha value on slider interaction', () => {
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
-      const alphaElement = container.querySelector('.ew-color-picker-alpha') as HTMLElement;
+      const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha') as HTMLElement;
+      const alphaBar = alphaElement.querySelector('.ew-color-picker-alpha-slider-bar') as HTMLElement;
       
       // Mock getBoundingClientRect
       const mockRect = {
@@ -102,7 +118,7 @@ describe('Alpha Plugin', () => {
         right: 200,
         toJSON: () => mockRect
       } as DOMRect;
-      alphaElement.getBoundingClientRect = vi.fn(() => mockRect);
+      alphaBar.getBoundingClientRect = vi.fn(() => mockRect);
       
       // Simulate mouse event at 50% position
       const mouseEvent = new MouseEvent('mousedown', {
@@ -110,7 +126,7 @@ describe('Alpha Plugin', () => {
         clientY: 10
       });
       
-      alphaElement.dispatchEvent(mouseEvent);
+      alphaBar.dispatchEvent(mouseEvent);
       
       expect(mockCore.setColor).toHaveBeenCalled();
     });
@@ -129,10 +145,10 @@ describe('Alpha Plugin', () => {
       expect(colorChangeHandler).toBeDefined();
       
       // Call the color change handler
-      colorChangeHandler();
+      colorChangeHandler('#ff0000');
       
       // Should update the alpha slider
-      const alphaElement = container.querySelector('.ew-color-picker-alpha');
+      const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha');
       expect(alphaElement).toBeTruthy();
     });
   });
@@ -145,7 +161,7 @@ describe('Alpha Plugin', () => {
       
       plugin.install(mockCore);
       
-      const alphaElement = container.querySelector('.ew-color-picker-alpha') as HTMLElement;
+      const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha') as HTMLElement;
       expect(alphaElement).toBeTruthy();
       expect(alphaElement.classList.contains('ew-color-picker-is-horizontal')).toBe(true);
     });
@@ -156,14 +172,16 @@ describe('Alpha Plugin', () => {
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
-      // Mock destroy method
-      const destroySpy = vi.fn();
-      mockCore.destroy = destroySpy;
+      // 先断言 alpha 元素存在
+      const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha');
+      expect(alphaElement).toBeTruthy();
       
-      // Simulate core destruction
+      // 调用 destroy
       plugin.destroy?.();
       
-      expect(destroySpy).toHaveBeenCalled();
+      // alpha 元素应被移除（destroy 会清理 DOM 引用）
+      expect(plugin.alphaBar).toBeNull();
+      expect(plugin.alphaThumb).toBeNull();
     });
   });
 }); 
