@@ -146,7 +146,14 @@ export default class ewColorPickerColorModePlugin {
     insertNode(this.modeContainer, this.upButton);
     insertNode(this.modeContainer, this.modeText);
     insertNode(this.modeContainer, this.downButton);
-    insertNode(panelContainer, this.modeContainer);
+
+    // 查找 bottomRow，插入到其之前
+    const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
+    if (bottomRow) {
+      insertNode(panelContainer, this.modeContainer, undefined, bottomRow);
+    } else {
+      insertNode(panelContainer, this.modeContainer);
+    }
   }
 
   updateModeDisplay() {

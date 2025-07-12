@@ -10,16 +10,33 @@ describe('InputNumber Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'panelContainer';
+    container.appendChild(panelContainer);
+    
+    const bottomRow = create('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
+    
+    const btnGroup = create('div');
+    btnGroup.className = 'ew-color-picker-drop-btn-group';
+    bottomRow.appendChild(btnGroup);
+    
     mockCore = {
       container,
+      getMountPoint: vi.fn((name: string) => {
+        if (name === 'panelContainer') return panelContainer;
+        return container;
+      }),
       options: {
-        showInputNumber: true,
+        hasInputNumber: true,
         defaultColor: '#ff0000'
       },
       on: vi.fn(),
       emit: vi.fn(),
       getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn()
+      setColor: vi.fn(),
     };
   });
 

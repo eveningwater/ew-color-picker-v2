@@ -8,10 +8,24 @@ describe('Panel Plugin', () => {
 
   beforeEach(() => {
     container = create('div');
+    container.className = 'panelContainer';
     document.body.appendChild(container);
+    
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'panelContainer';
+    container.appendChild(panelContainer);
+    
+    const bottomRow = create('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
     
     mockCore = {
       container,
+      getMountPoint: vi.fn((name: string) => {
+        if (name === 'panelContainer') return panelContainer;
+        return container;
+      }),
       options: {
         showPanel: true,
         defaultColor: '#ff0000'
@@ -19,7 +33,7 @@ describe('Panel Plugin', () => {
       on: vi.fn(),
       emit: vi.fn(),
       getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn()
+      setColor: vi.fn(),
     };
   });
 
@@ -29,14 +43,14 @@ describe('Panel Plugin', () => {
 
   describe('plugin installation', () => {
     it('should install plugin correctly', () => {
-      const plugin = new PanelPlugin();
+      const plugin = new PanelPlugin(mockCore);
       
       expect(() => plugin.install(mockCore)).not.toThrow();
       expect(mockCore.on).toHaveBeenCalled();
     });
 
     it('should create panel element', () => {
-      const plugin = new PanelPlugin();
+      const plugin = new PanelPlugin(mockCore);
       plugin.install(mockCore);
       
       const panelElement = container.querySelector('.ew-color-picker-panel');
@@ -45,7 +59,7 @@ describe('Panel Plugin', () => {
 
     it('should not create panel element when showPanel is false', () => {
       mockCore.options.showPanel = false;
-      const plugin = new PanelPlugin();
+      const plugin = new PanelPlugin(mockCore);
       plugin.install(mockCore);
       
       const panelElement = container.querySelector('.ew-color-picker-panel');
@@ -55,7 +69,7 @@ describe('Panel Plugin', () => {
 
   describe('panel functionality', () => {
     it('should handle mouse events on panel', () => {
-      const plugin = new PanelPlugin();
+      const plugin = new PanelPlugin(mockCore);
       plugin.install(mockCore);
       
       const panelElement = container.querySelector('.ew-color-picker-panel') as HTMLElement;
@@ -74,7 +88,7 @@ describe('Panel Plugin', () => {
     });
 
     it('should update color on panel interaction', () => {
-      const plugin = new PanelPlugin();
+      const plugin = new PanelPlugin(mockCore);
       plugin.install(mockCore);
       
       const panelElement = container.querySelector('.ew-color-picker-panel') as HTMLElement;
@@ -102,7 +116,7 @@ describe('Panel Plugin', () => {
 
   describe('color updates', () => {
     it('should update panel when color changes', () => {
-      const plugin = new PanelPlugin();
+      const plugin = new PanelPlugin(mockCore);
       plugin.install(mockCore);
       
       // Simulate color change event
@@ -123,7 +137,7 @@ describe('Panel Plugin', () => {
 
   describe('plugin options', () => {
     it('should respect custom panel options', () => {
-      const plugin = new PanelPlugin({
+      const plugin = new PanelPlugin(mockCore, {
         width: 300,
         height: 300,
         className: 'custom-panel'
@@ -140,7 +154,7 @@ describe('Panel Plugin', () => {
 
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
-      const plugin = new PanelPlugin();
+      const plugin = new PanelPlugin(mockCore);
       plugin.install(mockCore);
       
       // Mock destroy method

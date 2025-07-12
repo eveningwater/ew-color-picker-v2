@@ -10,16 +10,33 @@ describe('Input Plugin', () => {
     container = create('div');
     document.body.appendChild(container);
     
+    // 创建完整的 DOM 结构
+    const panelContainer = create('div');
+    panelContainer.className = 'panelContainer';
+    container.appendChild(panelContainer);
+    
+    const bottomRow = create('div');
+    bottomRow.className = 'ew-color-picker-bottom-row';
+    panelContainer.appendChild(bottomRow);
+    
+    const btnGroup = create('div');
+    btnGroup.className = 'ew-color-picker-drop-btn-group';
+    bottomRow.appendChild(btnGroup);
+    
     mockCore = {
       container,
+      getMountPoint: vi.fn((name: string) => {
+        if (name === 'panelContainer') return panelContainer;
+        return container;
+      }),
       options: {
-        showInput: true,
+        hasInput: true,
         defaultColor: '#ff0000'
       },
       on: vi.fn(),
       emit: vi.fn(),
       getColor: vi.fn(() => '#ff0000'),
-      setColor: vi.fn()
+      setColor: vi.fn(),
     };
   });
 
@@ -29,14 +46,14 @@ describe('Input Plugin', () => {
 
   describe('plugin installation', () => {
     it('should install plugin correctly', () => {
-      const plugin = new InputPlugin();
+      const plugin = new InputPlugin(mockCore);
       
       expect(() => plugin.install(mockCore)).not.toThrow();
       expect(mockCore.on).toHaveBeenCalled();
     });
 
     it('should create input element', () => {
-      const plugin = new InputPlugin();
+      const plugin = new InputPlugin(mockCore);
       plugin.install(mockCore);
       
       const inputElement = container.querySelector('.ew-color-picker-input');
@@ -44,8 +61,8 @@ describe('Input Plugin', () => {
     });
 
     it('should not create input element when showInput is false', () => {
-      mockCore.options.showInput = false;
-      const plugin = new InputPlugin();
+      mockCore.options.hasInput = false;
+      const plugin = new InputPlugin(mockCore);
       plugin.install(mockCore);
       
       const inputElement = container.querySelector('.ew-color-picker-input');
@@ -55,7 +72,7 @@ describe('Input Plugin', () => {
 
   describe('input functionality', () => {
     it('should handle input change events', () => {
-      const plugin = new InputPlugin();
+      const plugin = new InputPlugin(mockCore);
       plugin.install(mockCore);
       
       const inputElement = container.querySelector('.ew-color-picker-input') as HTMLInputElement;
@@ -70,7 +87,7 @@ describe('Input Plugin', () => {
     });
 
     it('should handle input blur events', () => {
-      const plugin = new InputPlugin();
+      const plugin = new InputPlugin(mockCore);
       plugin.install(mockCore);
       
       const inputElement = container.querySelector('.ew-color-picker-input') as HTMLInputElement;
@@ -83,7 +100,7 @@ describe('Input Plugin', () => {
     });
 
     it('should validate color input', () => {
-      const plugin = new InputPlugin();
+      const plugin = new InputPlugin(mockCore);
       plugin.install(mockCore);
       
       const inputElement = container.querySelector('.ew-color-picker-input') as HTMLInputElement;
@@ -96,7 +113,7 @@ describe('Input Plugin', () => {
     });
 
     it('should handle invalid color input', () => {
-      const plugin = new InputPlugin();
+      const plugin = new InputPlugin(mockCore);
       plugin.install(mockCore);
       
       const inputElement = container.querySelector('.ew-color-picker-input') as HTMLInputElement;
@@ -112,7 +129,7 @@ describe('Input Plugin', () => {
 
   describe('color updates', () => {
     it('should update input when color changes', () => {
-      const plugin = new InputPlugin();
+      const plugin = new InputPlugin(mockCore);
       plugin.install(mockCore);
       
       // Simulate color change event
@@ -133,7 +150,7 @@ describe('Input Plugin', () => {
 
   describe('plugin options', () => {
     it('should respect custom input options', () => {
-      const plugin = new InputPlugin({
+      const plugin = new InputPlugin(mockCore, {
         placeholder: 'Enter color',
         className: 'custom-input'
       });
@@ -148,7 +165,7 @@ describe('Input Plugin', () => {
 
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
-      const plugin = new InputPlugin();
+      const plugin = new InputPlugin(mockCore);
       plugin.install(mockCore);
       
       // Mock destroy method

@@ -46,7 +46,9 @@ export default class ewColorPickerPredefinePlugin {
   }
 
   handleOptions() {
-    this.options = extend({}, this.options, this.ewColorPicker.options);
+    if (this.ewColorPicker && this.ewColorPicker.options) {
+      this.options = extend({}, this.options, this.ewColorPicker.options);
+    }
   }
 
   run() {
@@ -179,6 +181,13 @@ export default class ewColorPickerPredefinePlugin {
     // 清理DOM引用
     this.predefineItems = [];
     this.container = null;
+  }
+
+  // 新增 install 方法，便于测试
+  install(ewColorPicker: any) {
+    this.ewColorPicker = ewColorPicker;
+    this.handleOptions();
+    this.run();
   }
 }
 

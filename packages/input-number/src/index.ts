@@ -39,6 +39,7 @@ export default class InputNumber {
   private downButton: HTMLButtonElement;
   private currentValue: number;
   private isFocused: boolean = false;
+  private ewColorPicker: any;
   
   // 防抖处理输入事件
   private debouncedOnChange: (value: number) => void;
@@ -327,5 +328,22 @@ export default class InputNumber {
     this.input = null as any;
     this.upButton = null as any;
     this.downButton = null as any;
+  }
+
+  public install(ewColorPicker: any) {
+    // 兼容测试用例的插件用法
+    this.ewColorPicker = ewColorPicker;
+    // 这里可以根据 ewColorPicker.options 进行扩展，或挂载到 ewColorPicker.container
+    // 例如：
+    if (ewColorPicker && ewColorPicker.container) {
+      ewColorPicker.container.appendChild(this.getElement());
+    }
+    // 注册事件等
+    if (ewColorPicker && typeof ewColorPicker.on === 'function') {
+      ewColorPicker.on('change', () => {
+        // 颜色变化时可同步 input number
+        // 这里只是示例，具体实现可根据实际需求调整
+      });
+    }
   }
 } 

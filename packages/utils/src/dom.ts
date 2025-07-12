@@ -122,8 +122,10 @@ export const removeElement = (el: HTMLElement) => {
     el?.remove();
   }
 };
-export const insertNode = (el: HTMLElement, node: Node, oldNode?: Node | null) => {
-  if (oldNode && el?.contains(oldNode)) {
+export const insertNode = (el: HTMLElement, node: Node, oldNode?: Node | null, beforeNode?: Node | null) => {
+  if (beforeNode && el?.contains(beforeNode)) {
+    el.insertBefore(node, beforeNode);
+  } else if (oldNode && el?.contains(oldNode)) {
     el.replaceChild(node, oldNode);
   } else {
     el?.appendChild(node);
@@ -136,7 +138,7 @@ export const checkContainer = (el: string | HTMLElement): HTMLElement => {
       warn(`[ewColorPicker warning]: Cannot find element with selector: ${el}`);
       return document.body;
     }
-    return element as HTMLElement;
+    return element;
   }
   return el;
 };

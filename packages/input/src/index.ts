@@ -43,7 +43,9 @@ export default class ewColorPickerInputPlugin {
   }
 
   handleOptions() {
-    this.options = extend({}, this.options, this.ewColorPicker.options);
+    if (this.ewColorPicker && this.ewColorPicker.options) {
+      this.options = extend({}, this.options, this.ewColorPicker.options);
+    }
   }
 
   // 更新配置并重新渲染
@@ -221,6 +223,13 @@ export default class ewColorPickerInputPlugin {
     
     // 清理DOM引用
     this.input = null;
+  }
+
+  // 新增 install 方法，便于测试
+  install(ewColorPicker: any) {
+    this.ewColorPicker = ewColorPicker;
+    this.handleOptions();
+    this.run();
   }
 }
 
