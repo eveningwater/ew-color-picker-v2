@@ -100,13 +100,14 @@ export default class ewColorPickerPanelPlugin {
     }
     this.panel = create("div");
     addClass(this.panel, "ew-color-picker-panel");
-    setStyle(this.panel, {
-      width: panelWidth + "px",
-      height: "180px",
-    });
-
+    addClass(this.panel, "ew-color-picker-panel-dynamic-size");
+    
     this.panelWidth = panelWidth;
     this.panelHeight = 180;
+
+    // 使用 setProperty 直接设置 CSS 变量
+    this.panel.style.setProperty('--panel-width', panelWidth + 'px');
+    this.panel.style.setProperty('--panel-height', this.panelHeight + 'px');
 
     panelContainer.appendChild(this.panel);
 

@@ -206,27 +206,16 @@ export default class ewColorPickerButtonPlugin {
     
     if (hasMultipleInputs) {
       // HSL 或 RGB 模式：按钮组占据一行并居中
-      setStyle(btnGroup, {
-        display: 'flex',
-        justifyContent: 'center',
-        gap: '8px',
-        width: '100%',
-        marginTop: '8px'
-      });
-      setStyle(bottomRow, {
-        flexDirection: 'column',
-        alignItems: 'stretch'
-      });
+      addClass(btnGroup, 'ew-color-picker-drop-btn-group-multi');
+      removeClass(btnGroup, 'ew-color-picker-drop-btn-group-single');
+      addClass(bottomRow, 'ew-color-picker-bottom-row-multi');
+      removeClass(bottomRow, 'ew-color-picker-bottom-row-single');
     } else {
       // HEX 模式：按钮组正常布局
-      setStyle(btnGroup, {
-        display: 'flex',
-        gap: '4px'
-      });
-      setStyle(bottomRow, {
-        flexDirection: 'row',
-        alignItems: 'center'
-      });
+      addClass(btnGroup, 'ew-color-picker-drop-btn-group-single');
+      removeClass(btnGroup, 'ew-color-picker-drop-btn-group-multi');
+      addClass(bottomRow, 'ew-color-picker-bottom-row-single');
+      removeClass(bottomRow, 'ew-color-picker-bottom-row-multi');
     }
   }
 }

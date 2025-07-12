@@ -83,6 +83,29 @@ export default class ewColorPickerColorModePlugin {
       this.render();
       this.bindEvents();
     }
+    this.injectInputNumberStyleFix();
+  }
+
+  injectInputNumberStyleFix() {
+    if (document.getElementById('ew-input-number-style-fix')) return;
+    const style = document.createElement('style');
+    style.id = 'ew-input-number-style-fix';
+    style.innerHTML = `
+      .ew-color-picker-bottom-row {
+        justify-content: center;
+      }
+      .ew-color-picker-inputs-group {
+        display: flex;
+        width: 100%;
+        max-width: 320px;
+        min-width: 280px;
+        gap: 6px;
+        justify-content: center;
+        margin-bottom: 8px;
+        box-sizing: border-box;
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   render() {
@@ -108,18 +131,6 @@ export default class ewColorPickerColorModePlugin {
   createModeContainer(panelContainer: HTMLElement) {
     this.modeContainer = create('div');
     addClass(this.modeContainer, 'ew-color-picker-mode-container');
-    setStyle(this.modeContainer, {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '8px',
-      marginTop: '8px',
-      marginBottom: '12px',
-      padding: '8px',
-      border: '1px solid #e5e6eb',
-      borderRadius: '6px',
-      backgroundColor: '#fafafa'
-    });
 
     // 创建上箭头按钮
     this.upButton = create<HTMLButtonElement>('button');
@@ -128,32 +139,11 @@ export default class ewColorPickerColorModePlugin {
       type: 'button',
       title: '上一个模式'
     });
-    setStyle(this.upButton, {
-      width: '24px',
-      height: '24px',
-      border: '1px solid #ddd',
-      background: '#fff',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: '4px',
-      transition: 'all 0.2s'
-    });
     this.upButton.innerHTML = upArrowIcon('', 16);
 
     // 创建模式文本显示
     this.modeText = create('div');
     addClass(this.modeText, 'ew-color-picker-mode-text');
-    setStyle(this.modeText, {
-      minWidth: '60px',
-      textAlign: 'center',
-      fontSize: '14px',
-      fontWeight: 'bold',
-      color: '#333',
-      userSelect: 'none',
-      padding: '0 8px'
-    });
 
     // 创建下箭头按钮
     this.downButton = create<HTMLButtonElement>('button');
@@ -161,18 +151,6 @@ export default class ewColorPickerColorModePlugin {
     setAttr(this.downButton, {
       type: 'button',
       title: '下一个模式'
-    });
-    setStyle(this.downButton, {
-      width: '24px',
-      height: '24px',
-      border: '1px solid #ddd',
-      background: '#fff',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: '4px',
-      transition: 'all 0.2s'
     });
     this.downButton.innerHTML = downArrowIcon('', 16);
 
@@ -331,38 +309,13 @@ export default class ewColorPickerColorModePlugin {
     // 包裹区
     const group = create('div');
     addClass(group, 'ew-color-picker-inputs-group');
-    setStyle(group, {
-      display: 'flex',
-      flexDirection: 'row',
-      gap: '4px',
-      alignItems: 'flex-end',
-      marginBottom: '0',
-      width: '100%'
-    });
     // 每个输入框及其label
     labels.forEach((label, idx) => {
       const col = create('div');
-      setStyle(col, {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        flex: '1',
-        minWidth: '0'
-      });
+      addClass(col, 'ew-color-picker-inputs-col');
       // label
       const lab = create('div');
       addClass(lab, 'ew-color-picker-input-label');
-      setStyle(lab, {
-        fontSize: '12px',
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: '2px',
-        letterSpacing: '1px',
-        fontWeight: 'bold',
-        height: '18px',
-        lineHeight: '18px',
-        userSelect: 'none'
-      });
       lab.textContent = label;
       col.appendChild(lab);
       // input
@@ -581,26 +534,16 @@ export default class ewColorPickerColorModePlugin {
     inputContainer.innerHTML = '';
 
     // 恢复 input 容器的默认样式
-    setStyle(inputContainer, {
-      flex: '1',
-      minWidth: '200px'
-    });
+    addClass(inputContainer, 'ew-color-picker-input-container-flex');
 
     // 创建默认的 input 元素
     const input = create<HTMLInputElement>('input');
     addClass(input, 'ew-color-picker-input');
+    addClass(input, 'ew-color-picker-input-default');
     setAttr(input, {
       type: 'text',
       name: 'ew-color-picker-input',
       placeholder: '请输入颜色值'
-    });
-    setStyle(input, {
-      width: '100%',
-      padding: '4px 8px',
-      border: '1px solid #ddd',
-      borderRadius: '4px',
-      fontSize: '12px',
-      textAlign: 'center'
     });
 
     // 插入到容器中

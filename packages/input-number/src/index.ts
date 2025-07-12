@@ -109,68 +109,16 @@ export default class InputNumber {
   }
 
   private setStyles() {
-    // 容器样式
-    setStyle(this.container, {
-      display: 'inline-flex',
-      alignItems: 'center',
-      border: '1px solid #d9d9d9',
-      borderRadius: '4px',
-      backgroundColor: '#fff',
-      transition: 'all 0.3s',
-      position: 'relative',
-      width: '100%',
-      minWidth: '80px',
-    });
-
-    // 输入框样式
-    setStyle(this.input, {
-      flex: '1',
-      border: 'none',
-      outline: 'none',
-      padding: '4px 8px',
-      fontSize: '14px',
-      backgroundColor: 'transparent',
-      minWidth: '0',
-    });
-
-    // 按钮容器样式
-    const buttonContainer = $('.ew-input-number__buttons', this.container);
-    if (buttonContainer) {
-      setStyle(buttonContainer, {
-        display: 'flex',
-        flexDirection: 'column',
-        borderLeft: '1px solid #d9d9d9',
-        backgroundColor: '#fafafa',
-      });
-    }
-
-    // 按钮样式
-    const buttons = this.container.querySelectorAll('.ew-input-number__button');
-    buttons.forEach((button) => {
-      setStyle(button as HTMLElement, {
-        border: 'none',
-        background: 'transparent',
-        cursor: 'pointer',
-        padding: '2px 4px',
-        fontSize: '10px',
-        lineHeight: '1',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transition: 'background-color 0.2s',
-        minHeight: '16px',
-      });
-    });
-
+   
     // 尺寸样式
     if (this.options.size === 'small') {
-      setStyle(this.container, { height: '24px' });
-      setStyle(this.input, { fontSize: '12px', padding: '2px 6px' });
+      addClass(this.container, 'ew-input-number-size-small');
+      addClass(this.input, 'ew-input-number-input-size-small');
     } else if (this.options.size === 'large') {
-      setStyle(this.container, { height: '32px' });
-      setStyle(this.input, { fontSize: '16px', padding: '6px 10px' });
+      addClass(this.container, 'ew-input-number-size-large');
+      addClass(this.input, 'ew-input-number-input-size-large');
     } else {
-      setStyle(this.container, { height: '28px' });
+      addClass(this.container, 'ew-input-number-size-default');
     }
 
     // 禁用状态

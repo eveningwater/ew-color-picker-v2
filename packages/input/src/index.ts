@@ -90,10 +90,7 @@ export default class ewColorPickerInputPlugin {
     if (!inputContainer) {
       inputContainer = create('div');
       addClass(inputContainer, 'ew-color-picker-input-container');
-      setStyle(inputContainer, {
-        flex: '1',
-        minWidth: '0'
-      });
+      addClass(inputContainer, 'ew-color-picker-input-container-flex');
       
       // 如果存在按钮组，插入到按钮组之前
       if (btnGroup && btnGroup.parentNode) {
@@ -101,7 +98,7 @@ export default class ewColorPickerInputPlugin {
       } else {
         // 如果没有按钮组，直接插入到 bottomRow
         insertNode(bottomRow, inputContainer);
-      }
+    }
     }
     
     // 查找已存在的 input 元素，避免重复插入
@@ -118,7 +115,7 @@ export default class ewColorPickerInputPlugin {
         
         // 插入到 input 容器中
         inputContainer.appendChild(this.input);
-      }
+    }
     }
     
     // 设置当前值
@@ -130,7 +127,7 @@ export default class ewColorPickerInputPlugin {
       this.ewColorPicker.setColor(currentColor);
     }
     if (this.input) {
-      this.input.value = currentColor;
+    this.input.value = currentColor;
     }
     
     // 如果禁用，添加禁用样式

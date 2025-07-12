@@ -19,6 +19,7 @@ import {
   extend,
   calculatePanelPosition,
   getRect,
+  addClass,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -246,7 +247,7 @@ export default class ewColorPicker extends EventEmitter {
     // 创建面板容器（默认隐藏）
     const panelContainer = create('div');
     setAttr(panelContainer, { class: 'ew-color-picker-panel-container' });
-    setStyle(panelContainer, { display: 'none' }); // 默认隐藏
+    addClass(panelContainer, 'ew-color-picker-panel-container-hidden');
     insertNode(rootElement, panelContainer);
 
     // 设置挂载点

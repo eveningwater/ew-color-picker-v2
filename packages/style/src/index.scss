@@ -1,5 +1,11 @@
 // 基础样式 - 基于原版 ew-color-picker.min.css
 
+// CSS 变量默认值
+:root {
+  --panel-width: 285px;
+  --panel-height: 180px;
+}
+
 // 绝对定位元素
 .ew-color-picker-alpha-slider-bg,
 .ew-color-picker-alpha-slider-thumb,
@@ -123,11 +129,19 @@
   opacity: 1;
 }
 .ew-fade-in {
-  opacity: 1 !important;
+  opacity: 1;
   pointer-events: auto;
 }
 .ew-fade-out {
-  opacity: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+.ew-color-picker-panel-container.ew-fade-in {
+  opacity: 1;
+  pointer-events: auto;
+}
+.ew-color-picker-panel-container.ew-fade-out {
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -608,4 +622,160 @@
 .ew-color-picker-white-panel,
 .ew-color-picker-black-panel {
   border-radius: inherit;
+}
+
+// ========== 颜色模式切换相关 ========== //
+.ew-color-picker-panel-container .ew-color-picker-mode-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  padding: 8px;
+  border: 1px solid #e5e6eb;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+.ew-color-picker-mode-up-btn,
+.ew-color-picker-mode-down-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.ew-color-picker-mode-text {
+  min-width: 60px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  user-select: none;
+  padding: 0 8px;
+}
+
+// ========== 输入组相关 ========== //
+.ew-color-picker-inputs-group {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: flex-end;
+  margin-bottom: 0;
+  width: 100%;
+}
+.ew-color-picker-inputs-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.ew-color-picker-input-label {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 2px;
+  letter-spacing: 1px;
+  font-weight: bold;
+  height: 18px;
+  line-height: 18px;
+  user-select: none;
+}
+
+// ========== 输入容器相关 ========== //
+.ew-color-picker-input-container-flex {
+  flex: 1;
+  min-width: 0;
+}
+
+// ========== 默认输入框样式 ========== //
+.ew-color-picker-input-default {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+}
+
+// ========== 按钮组相关 ========== //
+.ew-color-picker-drop-btn-group-multi {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+.ew-color-picker-drop-btn-group-single {
+  display: flex;
+  gap: 4px;
+}
+.ew-color-picker-bottom-row-multi {
+  flex-direction: column;
+  align-items: stretch;
+}
+.ew-color-picker-bottom-row-single {
+  flex-direction: row;
+  align-items: center;
+}
+
+// ========== input-number 尺寸样式 ========== //
+.ew-input-number-size-small {
+  height: 24px;
+}
+.ew-input-number-size-large {
+  height: 32px;
+}
+.ew-input-number-size-default {
+  height: 28px;
+}
+.ew-input-number-input-size-small {
+  font-size: 12px;
+  padding: 2px 6px;
+}
+.ew-input-number-input-size-large {
+  font-size: 16px;
+  padding: 6px 10px;
+}
+
+// ========== 面板动态尺寸 ========== //
+.ew-color-picker-panel-dynamic-size {
+  width: var(--panel-width, 285px); /* 使用 CSS 变量，默认值 285px */
+  height: var(--panel-height, 180px); /* 使用 CSS 变量，默认值 180px */
+}
+
+// ========== 面板隐藏 ========== //
+.ew-color-picker-panel-container-hidden {
+  display: none;
+}
+
+// ========== HSL 输入框统一样式优化（去掉 !important，提升权重） ========== //
+.ew-color-picker-panel-container .ew-color-picker-hsl-h-input,
+.ew-color-picker-panel-container .ew-color-picker-hsl-s-input,
+.ew-color-picker-panel-container .ew-color-picker-hsl-l-input,
+.ew-color-picker-panel-container .ew-color-picker-hsl-a-input {
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  box-sizing: border-box;
+}
+.ew-color-picker-panel-container .ew-color-picker-hsl-h-input.ew-input-number,
+.ew-color-picker-panel-container .ew-color-picker-hsl-a-input.ew-input-number {
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+}
+.ew-color-picker-panel-container .ew-color-picker-hsl-s-input.ew-color-picker-input,
+.ew-color-picker-panel-container .ew-color-picker-hsl-l-input.ew-color-picker-input {
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+  line-height: 32px;
+  width: 100%;
 }
