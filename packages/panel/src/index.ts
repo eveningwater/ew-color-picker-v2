@@ -65,7 +65,7 @@ export default class ewColorPickerPanelPlugin {
 
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
-      this.options = extend({}, this.options, this.ewColorPicker.options);
+      this.options = extend(this.options, this.ewColorPicker.options);
       this.isHueHorizontal = this.options.hueDirection === "horizontal";
       this.isAlphaHorizontal = this.options.alphaDirection === "horizontal";
     }

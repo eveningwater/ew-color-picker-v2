@@ -72,8 +72,10 @@ export default class ewColorPickerColorModePlugin {
   }
 
   handleOptions() {
-    this.options = extend({}, this.options, this.ewColorPicker.options);
-    this.currentMode = this.options.defaultMode || 'hex';
+    if (this.ewColorPicker && this.ewColorPicker.options) {
+      this.options = extend({}, this.options, this.ewColorPicker.options);
+      this.currentMode = this.options.defaultMode || 'hex';
+    }
   }
 
   // 更新配置并重新渲染

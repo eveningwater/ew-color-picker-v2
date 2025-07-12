@@ -26,7 +26,7 @@ export default class ewColorPickerHuePlugin {
 
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
-      this.options = extend({}, this.options, this.ewColorPicker.options);
+      this.options = extend(this.options, this.ewColorPicker.options);
       this.isHorizontal = this.options.hueDirection === 'horizontal';
     }
   }

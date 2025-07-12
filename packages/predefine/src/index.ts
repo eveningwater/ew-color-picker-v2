@@ -47,7 +47,7 @@ export default class ewColorPickerPredefinePlugin {
 
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
-      this.options = extend({}, this.options, this.ewColorPicker.options);
+      this.options = extend(this.options, this.ewColorPicker.options);
     }
   }
 

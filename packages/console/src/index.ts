@@ -21,7 +21,9 @@ export default class ewColorPickerConsolePlugin {
     this.run();
   }
   handleOptions() {
-    this.options = extend(this.options, this.ewColorPicker.options);
+    if (this.ewColorPicker && this.ewColorPicker.options) {
+      this.options = extend(this.options, this.ewColorPicker.options);
+    }
   }
   run() {
     const { isLog } = this.options;

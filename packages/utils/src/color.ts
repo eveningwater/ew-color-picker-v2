@@ -245,8 +245,8 @@ export function colorRgbaToHsla(rgba: string): { colorStr: string; colorObj: Hsl
         ")"
     ),
     colorObj: {
-      h: h!,
-      s: s * 100,
+      h: Math.round(h!),
+      s: Math.round(s * 100),
       l: Math.round(l * 100),
       a,
     },
@@ -295,54 +295,72 @@ export function colorRgbaToHsva(rgba: string): HsvaColor {
   s = s * 100;
   v = v * 100;
   return {
-    h,
-    s,
+    h: Math.round(h),
+    s: Math.round(s),
     v: Math.round(v),
     a,
   };
 }
-/*
- * 任意色值（甚至是CSS颜色关键字）转换为RGBA颜色的方法
- * 此方法IE9+浏览器支持，基于DOM特性实现
- * @param {*} color
- */
+// 常见 CSS 颜色关键字映射
+const COLOR_KEYWORDS: Record<string, string> = {
+  black: 'rgba(0, 0, 0, 1)',
+  silver: 'rgba(192, 192, 192, 1)',
+  gray: 'rgba(128, 128, 128, 1)',
+  white: 'rgba(255, 255, 255, 1)',
+  maroon: 'rgba(128, 0, 0, 1)',
+  red: 'rgba(255, 0, 0, 1)',
+  purple: 'rgba(128, 0, 128, 1)',
+  fuchsia: 'rgba(255, 0, 255, 1)',
+  green: 'rgba(0, 128, 0, 1)',
+  lime: 'rgba(0, 255, 0, 1)',
+  olive: 'rgba(128, 128, 0, 1)',
+  yellow: 'rgba(255, 255, 0, 1)',
+  navy: 'rgba(0, 0, 128, 1)',
+  blue: 'rgba(0, 0, 255, 1)',
+  teal: 'rgba(0, 128, 128, 1)',
+  aqua: 'rgba(0, 255, 255, 1)',
+  orange: 'rgba(255, 165, 0, 1)',
+  pink: 'rgba(255, 192, 203, 1)',
+  brown: 'rgba(165, 42, 42, 1)',
+  // 可扩展更多
+};
+
 export function colorToRgba(color: string): string {
-  // 如果是有效的 hex 颜色，直接转换
-  if (colorRegExp.test(color)) {
-    return colorHexToRgba(color);
+  // 统一小写
+  const input = color.trim().toLowerCase();
+
+  // 关键字映射
+  if (COLOR_KEYWORDS[input]) {
+    return COLOR_KEYWORDS[input];
   }
 
-  // 如果是有效的 rgb 颜色，转换为 rgba
-  if (colorRegRGB.test(color) && !color.includes('rgba')) {
-    return color.replace('rgb(', 'rgba(').replace(')', ', 1)');
+  // hex
+  if (colorRegExp.test(input)) {
+    const rgba = colorHexToRgba(input);
+    return rgba.replace(/rgba\(([^)]+)\)/, (match, values) => {
+      return `rgba(${values.split(',').map((v: string) => v.trim()).join(', ')})`;
+    });
   }
 
-  // 如果已经是 rgba 格式，直接返回
-  if (colorRegRGBA.test(color)) {
-    return color;
+  // rgb
+  const rgbReg = /^rgb\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/i;
+  if (rgbReg.test(input)) {
+    const rgba = input.replace(/rgb\s*\(/, 'rgba(').replace(/\)\s*$/, ', 1)');
+    return rgba.replace(/rgba\(([^)]+)\)/, (match, values) => {
+      return `rgba(${values.split(',').map((v: string) => v.trim()).join(', ')})`;
+    });
   }
 
-  // 尝试通过 DOM 验证颜色关键字
-  try {
-    const div = document.createElement("div");
-    setStyle(div, { "background-color": color });
-    document.body.appendChild(div);
-    const c = getStyle(div, "backgroundColor") as string;
-    document.body.removeChild(div);
-    
-    // 检查是否已经是 rgba 格式
-    if (c.startsWith('rgba(')) {
-      return c;
-    }
-    // 如果是 rgb 格式，转换为 rgba
-    if (c.startsWith('rgb(')) {
-      return c.replace('rgb(', 'rgba(').replace(')', ', 1)');
-    }
-    // 其他情况返回原值
-    return c;
-  } catch {
-    return color;
+  // rgba
+  const rgbaReg = /^rgba\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\)$/i;
+  if (rgbaReg.test(input)) {
+    return input.replace(/rgba\(([^)]+)\)/, (match, values) => {
+      return `rgba(${values.split(',').map((v: string) => v.trim()).join(', ')})`;
+    });
   }
+
+  // 其它格式暂不支持
+  return '';
 }
 /**
  * 判断是否是合格的颜色值
@@ -409,26 +427,18 @@ export function isValidColor(color: string): boolean {
   }
 }
 /**
- *
+ * 判断是否为带 alpha 的颜色
  * @param {*} color
  * @returns
  */
 export function isAlphaColor(color: string): boolean {
-  // 检查是否是有效的 rgba 颜色（包含 alpha）
-  if (colorRegRGBA.test(color)) {
-    return true;
-  }
-  
-  // 检查是否是有效的 hsla 颜色（包含 alpha）
-  if (colorRegHSLA.test(color)) {
-    return true;
-  }
-  
-  // 检查是否是有效的 hsva 颜色（包含 alpha）
-  if (color.includes('hsva(')) {
-    return true;
-  }
-  
+  // 允许空格的 rgba/hsla 正则
+  const rgbaReg = /^rgba\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\)$/i;
+  const hslaReg = /^hsla\s*\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*(0|1|0?\.\d+)\s*\)$/i;
+  if (rgbaReg.test(color)) return true;
+  if (hslaReg.test(color)) return true;
+  if (color.includes('hsva(')) return true;
+  if (color === 'transparent') return true;
   return false;
 }
 
