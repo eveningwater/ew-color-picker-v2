@@ -187,7 +187,30 @@ export default class ewColorPickerPredefinePlugin {
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions();
+    
+    // 注册事件监听器
+    if (core.on && typeof core.on === 'function') {
+      core.on('change', (color: string) => {
+        // 当颜色改变时，可以更新预定义颜色的激活状态
+        this.updateActivePredefineColor(color);
+      });
+    }
+    
     this.run?.();
+  }
+  
+  // 更新激活的预定义颜色
+  private updateActivePredefineColor(color: string) {
+    this.predefineItems.forEach((item, index) => {
+      const colorData = this.options.predefineColor![index];
+      const itemColor = typeof colorData === 'string' ? colorData : (colorData as PredefineColor).color;
+      
+      if (itemColor === color) {
+        addClass(item, 'ew-color-picker-predefine-color-active');
+      } else {
+        removeClass(item, 'ew-color-picker-predefine-color-active');
+      }
+    });
   }
 }
 

@@ -34,6 +34,17 @@ export default class ewColorPickerConsolePlugin {
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions();
+    
+    // 注册事件监听器
+    if (core.on && typeof core.on === 'function') {
+      core.on('change', (color: string) => {
+        // 控制台插件可以在这里处理颜色变化事件
+        if (this.options.isLog) {
+          console.log('Color changed:', color);
+        }
+      });
+    }
+    
     this.run?.();
   }
 }

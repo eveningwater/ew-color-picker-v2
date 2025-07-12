@@ -161,6 +161,16 @@ export default class ewColorPickerHuePlugin {
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions();
+    
+    // 注册事件监听器
+    if (core.on && typeof core.on === 'function') {
+      core.on('change', (color: string) => {
+        // 当颜色改变时，更新 hue 滑块位置
+        const hsva = colorRgbaToHsva(color);
+        this.updateHueThumbPosition(hsva.h);
+      });
+    }
+    
     this.run?.();
   }
 } 

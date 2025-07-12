@@ -74,6 +74,16 @@ export default class ewColorPickerColorModePlugin {
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions();
+    
+    // 注册事件监听器
+    if (core.on && isFunction(core.on)) {
+      core.on('change', (color: string) => {
+        if (this.currentMode !== 'hex') {
+          this.updateInputValues(color);
+        }
+      });
+    }
+    
     this.run?.();
   }
 

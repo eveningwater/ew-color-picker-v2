@@ -650,6 +650,16 @@ export default class ewColorPickerPanelPlugin {
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions();
+    
+    // 注册事件监听器
+    if (core.on && typeof core.on === 'function') {
+      core.on('change', (color: string) => {
+        // 当颜色改变时，更新面板光标位置
+        const hsva = colorRgbaToHsva(color);
+        this.updateCursorPosition(hsva.s, hsva.v);
+      });
+    }
+    
     this.run?.();
   }
 }

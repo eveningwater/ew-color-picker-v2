@@ -227,6 +227,7 @@ export default class ewColorPicker extends EventEmitter {
         this.options.el = document.body;
       }
       
+      // 设置 wrapper 为传入的容器元素
       this.wrapper = this.options.el;
       this.wrapper.isEwColorPickerContainer = true;
       

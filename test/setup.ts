@@ -1,5 +1,5 @@
 // 测试环境设置
-import { beforeAll, afterEach, afterAll } from 'vitest';
+import { beforeAll, afterEach, afterAll, vi } from 'vitest';
 
 // 模拟 __DEV__ 变量
 declare global {
@@ -11,7 +11,10 @@ globalThis.__DEV__ = true;
 
 // 清理 DOM
 afterEach(() => {
-  document.body.innerHTML = '';
+  // 确保 document.body 存在
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.innerHTML = '';
+  }
 });
 
 // 模拟 console 方法以避免测试输出

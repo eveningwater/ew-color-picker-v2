@@ -15,7 +15,10 @@ describe('ewColorPicker', () => {
     if (core) {
       core.destroy();
     }
-    document.body.removeChild(container);
+    // 安全地移除容器
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
   });
 
   describe('initialization', () => {

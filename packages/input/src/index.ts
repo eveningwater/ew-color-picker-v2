@@ -229,6 +229,15 @@ export default class ewColorPickerInputPlugin {
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions();
+    
+    // 注册事件监听器
+    if (core.on && typeof core.on === 'function') {
+      core.on('change', (color: string) => {
+        // 当颜色改变时，更新输入框
+        this.update(color);
+      });
+    }
+    
     this.run?.();
   }
 }

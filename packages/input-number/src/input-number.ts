@@ -330,6 +330,15 @@ export default class InputNumber {
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions?.();
+    
+    // 注册事件监听器
+    if (core.on && typeof core.on === 'function') {
+      core.on('change', (color: string) => {
+        // 当颜色改变时，可以更新数字输入框的值
+        // 这里可以根据需要实现具体的更新逻辑
+      });
+    }
+    
     this.run?.();
   }
 }

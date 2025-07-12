@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { create } from '@ew-color-picker/utils';
 import EWColorPicker from '../src/index';
 
@@ -15,7 +15,10 @@ describe('EWColorPicker', () => {
     if (colorPicker) {
       colorPicker.destroy();
     }
-    document.body.removeChild(container);
+    // 安全地移除容器
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
   });
 
   describe('initialization', () => {
