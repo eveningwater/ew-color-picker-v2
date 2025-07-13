@@ -7,6 +7,12 @@ import scss from 'rollup-plugin-scss';
 import fs from 'fs';
 import path from 'path';
 
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const packagesDir = path.resolve(__dirname, '../packages');
 const buildType = [
   { format: 'umd', ext: '.js', minify: false },
@@ -85,7 +91,6 @@ async function buildJsTsPackage(pkg) {
       name: pkg.charAt(0).toUpperCase() + pkg.slice(1),
       banner: getBanner(pkg),
       globals: globalsMap[pkg] || {},
-      exports: 'default',
     });
     await bundle.close();
   }
@@ -116,6 +121,7 @@ async function buildStylePackage(pkg) {
             outputStyle: isMin ? 'compressed' : 'expanded',
             sourceMap: false,
             fileName: outName,
+            additionalData: `@import './variable.scss';`,
           }),
         ],
         onwarn(warning, warn) {

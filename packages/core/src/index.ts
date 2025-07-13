@@ -326,9 +326,9 @@ export default class ewColorPicker extends EventEmitter {
     const panelContainer = this.mountPoints.get('panelContainer');
     if (!panelContainer) return;
 
-    // 如果当前没有颜色，设置默认的红色
+    // 如果当前没有颜色，且没有设置默认颜色，则设置默认的红色
     if (!this.currentColor) {
-      let defaultColor = '#ff0000';
+      let defaultColor = this.options.defaultColor || '#ff0000';
       
       // 如果开启了 alpha 配置，转换为 rgba 格式
       if (this.options.alpha) {

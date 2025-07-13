@@ -69,9 +69,11 @@ export default class ewColorPickerHuePlugin {
       insertNode(panelContainer, hueSlider);
     }
     // 设置初始 thumb 位置
-    const currentColor = this.ewColorPicker.getColor() || '#ff0000';
-    const hsva = colorRgbaToHsva(currentColor);
-    this.updateHueThumbPosition(hsva.h);
+    const currentColor = this.ewColorPicker.getColor();
+    if (currentColor) {
+      const hsva = colorRgbaToHsva(currentColor);
+      this.updateHueThumbPosition(hsva.h);
+    }
   }
 
   bindEvents() {
@@ -121,13 +123,19 @@ export default class ewColorPickerHuePlugin {
 
   updateHue(hue: number) {
     // 只更新 hue，保持 s/v/a 不变
-    let currentColor = this.ewColorPicker.getColor() || '#ff0000';
+    let currentColor = this.ewColorPicker.getColor();
     
     // 确保 hue 值在有效范围内
     const validHue = Math.max(0, Math.min(360, hue));
     
     // 获取当前的 HSVA 值
-    const hsva = colorRgbaToHsva(currentColor);
+    let hsva;
+    if (currentColor) {
+      hsva = colorRgbaToHsva(currentColor);
+    } else {
+      // 如果没有当前颜色，使用默认值
+      hsva = { h: validHue, s: 100, v: 100, a: 1 };
+    }
     
     // 检查 HSVA 值是否有效
     if (isNaN(hsva.h) || isNaN(hsva.s) || isNaN(hsva.v) || isNaN(hsva.a)) {

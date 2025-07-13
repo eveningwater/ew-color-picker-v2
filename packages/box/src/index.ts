@@ -132,7 +132,7 @@ export default class ewColorPickerBoxPlugin {
   
   setBoxBgColor(color?: string) {
     if (this.box) {
-      if (color) {
+      if (color && color.trim() !== '') {
         setStyle(this.box, {
           backgroundColor: color,
           transition: "background-color 0.3s"
