@@ -1,5 +1,5 @@
-import { removeAllSpace } from "./base";
-import { getStyle, setStyle } from "./dom";
+import { isString, removeAllSpace } from "./base";
+import { create, getStyle, setStyle } from "./dom";
 
 
 // HEX color
@@ -65,7 +65,7 @@ export function colorHexToRgba(hex: string, alpha: number = 1): string {
     for (let j = 1, len = hColor.length; j < len; j += 2) {
       rgbaColor.push(parseInt("0X" + hColor.slice(j, j + 2), 16));
     }
-    return removeAllSpace("rgba(" + rgbaColor.join(",") + "," + a + ")");
+    return `rgba(${rgbaColor.join(', ')}, ${a})`;
   } else {
     return removeAllSpace(hColor);
   }
@@ -262,48 +262,64 @@ export function colorRgbaToHsva(rgba: string): HsvaColor {
     return { h: 0, s: 100, v: 100, a: 1 };
   }
   
-  const rgbaArr = rgba
-    .slice(rgba.indexOf("(") + 1, rgba.lastIndexOf(")"))
-    .split(",");
-  let a = rgbaArr.length < 4 ? 1 : Number(rgbaArr[3]);
-  // 将透明度限制为1位小数
-  a = Math.round(a * 10) / 10;
-  let r = parseInt(rgbaArr[0]) / 255,
-    g = parseInt(rgbaArr[1]) / 255,
-    b = parseInt(rgbaArr[2]) / 255;
-  let h, s, v;
-  let min = Math.min(r, g, b);
-  let max = (v = Math.max(r, g, b));
-  let diff = max - min;
-  if (max === 0) {
-    s = 0;
-  } else {
-    s = 1 - min / max;
+  // 清理输入字符串，移除多余空格
+  const cleanRgba = rgba.replace(/\s+/g, ' ').trim();
+  
+  // 提取括号内的内容
+  const match = cleanRgba.match(/rgba?\(([^)]+)\)/i);
+  if (!match) {
+    return { h: 0, s: 100, v: 100, a: 1 };
   }
-  if (max === min) {
-    h = 0;
-  } else {
-    switch (max) {
-      case r:
-        h = (g - b) / diff + (g < b ? 6 : 0);
-        break;
-      case g:
-        h = 2.0 + (b - r) / diff;
-        break;
-      case b:
-        h = 4.0 + (r - g) / diff;
-        break;
+  
+  // 分割并清理每个值
+  const rgbaArr = match[1].split(',').map(val => val.trim());
+  
+  // 解析 RGB 值，使用 parseFloat 而不是 parseInt 来处理可能的浮点数
+  const r = parseFloat(rgbaArr[0]) || 0;
+  const g = parseFloat(rgbaArr[1]) || 0;
+  const b = parseFloat(rgbaArr[2]) || 0;
+  const a = rgbaArr.length >= 4 ? parseFloat(rgbaArr[3]) || 1 : 1;
+  
+  // 将 RGB 值标准化到 0-1 范围
+  const rNorm = r / 255;
+  const gNorm = g / 255;
+  const bNorm = b / 255;
+  
+  // 计算 HSV
+  const max = Math.max(rNorm, gNorm, bNorm);
+  const min = Math.min(rNorm, gNorm, bNorm);
+  const diff = max - min;
+  
+  let h = 0;
+  let s = 0;
+  const v = max;
+  
+  if (max !== 0) {
+    s = diff / max;
+  }
+  
+  if (diff !== 0) {
+    if (max === rNorm) {
+      h = 60 * (((gNorm - bNorm) / diff) % 6);
+    } else if (max === gNorm) {
+      h = 60 * ((bNorm - rNorm) / diff + 2);
+    } else if (max === bNorm) {
+      h = 60 * ((rNorm - gNorm) / diff + 4);
     }
-    h = h! * 60;
+    if (h < 0) h += 360;
+  } else {
+    // 当 diff === 0 时，所有颜色分量相等，色相为 0（红色）
+    h = 0;
   }
-
-  s = s * 100;
-  v = v * 100;
+  
+  // 将透明度限制为1位小数
+  const alpha = Math.round(a * 10) / 10;
+  
   return {
     h: Math.round(h),
-    s: Math.round(s),
-    v: Math.round(v),
-    a,
+    s: Math.round(s * 100),
+    v: Math.round(v * 100),
+    a: alpha,
   };
 }
 // 常见 CSS 颜色关键字映射
@@ -331,7 +347,11 @@ const COLOR_KEYWORDS: Record<string, string> = {
 };
 
 export function colorToRgba(color: string): string {
-  // 统一小写
+  // 处理空值
+  if (!color || typeof color !== 'string') {
+    return '';
+  }
+  // 统一小写并清理空格
   const input = color.trim().toLowerCase();
 
   // 关键字映射
@@ -341,30 +361,43 @@ export function colorToRgba(color: string): string {
 
   // hex
   if (colorRegExp.test(input)) {
-    const rgba = colorHexToRgba(input);
-    return rgba.replace(/rgba\(([^)]+)\)/, (match, values) => {
-      return `rgba(${values.split(',').map((v: string) => v.trim()).join(', ')})`;
-    });
+    // 直接调用 colorHexToRgba
+    let rgba = colorHexToRgba(input);
+    // 强制输出格式统一为 'rgba(r, g, b, a)'，兼容所有空格
+    rgba = rgba.replace(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+(?:\.\d+)?)\s*\)/, 'rgba($1, $2, $3, $4)');
+    return rgba;
   }
 
-  // rgb
-  const rgbReg = /^rgb\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/i;
-  if (rgbReg.test(input)) {
-    const rgba = input.replace(/rgb\s*\(/, 'rgba(').replace(/\)\s*$/, ', 1)');
-    return rgba.replace(/rgba\(([^)]+)\)/, (match, values) => {
-      return `rgba(${values.split(',').map((v: string) => v.trim()).join(', ')})`;
-    });
+  // rgb - 支持带空格的格式
+  const rgbReg = /^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i;
+  const rgbMatch = input.match(rgbReg);
+  if (rgbMatch) {
+    const [, r, g, b] = rgbMatch;
+    return `rgba(${r}, ${g}, ${b}, 1)`;
   }
 
-  // rgba
-  const rgbaReg = /^rgba\s*\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\)$/i;
-  if (rgbaReg.test(input)) {
-    return input.replace(/rgba\(([^)]+)\)/, (match, values) => {
-      return `rgba(${values.split(',').map((v: string) => v.trim()).join(', ')})`;
-    });
+  // rgba - 支持带空格的格式
+  const rgbaReg = /^rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(0|1|0?\.\d+)\s*\)$/i;
+  const rgbaMatch = input.match(rgbaReg);
+  if (rgbaMatch) {
+    const [, r, g, b, a] = rgbaMatch;
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
   }
 
-  // 其它格式暂不支持
+  // 尝试通过 DOM 解析颜色关键字
+  try {
+    const div = create("div");
+    setStyle(div, { "background-color": color });
+    const computedColor = getStyle(div, "backgroundColor") as string;
+    if (computedColor && computedColor !== 'rgba(0, 0, 0, 0)') {
+      // 统一输出格式
+      return computedColor.replace(/rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+(?:\.\d+)?)\s*\)/, 'rgba($1, $2, $3, $4)');
+    }
+  } catch {
+    // 忽略 DOM 解析错误
+  }
+
+  // 如果都不匹配，返回空字符串
   return '';
 }
 /**

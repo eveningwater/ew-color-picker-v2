@@ -232,6 +232,14 @@ export default class ewColorPicker extends EventEmitter {
     // 不设置默认颜色，让用户决定是否传递 defaultColor
     // 只有在打开面板时才需要默认颜色
     
+    // 处理 defaultColor
+    let color = this.options.defaultColor;
+    let rgba = colorToRgba(color);
+    // 只要 colorToRgba 返回非空字符串就信任，不再做正则判断和手动拼接
+    if (!rgba) {
+      rgba = 'rgba(255, 0, 0, 1)'; // fallback 红色
+    }
+    
     // 初始化实例
     this.init();
   }
@@ -251,6 +259,8 @@ export default class ewColorPicker extends EventEmitter {
       this.initCoreProperties();
       this.createMountPoints();
       this.applyPlugins();
+      // 插件挂载后，确保色相同步
+      this.notifyHuePluginUpdate(this.hsvaColor.h);
     });
   }
 
@@ -276,9 +286,14 @@ export default class ewColorPicker extends EventEmitter {
       
       this.currentColor = defaultColor;
       
-      // 检查 defaultColor 转换后的 HSVA 中的 h 值是否有变动
-      const newHsva = colorRgbaToHsva(defaultColor);
-      if (newHsva.h !== this.hsvaColor.h) {
+      // 统一转为 rgba 后再转 hsva
+      let rgbaColor = colorToRgba(defaultColor);
+      // 如果 colorToRgba 返回空字符串，使用 fallback
+      if (!rgbaColor) {
+        rgbaColor = 'rgba(255, 0, 0, 1)';
+      }
+      const newHsva = colorRgbaToHsva(rgbaColor);
+      if (!isNaN(newHsva.h)) {
         this.hsvaColor = newHsva;
         // 通知 hue 插件更新滑块位置（如果插件已加载）
         this.notifyHuePluginUpdate(newHsva.h);
@@ -347,11 +362,15 @@ export default class ewColorPicker extends EventEmitter {
       }
       
       this.currentColor = defaultColor;
-      const newHsva = colorRgbaToHsva(defaultColor);
+      let rgbaColor = colorToRgba(defaultColor);
+      if (!rgbaColor) {
+        rgbaColor = 'rgba(255, 0, 0, 1)';
+      }
+      const newHsva = colorRgbaToHsva(rgbaColor);
       this.hsvaColor = newHsva;
       
-      // 检查 h 值是否有变动，如果有变动则通知 hue 插件更新滑块位置
-      if (newHsva.h !== 0) { // 默认 h 值是 0
+      // 检查 h 值是否有效，如果有效则通知 hue 插件更新滑块位置
+      if (!isNaN(newHsva.h)) {
         this.notifyHuePluginUpdate(newHsva.h);
       }
     }
