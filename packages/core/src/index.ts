@@ -566,7 +566,7 @@ export default class ewColorPicker extends EventEmitter {
     if (this.isDestroyed) return;
     
     this.currentColor = color;
-    this.hooks.trigger('change', color);
+    this.trigger('change', color);
   }
 
   // 更新配置并重新渲染

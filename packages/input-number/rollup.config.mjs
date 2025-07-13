@@ -54,7 +54,7 @@ function generateBuildConfigs() {
         file: `dist/input-number${type.ext}`,
         name: 'InputNumber',
         format: type.format,
-        exports: 'default',
+        exports: 'named',
         banner: `/*!
  * @ew-color-picker/input-number
  * (c) 2024-${new Date().getFullYear()} eveningwater(854806732@qq.com)
