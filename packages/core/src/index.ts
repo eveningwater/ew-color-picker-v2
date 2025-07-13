@@ -384,6 +384,11 @@ export default class ewColorPicker extends EventEmitter {
       this.pickerFlag = true;
       this.trigger('toggle', true);
       
+      // 调用 togglePicker 回调
+      if (this.options.togglePicker && isFunction(this.options.togglePicker)) {
+        this.options.togglePicker(true);
+      }
+      
       // 优化：合并嵌套的 setTimeout
       setTimeout(() => {
         // 安全地调用 panel 插件的 handleAutoPosition 方法
@@ -422,6 +427,12 @@ export default class ewColorPicker extends EventEmitter {
       
       this.pickerFlag = false;
       this.trigger('toggle', false);
+      
+      // 调用 togglePicker 回调
+      if (this.options.togglePicker && isFunction(this.options.togglePicker)) {
+        this.options.togglePicker(false);
+      }
+      
       off(document, 'mousedown', this._onDocumentClick, { capture: true });
     }).catch(error => {
       warn(`[ewColorPicker error]: Failed to hide panel: ${error}`);
@@ -681,11 +692,23 @@ export default class ewColorPicker extends EventEmitter {
     
     // 更新 HSVA 颜色值
     if (color) {
-      this.hsvaColor = colorRgbaToHsva(color);
+      // 先将颜色转换为 rgba 格式，再转换为 hsva
+      const rgbaColor = colorToRgba(color);
+      if (rgbaColor) {
+        this.hsvaColor = colorRgbaToHsva(rgbaColor);
+      } else {
+        // 如果转换失败，使用默认值
+        this.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
+      }
     }
     
     // 触发颜色变化事件
     this.trigger('change', color);
+    
+    // 调用 changeColor 回调
+    if (this.options.changeColor && isFunction(this.options.changeColor)) {
+      this.options.changeColor(color);
+    }
   }
 
   public getColor(): string {
@@ -715,6 +738,25 @@ export default class ewColorPicker extends EventEmitter {
 
   public emit(event: string, ...args: any[]): void {
     this.trigger(event, ...args);
+    
+    // 调用相应的回调函数
+    switch (event) {
+      case 'clear':
+        if (this.options.clear && isFunction(this.options.clear)) {
+          this.options.clear();
+        }
+        break;
+      case 'sure':
+        if (this.options.sure && isFunction(this.options.sure)) {
+          this.options.sure();
+        }
+        break;
+      case 'toggle':
+        if (this.options.togglePicker && isFunction(this.options.togglePicker)) {
+          this.options.togglePicker(...args);
+        }
+        break;
+    }
   }
 
   public on(type: string, fn: Function, context?: Object): this {
