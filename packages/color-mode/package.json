@@ -1,6 +1,6 @@
 {
   "name": "@ew-color-picker/colorMode",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Color mode conversion plugin for ew-color-picker",
   "main": "dist/colorMode.js",
   "module": "dist/colorMode.esm.js",
