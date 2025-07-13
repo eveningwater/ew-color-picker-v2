@@ -10,6 +10,7 @@ export interface MockCore {
   plugins: Record<string, any>;
   _eventHandlers?: Record<string, Function[]>;
   wrapper: HTMLElement;
+  currentColor?: string; // 添加 currentColor 属性
   
   // DOM 相关方法
   getMountPoint: (name: string) => HTMLElement | null;
@@ -82,8 +83,9 @@ export function createMockCore(container: HTMLElement, options: any = {}): MockC
     getContainer: vi.fn(() => container),
     
     // 颜色相关方法
-    getColor: vi.fn(() => mockCore.options.defaultColor || '#ff0000'),
+    getColor: vi.fn(() => mockCore.currentColor || mockCore.options.defaultColor || '#ff0000'),
     setColor: vi.fn((color: string) => {
+      mockCore.currentColor = color;
       mockCore.options.defaultColor = color;
       // 触发 change 事件
       mockCore.emit('change', color);

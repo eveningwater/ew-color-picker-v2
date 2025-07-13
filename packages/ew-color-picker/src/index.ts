@@ -4,18 +4,20 @@ import Panel from "@ew-color-picker/panel";
 import Hue from "@ew-color-picker/hue";
 import Alpha from "@ew-color-picker/alpha";
 import Input from "@ew-color-picker/input";
+import InputNumber, { ewColorPickerInputNumberPlugin } from "@ew-color-picker/input-number";
 import Button from "@ew-color-picker/button";
 import Predefine from "@ew-color-picker/predefine";
 import Console from "@ew-color-picker/console";
 import ColorMode from "@ew-color-picker/color-mode";
 
-// 注册插件（color-mode）
+// 注册插件
 Core.use(Console);
 Core.use(Box);
 Core.use(Panel);
 Core.use(Hue);
 Core.use(Alpha);
 Core.use(Input);
+Core.use(ewColorPickerInputNumberPlugin); // 注册 InputNumber 插件
 Core.use(Button);
 Core.use(Predefine);
 Core.use(ColorMode);

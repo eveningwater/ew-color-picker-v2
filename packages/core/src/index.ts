@@ -116,6 +116,7 @@ const DEFAULT_PLUGINS = {
   ewColorPickerColorMode: true, // 保持插件名不变，便于兼容
   ewColorPickerHue: true,
   ewColorPickerAlpha: true,
+  ewColorPickerInputNumber: true, // 添加 InputNumber 插件
 } as const;
 
 // 挂载点名称映射
@@ -126,6 +127,7 @@ const MOUNT_ORDER_MAP: Record<string, number> = {
   'ewColorPickerHue': PluginMountOrder.HUE,
   'ewColorPickerAlpha': PluginMountOrder.ALPHA,
   'ewColorPickerInput': PluginMountOrder.INPUT,
+  'ewColorPickerInputNumber': PluginMountOrder.INPUT, // InputNumber 插件与 Input 插件使用相同的挂载点
   'ewColorPickerButton': PluginMountOrder.BUTTON,
   'ewColorPickerPredefine': PluginMountOrder.PREDEFINE,
   'ewColorPickerColorMode': PluginMountOrder.COLOR_MODE,
@@ -326,6 +328,7 @@ export default class ewColorPicker extends EventEmitter {
     const panelContainer = this.mountPoints.get('panelContainer');
     if (!panelContainer) return;
 
+    // 只有在面板真正需要显示时才设置默认颜色
     // 如果当前没有颜色，且没有设置默认颜色，则设置默认的红色
     if (!this.currentColor) {
       let defaultColor = this.options.defaultColor || '#ff0000';
@@ -350,7 +353,10 @@ export default class ewColorPicker extends EventEmitter {
       
       // 优化：合并嵌套的 setTimeout
       setTimeout(() => {
-        this.plugins.ewColorPickerPanel.handleAutoPosition();
+        // 安全地调用 panel 插件的 handleAutoPosition 方法
+        if (this.plugins.ewColorPickerPanel && typeof this.plugins.ewColorPickerPanel.handleAutoPosition === 'function') {
+          this.plugins.ewColorPickerPanel.handleAutoPosition();
+        }
         on(document, 'mousedown', this._onDocumentClick, { capture: true });
       }, 0);
     }).catch(error => {

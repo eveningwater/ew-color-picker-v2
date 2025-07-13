@@ -145,7 +145,13 @@ export default class ewColorPickerInputPlugin {
     // 检查当前颜色是否有效
     if (!currentColor || currentColor.indexOf('NaN') !== -1) {
       currentColor = defaultColor;
-      this.ewColorPicker.setColor(currentColor);
+      // 只有在真正需要时才设置颜色，避免在初始化时强制设置
+      if (this.ewColorPicker.currentColor === '') {
+        // 如果 currentColor 为空，说明用户没有设置 defaultColor，不应该强制设置
+        currentColor = '';
+      } else {
+        this.ewColorPicker.setColor(currentColor);
+      }
     }
     
     // 根据配置格式化颜色显示

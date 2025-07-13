@@ -119,6 +119,67 @@ describe('Box Plugin', () => {
     });
   });
 
+  describe('defaultColor scenarios', () => {
+    it('should not display background color when no defaultColor is set', () => {
+      // 创建没有 defaultColor 的 mock
+      const mockCoreNoColor = createMockCore(container, {
+        showBox: true,
+        defaultColor: '' // 空字符串
+      });
+      mockCoreNoColor.currentColor = ''; // 确保 currentColor 也为空
+      
+      const plugin = new BoxPlugin(mockCoreNoColor);
+      
+      const boxElement = container.querySelector('.ew-color-picker-box') as HTMLElement;
+      expect(boxElement).toBeTruthy();
+      
+      // Box 不应该有背景色
+      const bg = boxElement.style.backgroundColor;
+      expect(bg === '' || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)').toBeTruthy();
+    });
+
+    it('should display background color when defaultColor is set', () => {
+      const mockCoreWithColor = createMockCore(container, {
+        showBox: true,
+        defaultColor: '#00ff00'
+      });
+      mockCoreWithColor.currentColor = '#00ff00';
+      
+      const plugin = new BoxPlugin(mockCoreWithColor);
+      
+      const boxElement = container.querySelector('.ew-color-picker-box') as HTMLElement;
+      expect(boxElement).toBeTruthy();
+      
+      // Box 应该显示背景色
+      const bg = boxElement.style.backgroundColor;
+      expect(bg === 'rgb(0, 255, 0)' || bg === '#00ff00').toBeTruthy();
+    });
+
+    it('should update box background when color changes from empty to valid color', () => {
+      const mockCore = createMockCore(container, {
+        showBox: true,
+        defaultColor: ''
+      });
+      mockCore.currentColor = '';
+      
+      const plugin = new BoxPlugin(mockCore);
+      
+      const boxElement = container.querySelector('.ew-color-picker-box') as HTMLElement;
+      
+      // 初始状态应该没有背景色
+      let bg = boxElement.style.backgroundColor;
+      expect(bg === '' || bg === 'transparent' || bg === 'rgba(0, 0, 0, 0)').toBeTruthy();
+      
+      // 模拟颜色变化
+      mockCore.getColor = vi.fn(() => '#ff0000');
+      mockCore.emit('change', '#ff0000');
+      
+      // 应该有背景色了
+      bg = boxElement.style.backgroundColor;
+      expect(bg === 'rgb(255, 0, 0)' || bg === '#ff0000').toBeTruthy();
+    });
+  });
+
   describe('cleanup', () => {
     it('should clean up event listeners on destroy', () => {
       const plugin = new BoxPlugin(mockCore);

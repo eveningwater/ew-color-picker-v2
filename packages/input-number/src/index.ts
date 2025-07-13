@@ -17,6 +17,10 @@ import {
 } from "@ew-color-picker/utils";
 import { upArrowIcon, downArrowIcon } from "@ew-color-picker/icon";
 
+// 添加插件类
+import ewColorPicker from "@ew-color-picker/core";
+import { ApplyOrder } from "@ew-color-picker/utils";
+
 export interface InputNumberOptions {
   value?: number;
   min?: number;
@@ -29,6 +33,47 @@ export interface InputNumberOptions {
   onChange?: (value: number) => void;
   onBlur?: (value: number) => void;
   onFocus?: (event: FocusEvent) => void;
+}
+
+export interface InputNumberPluginOptions {
+  // 可以添加插件级别的配置选项
+}
+
+export class ewColorPickerInputNumberPlugin {
+  static pluginName = "ewColorPickerInputNumber";
+  static applyOrder = ApplyOrder.Post;
+  
+  options: InputNumberPluginOptions = {};
+  private instances: Map<string, InputNumber> = new Map();
+
+  constructor(public ewColorPicker: ewColorPicker) {
+    this.handleOptions();
+  }
+
+  handleOptions() {
+    if (this.ewColorPicker && this.ewColorPicker.options) {
+      this.options = { ...this.options, ...this.ewColorPicker.options };
+    }
+  }
+
+  // 创建 InputNumber 实例
+  createInputNumber(options: InputNumberOptions): InputNumber {
+    return new InputNumber(options);
+  }
+
+  // 销毁插件
+  destroy() {
+    // 销毁所有 InputNumber 实例
+    this.instances.forEach(instance => {
+      instance.destroy();
+    });
+    this.instances.clear();
+  }
+
+  // 更新配置
+  updateOptions() {
+    this.handleOptions();
+  }
 }
 
 export default class InputNumber {

@@ -182,4 +182,50 @@ describe('ewColorPicker', () => {
       expect(core.options.showAlpha).toBe(true);
     });
   });
+
+  describe('defaultColor handling', () => {
+    it('should not set currentColor when defaultColor is not provided', () => {
+      core = new ewColorPicker({ el: container });
+      
+      // 没有设置 defaultColor 时，currentColor 应该为空
+      expect(core.currentColor).toBe('');
+    });
+
+    it('should set currentColor when defaultColor is provided', () => {
+      core = new ewColorPicker({ 
+        el: container, 
+        defaultColor: '#00ff00' 
+      });
+      
+      // 设置了 defaultColor 时，currentColor 应该等于 defaultColor
+      expect(core.currentColor).toBe('#00ff00');
+    });
+
+    it('should use defaultColor in showPanel when currentColor is empty', () => {
+      core = new ewColorPicker({ 
+        el: container, 
+        defaultColor: '#0000ff' 
+      });
+      
+      // 清空 currentColor
+      core.currentColor = '';
+      
+      // 调用 showPanel，应该使用 defaultColor
+      core.showPanel();
+      
+      expect(core.currentColor).toBe('#0000ff');
+    });
+
+    it('should use fallback red color in showPanel when both currentColor and defaultColor are empty', () => {
+      core = new ewColorPicker({ el: container });
+      
+      // 确保 currentColor 为空
+      core.currentColor = '';
+      
+      // 调用 showPanel，应该使用默认红色
+      core.showPanel();
+      
+      expect(core.currentColor).toBe('#ff0000');
+    });
+  });
 }); 
