@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
+import { create } from '../../utils/src/dom';
 import EWColorPicker from '../src/index';
 
 describe('EWColorPicker', () => {
@@ -97,6 +97,7 @@ describe('EWColorPicker', () => {
       
       colorPicker.setColor('#ff0000');
       
+      // 直接检查事件是否被触发
       expect(eventEmitted).toBe(true);
     });
 

@@ -28,6 +28,9 @@ describe('Box Plugin', () => {
         showBox: true,
         defaultColor: '#ff0000'
     });
+    
+    // 设置当前颜色，因为 box 插件现在使用 currentColor
+    mockCore.currentColor = '#ff0000';
   });
 
   afterEach(() => {

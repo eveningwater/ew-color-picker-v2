@@ -671,16 +671,16 @@ export default class ewColorPicker extends EventEmitter {
   }
 
   public emit(event: string, ...args: any[]): void {
-    this.hooks.trigger(event, ...args);
+    this.trigger(event, ...args);
   }
 
   public on(type: string, fn: Function, context?: Object): this {
-    this.hooks.on(type, fn, context);
+    super.on(type, fn, context);
     return this;
   }
 
   public off(type?: string, fn?: Function): this | undefined {
-    this.hooks.off(type, fn);
+    super.off(type, fn);
     return this;
   }
 

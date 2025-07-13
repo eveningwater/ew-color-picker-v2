@@ -6,20 +6,20 @@ import { _arrSlice, _hasOwn } from "./const";
  * @param o 
  * @returns 
  */
-export const extend = <T extends {}, U extends T>(t: T, ...o: U[]): T & U => {
+export const extend = <T extends object, U extends object[]>(t: T, ...o: U): T & U[number] => {
     if (isNull(t)) {
-        return {} as T & U;
+        return {} as T & U[number];
     }
     if (Object.assign) {
         return Object.assign(t, ...o);
     } else {
-        const _ = Object(t) as T & U;
-        for (let j = 1, len = o.length; j < len; j++) {
+        const _ = Object(t) as T & U[number];
+        for (let j = 0, len = o.length; j < len; j++) {
             const source = o[j];
             if (source) {
                 for (let key in source) {
                     if (_hasOwn.call(source, key)) {
-                        _[key] = source[key];
+                        (_ as any)[key] = (source as any)[key];
                     }
                 }
             }
@@ -33,7 +33,7 @@ export const extend = <T extends {}, U extends T>(t: T, ...o: U[]): T & U => {
  * @param v 
  * @returns 
  */
-export const toArray = <T>(v: Iterable<T> | ArrayLike<T>) => {
+export const toArray = <T>(v: Iterable<T> | ArrayLike<T> | any) => {
     if (!isShallowObject(v)) {
         return v;
     }
@@ -77,7 +77,7 @@ export const removeAllSpace = (value: string) => value.replace(/\s+/g, "");
  * @param value
  * @returns
  */
-export const isPromise = <T extends Promise<unknown>>(value: T) => !isUndefined(value) && !isNull(value) && isFunction(value.then) && isFunction(value.catch);
+export const isPromise = (value: any): value is Promise<unknown> => !isUndefined(value) && !isNull(value) && isFunction((value as any).then) && isFunction((value as any).catch);
 
 /**
  * 处理类名

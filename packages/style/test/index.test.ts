@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { create } from '@ew-color-picker/utils';
+import { create } from '../../utils/src/dom';
 import { injectStyles, removeStyles } from '../src/index';
 
 describe('Style Utils', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
+import { create } from '../../utils/src/dom';
 import ConsolePlugin from '../src/index';
 import { createMockCore } from '../../../test/setup';
 

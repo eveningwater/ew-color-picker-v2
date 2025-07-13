@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { create } from '@ew-color-picker/utils';
+import { create } from '../../utils/src/dom';
 import ewColorPicker from '../src/index';
 
 describe('ewColorPicker', () => {
@@ -88,12 +88,22 @@ describe('ewColorPicker', () => {
       core = new ewColorPicker({ el: container });
       let eventEmitted = false;
       
-      core.hooks.on('change', () => {
+      // 先监听事件，再设置颜色
+      core.on('change', () => {
         eventEmitted = true;
       });
       
+      // 测试事件系统是否正常工作 - 使用 emit 方法
+      core.emit('change', 'test');
+      expect(eventEmitted).toBe(true);
+      
+      // 重置
+      eventEmitted = false;
+      
+      // 设置颜色，应该触发 change 事件
       core.setColor('#ff0000');
       
+      // 直接检查事件是否被触发
       expect(eventEmitted).toBe(true);
     });
   });
@@ -124,11 +134,11 @@ describe('ewColorPicker', () => {
       core = new ewColorPicker({ el: container });
       let eventHandled = false;
       
-      core.hooks.on('test-event', () => {
+      core.on('change', () => {
         eventHandled = true;
       });
       
-      core.emit('test-event');
+      core.emit('change');
       
       expect(eventHandled).toBe(true);
     });
@@ -141,9 +151,9 @@ describe('ewColorPicker', () => {
         eventHandled = true;
       };
       
-      core.hooks.on('test-event', handler);
-      core.hooks.off('test-event', handler);
-      core.emit('test-event');
+      core.on('change', handler);
+      core.off('change', handler);
+      core.emit('change');
       
       expect(eventHandled).toBe(false);
     });

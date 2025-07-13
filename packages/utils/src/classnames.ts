@@ -3,7 +3,7 @@ import { _hasOwn } from "./const";
 export type Value = boolean | string | number | undefined | null | Symbol;
 export type Mapping = Record<string, unknown>;
 export interface ArgumentArray extends Array<Argument> {}
-export type Argument = Mapping | ArgumentArray;
+export type Argument = string | number | boolean | null | undefined | Mapping | ArgumentArray;
 export const classnames = (...args: ArgumentArray) => {
   const classes: string[] = [];
   for (let i = 0, len = args.length; i < len; i++) {
