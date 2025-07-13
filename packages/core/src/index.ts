@@ -275,6 +275,14 @@ export default class ewColorPicker extends EventEmitter {
       }
       
       this.currentColor = defaultColor;
+      
+      // 检查 defaultColor 转换后的 HSVA 中的 h 值是否有变动
+      const newHsva = colorRgbaToHsva(defaultColor);
+      if (newHsva.h !== this.hsvaColor.h) {
+        this.hsvaColor = newHsva;
+        // 通知 hue 插件更新滑块位置（如果插件已加载）
+        this.notifyHuePluginUpdate(newHsva.h);
+      }
     } else {
       // 没有默认颜色时，设置为空字符串
       this.currentColor = '';
@@ -339,7 +347,13 @@ export default class ewColorPicker extends EventEmitter {
       }
       
       this.currentColor = defaultColor;
-      this.hsvaColor = colorRgbaToHsva(defaultColor);
+      const newHsva = colorRgbaToHsva(defaultColor);
+      this.hsvaColor = newHsva;
+      
+      // 检查 h 值是否有变动，如果有变动则通知 hue 插件更新滑块位置
+      if (newHsva.h !== 0) { // 默认 h 值是 0
+        this.notifyHuePluginUpdate(newHsva.h);
+      }
     }
 
     const type = animationType || getAnimationType(this);
@@ -700,5 +714,14 @@ export default class ewColorPicker extends EventEmitter {
 
   public getOptions(): ewColorPickerMergeOptionsData {
     return this.options;
+  }
+
+  // 通知 hue 插件更新滑块位置
+  private notifyHuePluginUpdate(hue: number): void {
+    // 如果 hue 插件已加载，调用其 updateHueThumbPosition 方法
+    const huePlugin = this.plugins?.ewColorPickerHue;
+    if (huePlugin && isFunction(huePlugin.updateHueThumbPosition)) {
+      huePlugin.updateHueThumbPosition(hue);
+    }
   }
 }
