@@ -60,10 +60,10 @@ export default class ewColorPickerPanelPlugin {
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
-    
+
     // 注册颜色变化事件监听器
-    if (this.ewColorPicker.on && typeof this.ewColorPicker.on === 'function') {
-      this.ewColorPicker.on('change', (color: string) => {
+    if (this.ewColorPicker.on && typeof this.ewColorPicker.on === "function") {
+      this.ewColorPicker.on("change", (color: string) => {
         // 当颜色改变时，更新面板光标位置
         if (color && this.panel) {
           const hsva = colorRgbaToHsva(color);
@@ -71,15 +71,15 @@ export default class ewColorPickerPanelPlugin {
         }
       });
     }
-    
+
     this.run();
   }
 
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
       this.options = extend(this.options, this.ewColorPicker.options);
-    this.isHueHorizontal = this.options.hueDirection === "horizontal";
-    this.isAlphaHorizontal = this.options.alphaDirection === "horizontal";
+      this.isHueHorizontal = this.options.hueDirection === "horizontal";
+      this.isAlphaHorizontal = this.options.alphaDirection === "horizontal";
     }
   }
 
@@ -88,7 +88,7 @@ export default class ewColorPickerPanelPlugin {
     if (this.options.ewColorPickerPanel === false) {
       return;
     }
-    
+
     this.render();
     // 延迟绑定事件，确保DOM完全渲染
     setTimeout(() => {
@@ -121,34 +121,34 @@ export default class ewColorPickerPanelPlugin {
     this.panel = create("div");
     addClass(this.panel, "ew-color-picker-panel");
     addClass(this.panel, "ew-color-picker-panel-dynamic-size");
-    
+
     this.panelWidth = panelWidth;
     this.panelHeight = 180;
 
     // 使用 setProperty 直接设置 CSS 变量
-    this.panel.style.setProperty('--panel-width', panelWidth + 'px');
-    this.panel.style.setProperty('--panel-height', this.panelHeight + 'px');
+    this.panel.style.setProperty("--panel-width", panelWidth + "px");
+    this.panel.style.setProperty("--panel-height", this.panelHeight + "px");
 
     // 组装面板结构
     insertNode(panelContainer, this.panel);
-    
+
     // 创建颜色面板
-    this.whitePanel = create('div');
-    addClass(this.whitePanel, 'ew-color-picker-white-panel');
+    this.whitePanel = create("div");
+    addClass(this.whitePanel, "ew-color-picker-white-panel");
     insertNode(this.panel, this.whitePanel);
-    
-    this.blackPanel = create('div');
-    addClass(this.blackPanel, 'ew-color-picker-black-panel');
+
+    this.blackPanel = create("div");
+    addClass(this.blackPanel, "ew-color-picker-black-panel");
     insertNode(this.panel, this.blackPanel);
-    
+
     // 创建光标
-    this.cursor = create('div');
-    addClass(this.cursor, 'ew-color-picker-panel-cursor');
+    this.cursor = create("div");
+    addClass(this.cursor, "ew-color-picker-panel-cursor");
     insertNode(this.panel, this.cursor);
-    
+
     // 创建底部行容器
-    const bottomRow = create('div');
-    addClass(bottomRow, 'ew-color-picker-bottom-row');
+    const bottomRow = create("div");
+    addClass(bottomRow, "ew-color-picker-bottom-row");
     insertNode(panelContainer, bottomRow);
 
     // 使用 setTimeout 确保容器完全渲染后再计算尺寸
@@ -159,7 +159,7 @@ export default class ewColorPickerPanelPlugin {
 
     // 设置初始色相底色
     this.updateHueBg();
-    
+
     // 根据当前颜色设置初始光标位置
     const currentColor = this.ewColorPicker.getColor();
     if (currentColor) {
@@ -183,8 +183,6 @@ export default class ewColorPickerPanelPlugin {
       this.handlePanelClick(event as MouseEvent)
     );
     on(this.panel, "mousedown", () => this.handlePanelMouseDown());
-
-  
   }
 
   handlePanelClick(event: MouseEvent) {
@@ -197,7 +195,7 @@ export default class ewColorPickerPanelPlugin {
     // 计算饱和度和明度
     const saturation = Math.max(0, Math.min(100, (x / this.panelWidth) * 100));
     const value = Math.max(0, Math.min(100, (1 - y / this.panelHeight) * 100));
-    
+
     // 更新光标位置和颜色
     this.updateCursorPosition(saturation, value);
     this.updateColor(saturation, value);
@@ -249,7 +247,7 @@ export default class ewColorPickerPanelPlugin {
     const hsva = colorRgbaToHsva(currentColor);
     hsva.s = saturation;
     hsva.v = value;
-    
+
     const newColor = colorHsvaToRgba(hsva);
     this.ewColorPicker.setColor(newColor);
     // 触发change事件
@@ -449,7 +447,7 @@ export default class ewColorPickerPanelPlugin {
             } else if (align === "end") {
               // right-end: 面板底部与box底部对齐
               top = boxHeight;
-    } else {
+            } else {
               // right-center: 面板中心与box中心对齐
               top = -this.containerHeight / 2;
             }
@@ -492,58 +490,65 @@ export default class ewColorPickerPanelPlugin {
     const panelBottomInViewport = panelTopInViewport + this.containerHeight;
 
     // 临时调试信息
-    console.log('🔍 Boundary Check Debug:');
-    console.log('position:', position);
-    console.log('align:', align);
-    console.log('rootRect:', rootRect);
-    console.log('viewportWidth:', viewportWidth);
-    console.log('viewportHeight:', viewportHeight);
-    console.log('panelLeftInViewport:', panelLeftInViewport);
-    console.log('panelTopInViewport:', panelTopInViewport);
-    console.log('panelRightInViewport:', panelRightInViewport);
-    console.log('panelBottomInViewport:', panelBottomInViewport);
-    console.log('containerWidth:', this.containerWidth);
-    console.log('containerHeight:', this.containerHeight);
-    console.log('margin:', margin);
+    console.log("🔍 Boundary Check Debug:");
+    console.log("position:", position);
+    console.log("align:", align);
+    console.log("rootRect:", rootRect);
+    console.log("viewportWidth:", viewportWidth);
+    console.log("viewportHeight:", viewportHeight);
+    console.log("panelLeftInViewport:", panelLeftInViewport);
+    console.log("panelTopInViewport:", panelTopInViewport);
+    console.log("panelRightInViewport:", panelRightInViewport);
+    console.log("panelBottomInViewport:", panelBottomInViewport);
+    console.log("containerWidth:", this.containerWidth);
+    console.log("containerHeight:", this.containerHeight);
+    console.log("margin:", margin);
 
     // 检测边界问题
     const boundaryIssues = {
       top: panelTopInViewport < margin,
       bottom: panelBottomInViewport > viewportHeight - margin,
       left: panelLeftInViewport < margin,
-      right: panelRightInViewport > viewportWidth - margin
+      right: panelRightInViewport > viewportWidth - margin,
     };
 
-    console.log('Boundary issues:', boundaryIssues);
+    console.log("Boundary issues:", boundaryIssues);
 
     // 如果没有边界问题，直接返回原位置
-    if (!boundaryIssues.top && !boundaryIssues.bottom && !boundaryIssues.left && !boundaryIssues.right) {
-      console.log('✅ No boundary issues');
+    if (
+      !boundaryIssues.top &&
+      !boundaryIssues.bottom &&
+      !boundaryIssues.left &&
+      !boundaryIssues.right
+    ) {
+      console.log("✅ No boundary issues");
       return { left, top };
     }
 
     // 小屏幕特殊处理：如果面板宽度超过视口宽度的80%，采用移动端定位策略
     const isSmallScreen = this.containerWidth > viewportWidth * 0.8;
-    
+
     if (isSmallScreen) {
-      console.log('📱 Small screen detected, using mobile positioning strategy');
-      
+      console.log(
+        "📱 Small screen detected, using mobile positioning strategy"
+      );
+
       // 获取box的尺寸
       const boxWidth = colorBox.offsetWidth;
       const boxHeight = colorBox.offsetHeight;
-      
+
       // 移动端定位：面板显示在box下方，水平定位在视口右侧
       const mobileTop = boxHeight; // 面板顶部对齐box底部
       const mobileLeft = -(viewportWidth - this.containerWidth); // 水平定位在视口右侧
-      
-      console.log('✅ Mobile position:', { left: mobileLeft, top: mobileTop });
+
+      console.log("✅ Mobile position:", { left: mobileLeft, top: mobileTop });
       return { left: mobileLeft, top: mobileTop };
     }
 
     // 智能边界调整策略 - 尝试所有可能的位置组合
-    const allPositions = ['top', 'bottom', 'left', 'right'];
-    const allAligns = ['start', 'end', 'center'];
-    
+    const allPositions = ["top", "bottom", "left", "right"];
+    const allAligns = ["start", "end", "center"];
+
     let bestPosition = { left, top };
     let bestIssuesCount = Object.values(boundaryIssues).filter(Boolean).length;
     let bestPositionKey = `${position}-${align}`;
@@ -553,50 +558,75 @@ export default class ewColorPickerPanelPlugin {
       for (const testAlign of allAligns) {
         const testPositionKey = `${testPosition}-${testAlign}`;
         const testPositionValue = positionMap[testPositionKey];
-        
+
         if (testPositionValue) {
           // 计算测试位置在视口中的绝对位置
-          const testPanelLeftInViewport = rootRect.left + testPositionValue.left;
+          const testPanelLeftInViewport =
+            rootRect.left + testPositionValue.left;
           const testPanelTopInViewport = rootRect.top + testPositionValue.top;
-          const testPanelRightInViewport = testPanelLeftInViewport + this.containerWidth;
-          const testPanelBottomInViewport = testPanelTopInViewport + this.containerHeight;
+          const testPanelRightInViewport =
+            testPanelLeftInViewport + this.containerWidth;
+          const testPanelBottomInViewport =
+            testPanelTopInViewport + this.containerHeight;
 
           // 检测测试位置的边界问题
           const testBoundaryIssues = {
             top: testPanelTopInViewport < margin,
             bottom: testPanelBottomInViewport > viewportHeight - margin,
             left: testPanelLeftInViewport < margin,
-            right: testPanelRightInViewport > viewportWidth - margin
+            right: testPanelRightInViewport > viewportWidth - margin,
           };
 
-          const testIssuesCount = Object.values(testBoundaryIssues).filter(Boolean).length;
+          const testIssuesCount =
+            Object.values(testBoundaryIssues).filter(Boolean).length;
 
           // 如果这个位置比当前最好的位置更好，更新最佳位置
           if (testIssuesCount < bestIssuesCount) {
             bestIssuesCount = testIssuesCount;
             bestPosition = testPositionValue;
             bestPositionKey = testPositionKey;
-            console.log(`🔄 Better position found: ${testPositionKey} (issues: ${testIssuesCount})`);
+            console.log(
+              `🔄 Better position found: ${testPositionKey} (issues: ${testIssuesCount})`
+            );
           }
         }
       }
     }
 
     // 如果找到了更好的位置，返回它
-    if (bestIssuesCount < Object.values(boundaryIssues).filter(Boolean).length) {
-      console.log(`✅ Final best position: ${bestPositionKey} (issues: ${bestIssuesCount})`);
+    if (
+      bestIssuesCount < Object.values(boundaryIssues).filter(Boolean).length
+    ) {
+      console.log(
+        `✅ Final best position: ${bestPositionKey} (issues: ${bestIssuesCount})`
+      );
       return bestPosition;
     }
 
     // 如果所有位置都有问题，尝试强制居中
-    console.log('⚠️ All positions have boundary issues, trying forced center');
-    const forcedCenterLeft = Math.max(margin, (viewportWidth - this.containerWidth) / 2);
-    const forcedCenterTop = Math.max(margin, (viewportHeight - this.containerHeight) / 2);
-    
-    const finalLeft = Math.min(forcedCenterLeft, viewportWidth - this.containerWidth - margin);
-    const finalTop = Math.min(forcedCenterTop, viewportHeight - this.containerHeight - margin);
-    
-    console.log('✅ Forced center position:', { left: finalLeft, top: finalTop });
+    console.log("⚠️ All positions have boundary issues, trying forced center");
+    const forcedCenterLeft = Math.max(
+      margin,
+      (viewportWidth - this.containerWidth) / 2
+    );
+    const forcedCenterTop = Math.max(
+      margin,
+      (viewportHeight - this.containerHeight) / 2
+    );
+
+    const finalLeft = Math.min(
+      forcedCenterLeft,
+      viewportWidth - this.containerWidth - margin
+    );
+    const finalTop = Math.min(
+      forcedCenterTop,
+      viewportHeight - this.containerHeight - margin
+    );
+
+    console.log("✅ Forced center position:", {
+      left: finalLeft,
+      top: finalTop,
+    });
     return { left: finalLeft, top: finalTop };
   }
 
@@ -656,12 +686,12 @@ export default class ewColorPickerPanelPlugin {
           top = -this.containerHeight - boxHeight / 2;
         } else if (align === "end") {
           top = boxHeight;
-    } else {
+        } else {
           top = -this.containerHeight / 2;
         }
         break;
     }
-    
+
     return { left, top };
   }
 
@@ -671,7 +701,7 @@ export default class ewColorPickerPanelPlugin {
       off(this.panel, "click", this.handlePanelClick as EventListener);
       off(this.panel, "mousedown", this.handlePanelMouseDown as EventListener);
     }
-    
+
     // 清理DOM引用
     this.panel = null;
     this.cursor = null;
@@ -688,16 +718,16 @@ export default class ewColorPickerPanelPlugin {
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions();
-    
+
     // 注册事件监听器
-    if (core.on && typeof core.on === 'function') {
-      core.on('change', (color: string) => {
+    if (core.on && typeof core.on === "function") {
+      core.on("change", (color: string) => {
         // 当颜色改变时，更新面板光标位置
         const hsva = colorRgbaToHsva(color);
         this.updateCursorPosition(hsva.s, hsva.v);
       });
     }
-    
+
     this.run?.();
   }
 }
@@ -706,4 +736,4 @@ declare module "@ew-color-picker/panel" {
   interface CustomOptions {
     ewColorPickerPanel: PanelOptions;
   }
-} 
+}

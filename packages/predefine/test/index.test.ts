@@ -25,7 +25,10 @@ describe('Predefine Plugin', () => {
     
     mockCore = createMockCore(container, {
         showPredefine: true,
-        predefineColor: ['#ff0000', '#00ff00', '#0000ff']
+        ewColorPickerPredefine: {
+            predefineColor: ['#ff0000', '#00ff00', '#0000ff'],
+            showPredefine: true
+        }
     });
   });
 
@@ -48,7 +51,7 @@ describe('Predefine Plugin', () => {
     it('should create predefine element', () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
-      
+      plugin.render(); // 确保插入DOM
       const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeTruthy();
     });
@@ -67,7 +70,8 @@ describe('Predefine Plugin', () => {
     it('should create color swatches for predefined colors', () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
-      
+      plugin.handleOptions(); // 确保 options 结构正确
+      plugin.render(); // 确保插入DOM
       const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(3);
     });
@@ -75,16 +79,14 @@ describe('Predefine Plugin', () => {
     it('should handle color swatch click events', async () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
-      
+      plugin.handleOptions(); // 确保 options 结构正确
+      plugin.render(); // 确保插入DOM
       // 等待事件绑定完成
       await new Promise(resolve => setTimeout(resolve, 100));
-      
       const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
       expect(firstSwatch).toBeTruthy();
-      
       // 直接调用 onPredefineColorClick 方法来测试功能
       (plugin as any).onPredefineColorClick({ target: firstSwatch }, '#ff0000');
-      
       // Should call setColor
       expect(mockCore.setColor).toHaveBeenCalled();
     });
@@ -92,37 +94,47 @@ describe('Predefine Plugin', () => {
     it('should highlight selected color', async () => {
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
+      plugin.handleOptions(); // 确保 options 结构正确
+      plugin.render(); // 确保插入DOM
       
       // 等待事件绑定完成
       await new Promise(resolve => setTimeout(resolve, 100));
+      const firstPredefineColor = plugin.predefineItems[0] as HTMLElement;
+      expect(firstPredefineColor).toBeTruthy();
+
+      // 确保事件已绑定，predefineItems 数组已填充
+      plugin.bindEvents();
       
-      const firstSwatch = container.querySelector('.ew-color-picker-predefine-color-item') as HTMLElement;
-      expect(firstSwatch).toBeTruthy();
+      // 直接调用非防抖的方法，避免防抖延迟
+      (plugin as any).onPredefineColorClick({ target: firstPredefineColor }, '#ff0000');
       
-      // 直接调用 onPredefineColorClick 方法来测试功能
-      (plugin as any).onPredefineColorClick({ target: firstSwatch }, '#ff0000');
-      
-      // Should have active class
-      expect(firstSwatch.classList.contains('ew-color-picker-predefine-color-active')).toBe(true);
+      console.log('firstPredefineColor', firstPredefineColor);
+      // 直接检查元素的 className 属性
+      expect(firstPredefineColor.className).toContain('ew-color-picker-predefine-color-active');
     });
   });
 
   describe('plugin options', () => {
     it('should respect custom predefine options', () => {
-      mockCore.options.predefineColor = ['#ff0000', '#00ff00'];
-      
+      mockCore.options.ewColorPickerPredefine = {
+        predefineColor: ['#ff0000', '#00ff00'],
+        showPredefine: true
+      };
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
-      
+      plugin.handleOptions(); // 确保 options 结构正确
+      plugin.render(); // 确保插入DOM
       const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
       expect(predefineElement).toBeTruthy();
-      
       const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(2);
     });
 
     it('should handle empty color array', () => {
-      mockCore.options.predefineColor = [];
+      mockCore.options.ewColorPickerPredefine = {
+        predefineColor: [],
+        showPredefine: true
+      };
       
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);

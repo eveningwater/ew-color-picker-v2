@@ -11,6 +11,7 @@ export interface MockCore {
   _eventHandlers?: Record<string, Function[]>;
   wrapper: HTMLElement;
   currentColor?: string; // 添加 currentColor 属性
+  hsvaColor?: any; // 添加 hsvaColor 属性
   
   // DOM 相关方法
   getMountPoint: (name: string) => HTMLElement | null;
@@ -63,6 +64,7 @@ export function createMockCore(container: HTMLElement, options: any = {}): MockC
     },
     plugins: {},
     wrapper: container,
+    hsvaColor: { h: 0, s: 100, v: 100, a: 1 }, // 添加默认的 hsvaColor
     
     // DOM 相关方法
     getMountPoint: vi.fn((name: string) => {
