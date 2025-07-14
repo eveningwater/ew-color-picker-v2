@@ -64,10 +64,11 @@ export default class ewColorPickerPanelPlugin {
     // 注册颜色变化事件监听器
     if (this.ewColorPicker.on && typeof this.ewColorPicker.on === "function") {
       this.ewColorPicker.on("change", (color: string) => {
-        // 当颜色改变时，更新面板光标位置
+        // 当颜色改变时，更新面板光标位置和背景色
         if (color && this.panel) {
           const hsva = colorRgbaToHsva(color);
           this.updateCursorPosition(hsva.s, hsva.v);
+          this.updateHueBg(hsva.h); // 更新面板背景色
         }
       });
     }
@@ -480,8 +481,10 @@ export default class ewColorPickerPanelPlugin {
 
     // 获取根容器在视口中的位置
     const rootRect = getRect(rootElement);
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    
+    // 修复视口尺寸获取问题
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 
     // 计算面板在视口中的绝对位置
     const panelLeftInViewport = rootRect.left + left;
@@ -496,6 +499,9 @@ export default class ewColorPickerPanelPlugin {
     console.log("rootRect:", rootRect);
     console.log("viewportWidth:", viewportWidth);
     console.log("viewportHeight:", viewportHeight);
+    console.log("window.innerHeight:", window.innerHeight);
+    console.log("document.documentElement.clientHeight:", document.documentElement.clientHeight);
+    console.log("document.body.clientHeight:", document.body.clientHeight);
     console.log("panelLeftInViewport:", panelLeftInViewport);
     console.log("panelTopInViewport:", panelTopInViewport);
     console.log("panelRightInViewport:", panelRightInViewport);

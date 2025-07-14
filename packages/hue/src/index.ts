@@ -38,6 +38,18 @@ export default class ewColorPickerHuePlugin {
     this.handleOptions();
     // 初始化节流函数
     this.throttledUpdateHue = throttle(this.updateHue.bind(this), 16); // 60fps
+    
+    // 注册颜色变化事件监听器
+    if (this.ewColorPicker.on && typeof this.ewColorPicker.on === "function") {
+      this.ewColorPicker.on("change", (color: string) => {
+        // 当颜色改变时，更新 hue 滑块位置
+        if (color && this.hueThumb) {
+          const hsva = colorRgbaToHsva(color);
+          this.updateHueThumbPosition(hsva.h);
+        }
+      });
+    }
+    
     this.run();
   }
 

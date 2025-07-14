@@ -87,10 +87,9 @@ export default class ewColorPickerPredefinePlugin {
     if (!this.container) {
       this.container = create('div');
       addClass(this.container, 'ew-color-picker-predefine-container');
-      // 立即插入到DOM中
+      // 首次创建时插入到正确位置
       this.ensureContainerAtCorrectPosition(panelContainer);
     }
-    
     
     // 清空旧内容
     if (this.container) {
