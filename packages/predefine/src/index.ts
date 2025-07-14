@@ -272,7 +272,7 @@ export default class ewColorPickerPredefinePlugin {
   }
 
   updatePredefineColors(colors: string[] | PredefineColor[]) {
-    this.options.predefineColor = colors as any;
+    this.options.predefineColor = colors;
     
     // 重新渲染
     this.predefineItems = [];
@@ -310,7 +310,7 @@ export default class ewColorPickerPredefinePlugin {
   }
 
   // 新增 install 方法，便于测试
-  install(core: any) {
+  install(core: ewColorPicker) {
     this.ewColorPicker = core;
     this.handleOptions();
     

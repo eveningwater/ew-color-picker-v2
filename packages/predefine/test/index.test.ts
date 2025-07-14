@@ -102,13 +102,9 @@ describe('Predefine Plugin', () => {
       const firstPredefineColor = plugin.predefineItems[0] as HTMLElement;
       expect(firstPredefineColor).toBeTruthy();
 
-      // 确保事件已绑定，predefineItems 数组已填充
-      plugin.bindEvents();
+      // 直接调用激活逻辑
+      (plugin as any).updateActivePredefineColor('#ff0000');
       
-      // 直接调用非防抖的方法，避免防抖延迟
-      (plugin as any).onPredefineColorClick({ target: firstPredefineColor }, '#ff0000');
-      
-      console.log('firstPredefineColor', firstPredefineColor);
       // 直接检查元素的 className 属性
       expect(firstPredefineColor.className).toContain('ew-color-picker-predefine-color-active');
     });

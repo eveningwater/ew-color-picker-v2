@@ -610,7 +610,23 @@ export default class ewColorPicker extends EventEmitter {
     if (this.isDestroyed) return;
     
     this.currentColor = color;
+    
+    // 新增：同步 hsvaColor，确保面板、hue、alpha 等 UI 组件能正确响应
+    if (color) {
+      const rgbaColor = colorToRgba(color);
+      if (rgbaColor) {
+        this.hsvaColor = colorRgbaToHsva(rgbaColor);
+      } else {
+        this.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
+      }
+    }
+    
     this.trigger('change', color);
+    
+    // 可选：如果有 changeColor 回调，也可以调用
+    if (this.options.changeColor && isFunction(this.options.changeColor)) {
+      this.options.changeColor(color);
+    }
   }
 
   // 更新配置并重新渲染
