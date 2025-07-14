@@ -87,8 +87,6 @@ export default class ewColorPickerPredefinePlugin {
     if (!this.container) {
       this.container = create('div');
       addClass(this.container, 'ew-color-picker-predefine-container');
-      // 首次创建时插入到正确位置
-      this.ensureContainerAtCorrectPosition(panelContainer);
     }
     
     // 清空旧内容
@@ -109,6 +107,9 @@ export default class ewColorPickerPredefinePlugin {
         this.predefineItems.push(item);
       });
     }
+
+    // 每次渲染后都强制重新插入到正确位置
+    this.ensureContainerAtCorrectPosition(panelContainer);
 
     // 绑定面板切换事件（避免重复绑定）
     this.bindToggleEvent(panelContainer);
@@ -144,62 +145,34 @@ export default class ewColorPickerPredefinePlugin {
   // 确保容器在正确位置
   private ensureContainerAtCorrectPosition(panelContainer: HTMLElement) {
     if (!this.container) return;
-    
-    // 查找相关元素
-    const horizontalSlider = $('.ew-color-picker-slider.ew-color-picker-is-horizontal', panelContainer);
-    const modeContainer = $('.ew-color-picker-mode-container', panelContainer);
-    const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
-    
 
-    // 确定目标位置
-    let targetElement: HTMLElement | null = null;
-    
-    // 优先级1: 如果存在水平方向的slider，插入到slider之后
-    if (horizontalSlider) {
-      targetElement = horizontalSlider.nextSibling as HTMLElement;
-    }
-    // 优先级2: 如果存在mode-container，插入到mode-container之前
-    else if (modeContainer) {
-      targetElement = modeContainer;
-    }
-    // 优先级3: 如果存在bottom-row，插入到bottom-row之前
-    else if (bottomRow) {
-      targetElement = bottomRow;
-    }
-    // 优先级4: 默认插入到面板之后
-    else {
-      const panel = $('.ew-color-picker-panel', panelContainer);
-      if (panel) {
-        targetElement = panel.nextSibling as HTMLElement;
-      }
-    }
-    
-    // 调试信息已移除
-    // 如果容器还没有被插入到DOM中
-    if (!this.container.parentNode) {
-      if (targetElement) {
-        panelContainer.insertBefore(this.container, targetElement);
-      } else {
-        // 兜底方案：直接插入到面板容器底部
-        insertNode(panelContainer, this.container);
-      }
+    // 优先级1: mode-container
+    const modeContainer = $('.ew-color-picker-mode-container', panelContainer);
+    if (modeContainer) {
+      panelContainer.insertBefore(this.container, modeContainer);
       return;
     }
-    
-    // 如果容器已经在DOM中，检查位置是否正确
-    if (targetElement && this.container.parentNode === panelContainer) {
-      // 检查当前容器是否在正确位置
-      const currentIndex = Array.from(panelContainer.children).indexOf(this.container);
-      const targetIndex = Array.from(panelContainer.children).indexOf(targetElement);
-      
-      // 如果容器在目标元素之前，说明位置正确
-      if (currentIndex < targetIndex) {
-        return;
-      }
-      
-      // 如果位置不正确，移动容器
-      panelContainer.insertBefore(this.container, targetElement);
+
+    // 优先级2: bottom-row
+    const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
+    if (bottomRow) {
+      panelContainer.insertBefore(this.container, bottomRow);
+      return;
     }
+
+    // 优先级3: panel 之后
+    const panel = $('.ew-color-picker-panel', panelContainer);
+    if (panel && panel.nextSibling) {
+      panelContainer.insertBefore(this.container, panel.nextSibling);
+      return;
+    }
+    if (panel) {
+      panelContainer.appendChild(this.container);
+      return;
+    }
+
+    // 兜底：插到最后
+    panelContainer.appendChild(this.container);
   }
 
   bindEvents() {
