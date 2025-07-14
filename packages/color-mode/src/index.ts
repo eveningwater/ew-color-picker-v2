@@ -241,10 +241,25 @@ export default class ewColorPickerColorModePlugin {
     // 更新输入框
     this.updateInputStructure();
     
-    // 更新当前颜色的显示（只在非 hex 模式下）
-    if (mode !== 'hex') {
-      const currentColor = this.ewColorPicker.getColor();
-      if (currentColor) {
+    // 更新当前颜色的显示
+    const currentColor = this.ewColorPicker.getColor();
+    if (currentColor) {
+      if (mode === 'hex') {
+        // HEX 模式下，将颜色转换为 HEX 格式显示
+        const rgbaString = colorToRgba(currentColor);
+        if (rgbaString) {
+          const rgba = parseRgbaString(rgbaString);
+          if (rgba) {
+            const hexColor = rgbaToHex(rgba);
+            // 更新输入框显示 HEX 格式
+            const input = $('.ew-color-picker-input-default') as HTMLInputElement;
+            if (input) {
+              input.value = hexColor;
+            }
+          }
+        }
+      } else {
+        // RGB 或 HSL 模式下，更新对应的输入框值
         this.updateInputValues(currentColor);
       }
     }
@@ -510,7 +525,24 @@ export default class ewColorPickerColorModePlugin {
       this.ewColorPicker.setColor(currentColor);
     }
     
-    input.value = currentColor;
+    // 在 HEX 模式下，将颜色转换为 HEX 格式显示
+    if (this.currentMode === 'hex') {
+      const rgbaString = colorToRgba(currentColor);
+      if (rgbaString) {
+        const rgba = parseRgbaString(rgbaString);
+        if (rgba) {
+          // 转换为 HEX 格式
+          const hexColor = rgbaToHex(rgba);
+          input.value = hexColor;
+        } else {
+          input.value = currentColor;
+        }
+      } else {
+        input.value = currentColor;
+      }
+    } else {
+      input.value = currentColor;
+    }
 
     // 绑定默认 input 插件的事件
     this.bindDefaultInputEvents(input);

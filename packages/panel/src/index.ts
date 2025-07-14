@@ -60,19 +60,19 @@ export default class ewColorPickerPanelPlugin {
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
-
+    
     // 注册颜色变化事件监听器
     if (this.ewColorPicker.on && typeof this.ewColorPicker.on === "function") {
       this.ewColorPicker.on("change", (color: string) => {
-        // 当颜色改变时，更新面板光标位置和背景色
+        // 当颜色改变时，更新面板背景色和光标位置
         if (color && this.panel) {
           const hsva = colorRgbaToHsva(color);
+          this.updateHueBg(hsva.h);
           this.updateCursorPosition(hsva.s, hsva.v);
-          this.updateHueBg(hsva.h); // 更新面板背景色
         }
       });
     }
-
+    
     this.run();
   }
 

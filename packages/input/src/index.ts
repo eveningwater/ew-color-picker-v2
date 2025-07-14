@@ -17,7 +17,15 @@ import {
   off,
   removeElement,
 } from "@ew-color-picker/utils";
-import { colorRgbaToHsva, colorToRgba, isValidColor, colorHsvaToRgba, colorRgbaToHex } from "@ew-color-picker/utils";
+import { 
+  colorRgbaToHsva, 
+  colorHsvaToRgba, 
+  colorRgbaToHex, 
+  colorToRgba, 
+  isValidColor,
+  parseRgbaString,
+  rgbaToHex
+} from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 
 export interface InputOptions {
@@ -156,13 +164,39 @@ export default class ewColorPickerInputPlugin {
     
     // 根据配置格式化颜色显示
     let displayColor = currentColor;
-    if (hasAlpha && !displayColor.startsWith('rgba')) {
-      // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
-      const hsva = colorRgbaToHsva(displayColor);
-      displayColor = colorHsvaToRgba(hsva);
-    } else if (!hasAlpha && displayColor.startsWith('rgba')) {
-      // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
-      displayColor = colorRgbaToHex(displayColor);
+    
+    // 检查是否开启了颜色模式切换，并且当前模式是 HEX
+    if (openChangeColorMode) {
+      const colorModePlugin = this.ewColorPicker.plugins?.ewColorPickerColorMode;
+      if (colorModePlugin && colorModePlugin.getCurrentMode() === 'hex') {
+        // HEX 模式下，将颜色转换为 HEX 格式显示
+        if (displayColor && !displayColor.startsWith('#')) {
+          const rgbaString = colorToRgba(displayColor);
+          if (rgbaString) {
+            const rgba = parseRgbaString(rgbaString);
+            if (rgba) {
+              displayColor = rgbaToHex(rgba);
+            }
+          }
+        }
+      } else if (hasAlpha && !displayColor.startsWith('rgba')) {
+        // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
+        const hsva = colorRgbaToHsva(displayColor);
+        displayColor = colorHsvaToRgba(hsva);
+      } else if (!hasAlpha && displayColor.startsWith('rgba')) {
+        // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
+        displayColor = colorRgbaToHex(displayColor);
+      }
+    } else {
+      // 没有开启颜色模式切换时的原有逻辑
+      if (hasAlpha && !displayColor.startsWith('rgba')) {
+        // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
+        const hsva = colorRgbaToHsva(displayColor);
+        displayColor = colorHsvaToRgba(hsva);
+      } else if (!hasAlpha && displayColor.startsWith('rgba')) {
+        // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
+        displayColor = colorRgbaToHex(displayColor);
+      }
     }
     
     if (this.input) {
@@ -271,13 +305,37 @@ export default class ewColorPickerInputPlugin {
       }
     } else {
       // 根据配置格式化颜色显示
-      if (hasAlpha && !color.startsWith('rgba')) {
-        // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
-        const hsva = colorRgbaToHsva(color);
-        displayColor = colorHsvaToRgba(hsva);
-      } else if (!hasAlpha && color.startsWith('rgba')) {
-        // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
-        displayColor = colorRgbaToHex(color);
+      if (openChangeColorMode) {
+        const colorModePlugin = this.ewColorPicker.plugins?.ewColorPickerColorMode;
+        if (colorModePlugin && colorModePlugin.getCurrentMode() === 'hex') {
+          // HEX 模式下，将颜色转换为 HEX 格式显示
+          if (displayColor && !displayColor.startsWith('#')) {
+            const rgbaString = colorToRgba(displayColor);
+            if (rgbaString) {
+              const rgba = parseRgbaString(rgbaString);
+              if (rgba) {
+                displayColor = rgbaToHex(rgba);
+              }
+            }
+          }
+        } else if (hasAlpha && !color.startsWith('rgba')) {
+          // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
+          const hsva = colorRgbaToHsva(color);
+          displayColor = colorHsvaToRgba(hsva);
+        } else if (!hasAlpha && color.startsWith('rgba')) {
+          // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
+          displayColor = colorRgbaToHex(color);
+        }
+      } else {
+        // 没有开启颜色模式切换时的原有逻辑
+        if (hasAlpha && !color.startsWith('rgba')) {
+          // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
+          const hsva = colorRgbaToHsva(color);
+          displayColor = colorHsvaToRgba(hsva);
+        } else if (!hasAlpha && color.startsWith('rgba')) {
+          // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
+          displayColor = colorRgbaToHex(color);
+        }
       }
     }
     
