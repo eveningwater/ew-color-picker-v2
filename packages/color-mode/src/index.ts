@@ -444,7 +444,17 @@ export default class ewColorPickerColorModePlugin {
     const a = aInput ? parseFloat(aInput.value) || 1 : 1;
 
     const color = `rgba(${r}, ${g}, ${b}, ${a})`;
+    
+    // 更新颜色，这会触发 change 事件，alpha 滑块会自动更新
     this.ewColorPicker.setColor(color);
+    
+    // 确保 alpha 滑块位置同步更新
+    if (this.ewColorPicker.options.alpha) {
+      const alphaPlugin = this.ewColorPicker.plugins?.ewColorPickerAlpha;
+      if (alphaPlugin && alphaPlugin.updateAlphaThumbPosition) {
+        alphaPlugin.updateAlphaThumbPosition(a);
+      }
+    }
   }
 
   updateColorFromHslInputs() {
@@ -467,7 +477,17 @@ export default class ewColorPickerColorModePlugin {
     const a = aInput ? parseFloat(aInput.value) || 1 : 1;
 
     const color = `hsla(${h}, ${s}%, ${l}%, ${a})`;
+    
+    // 更新颜色，这会触发 change 事件，alpha 滑块会自动更新
     this.ewColorPicker.setColor(color);
+    
+    // 确保 alpha 滑块位置同步更新
+    if (this.ewColorPicker.options.alpha) {
+      const alphaPlugin = this.ewColorPicker.plugins?.ewColorPickerAlpha;
+      if (alphaPlugin && alphaPlugin.updateAlphaThumbPosition) {
+        alphaPlugin.updateAlphaThumbPosition(a);
+      }
+    }
   }
 
   getModeDisplayName(mode: ColorMode): string {
