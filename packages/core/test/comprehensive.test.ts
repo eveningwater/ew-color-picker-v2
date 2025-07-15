@@ -42,15 +42,12 @@ describe('ewColorPicker 综合配置测试', () => {
         changeColor: vi.fn(),
         sure: vi.fn(),
         clear: vi.fn(),
-        isLog: true,
         boxDisabled: false,
         isClickOutside: true,
-        userDefineText: true,
         togglePickerAnimation: 'slide',
         pickerAnimationTime: 300,
         autoPanelPosition: true,
-        panelPlacement: 'bottom',
-        lang: 'zh-CN'
+        panelPlacement: 'bottom'
       };
 
       core = new ewColorPicker(config);
@@ -74,15 +71,12 @@ describe('ewColorPicker 综合配置测试', () => {
       expect(core.options.changeColor).toBe(config.changeColor);
       expect(core.options.sure).toBe(config.sure);
       expect(core.options.clear).toBe(config.clear);
-      expect(core.options.isLog).toBe(true);
       expect(core.options.boxDisabled).toBe(false);
       expect(core.options.isClickOutside).toBe(true);
-      expect(core.options.userDefineText).toBe(true);
       expect(core.options.togglePickerAnimation).toBe('slide');
       expect(core.options.pickerAnimationTime).toBe(300);
       expect(core.options.autoPanelPosition).toBe(true);
       expect(core.options.panelPlacement).toBe('bottom');
-      expect(core.options.lang).toBe('zh-CN');
     });
 
     it('应该处理最小配置', () => {

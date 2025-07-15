@@ -88,18 +88,14 @@ describe('Console Plugin', () => {
   });
 
   describe('plugin options', () => {
-    it('should respect custom console options', () => {
-      mockCore.options.isLog = true;
-      
+    it('should handle console plugin options', () => {
       const plugin = new ConsolePlugin(mockCore);
       plugin.install(mockCore);
       
       expect(plugin).toBeInstanceOf(ConsolePlugin);
     });
 
-    it('should handle specific color formats', () => {
-      mockCore.options.isLog = false;
-      
+    it('should handle plugin initialization', () => {
       const plugin = new ConsolePlugin(mockCore);
       plugin.install(mockCore);
       

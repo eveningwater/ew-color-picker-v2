@@ -13,9 +13,7 @@ export const tips = [
 export default class ewColorPickerConsolePlugin {
   static pluginName = "ewColorPickerConsole";
   options: ewColorPickerConsolePluginOptions &
-    Omit<ewColorPickerMergeOptionsData, "el"> = {
-    isLog: true,
-  };
+    Omit<ewColorPickerMergeOptionsData, "el"> = {};
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
     this.run();
@@ -43,9 +41,7 @@ export default class ewColorPickerConsolePlugin {
   }
 }
 
-export type ewColorPickerConsolePluginOptions = {
-  isLog?: boolean;
-};
+export type ewColorPickerConsolePluginOptions = {};
 
 declare module "@ew-color-picker/core" {
   interface CustomOptions {

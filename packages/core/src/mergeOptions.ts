@@ -29,7 +29,6 @@ export interface ewColorPickerOptions {
   predefineColor?: PredefineColor | string [];
   size?: string;
   defaultColor?: string;
-  isLog?: boolean;
   hasClear?: boolean;
   hasSure?: boolean;
   hasInput?: boolean;
@@ -39,8 +38,6 @@ export interface ewColorPickerOptions {
   boxBgColor?: boolean;
   hueDirection?: string;
   alphaDirection?: string;
-  lang?: string;
-  userDefineText?: boolean;
   clearText?: string;
   sureText?: string;
   togglePickerAnimation?: string;
@@ -62,7 +59,6 @@ export const defaultConfig: Omit<ewColorPickerOptions, "el"> = {
   predefineColor: [],
   size: "normal",
   defaultColor: "",
-  isLog: true,
   hasClear: true,
   hasSure: true,
   hasInput: true,
@@ -72,8 +68,6 @@ export const defaultConfig: Omit<ewColorPickerOptions, "el"> = {
   boxBgColor: false,
   hueDirection: "vertical",
   alphaDirection: "vertical",
-  lang: "zh",
-  userDefineText: false,
   clearText: "清空",
   sureText: "确定",
   togglePickerAnimation: "default",

@@ -342,26 +342,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
     });
   });
 
-  describe('language configuration hot update', () => {
-    it('should update language configuration', () => {
-      const picker = new ewColorPicker({
-        el: container,
-        lang: 'en',
-        hasPanel: true
-      });
 
-      // 验证初始语言
-      expect(picker.getOptions().lang).toBe('en');
-
-      // 热更新语言
-      picker.updateOptions({
-        lang: 'zh'
-      });
-
-      // 验证语言已更新
-      expect(picker.getOptions().lang).toBe('zh');
-    });
-  });
 
   describe('multiple configuration hot update', () => {
     it('should update multiple configurations simultaneously', () => {

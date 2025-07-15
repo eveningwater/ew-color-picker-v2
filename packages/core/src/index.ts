@@ -586,10 +586,6 @@ export default class ewColorPicker extends EventEmitter {
     if (this.options.hasPanel && !ewColorPicker.pluginsMap['ewColorPickerPanel']) {
       warn('[ewColorPicker warning]: hasPanel is enabled but ewColorPickerPanel plugin is not injected. Please use ewColorPicker.use(PanelPlugin) to register the plugin.');
     }
-
-    if(this.options.isLog && !ewColorPicker.pluginsMap['ewColorPickerConsole']) {
-      warn('[ewColorPicker warning]: isLog is enabled but ewColorPickerConsole plugin is not injected. Please use ewColorPicker.use(ConsolePlugin) to register the plugin.');
-    }
   }
 
   // 更新现有插件的配置

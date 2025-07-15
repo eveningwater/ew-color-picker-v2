@@ -674,28 +674,7 @@ describe('ewColorPicker', () => {
     });
   });
 
-  describe('配置对象参数测试 - isLog', () => {
-    it('should enable logging when isLog is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        isLog: true 
-      });
-      expect(core.options.isLog).toBe(true);
-    });
 
-    it('should disable logging when isLog is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        isLog: false 
-      });
-      expect(core.options.isLog).toBe(false);
-    });
-
-    it('should use default isLog value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.isLog).toBeDefined();
-    });
-  });
 
   describe('配置对象参数测试 - boxDisabled', () => {
     it('should disable box when boxDisabled is true', () => {
@@ -743,28 +722,7 @@ describe('ewColorPicker', () => {
     });
   });
 
-  describe('配置对象参数测试 - userDefineText', () => {
-    it('should enable user define text when userDefineText is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        userDefineText: true 
-      });
-      expect(core.options.userDefineText).toBe(true);
-    });
 
-    it('should disable user define text when userDefineText is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        userDefineText: false 
-      });
-      expect(core.options.userDefineText).toBe(false);
-    });
-
-    it('should use default userDefineText value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.userDefineText).toBeDefined();
-    });
-  });
 
   describe('配置对象参数测试 - togglePickerAnimation', () => {
     it('should handle custom togglePickerAnimation', () => {
@@ -858,20 +816,7 @@ describe('ewColorPicker', () => {
     });
   });
 
-  describe('配置对象参数测试 - lang', () => {
-    it('should handle custom lang', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        lang: 'en' 
-      });
-      expect(core.options.lang).toBe('en');
-    });
 
-    it('should use default lang value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.lang).toBeDefined();
-    });
-  });
 
   describe('配置对象参数测试 - 组合场景', () => {
     it('should handle complex configuration with multiple options', () => {
