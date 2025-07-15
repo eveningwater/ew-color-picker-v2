@@ -669,13 +669,13 @@ export default class ewColorPicker extends EventEmitter {
     
     // 销毁所有插件
     if (this.plugins) {
-    Object.values(this.plugins).forEach((plugin) => {
-      tryErrorHandler(() => {
-        if (plugin?.destroy && isFunction(plugin.destroy)) {
-          plugin.destroy();
-        }
+      Object.values(this.plugins).forEach((plugin) => {
+        tryErrorHandler(() => {
+          if (plugin?.destroy && isFunction(plugin.destroy)) {
+            plugin.destroy();
+          }
+        });
       });
-    });
     }
     
     // 清理所有挂载点
