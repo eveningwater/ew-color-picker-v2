@@ -15,13 +15,18 @@ export interface ewColorPickerConstructorOptions {
   [key: string]: any;
 }
 
+export interface PredefineColor {
+  color: string;
+  disabled?: boolean;
+}
+
 export interface ewColorPickerOptions {
   el: WrapperElement;
   hasBox?: boolean;
   hue?: boolean;
   alpha?: boolean;
   disabled?: boolean;
-  predefineColor?: any[];
+  predefineColor?: PredefineColor | string [];
   size?: string;
   defaultColor?: string;
   isLog?: boolean;

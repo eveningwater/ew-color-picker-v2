@@ -256,6 +256,8 @@ export default class ewColorPickerColorModePlugin {
             if (input) {
               input.value = hexColor;
             }
+            // 触发 change 事件，确保其他插件同步更新
+            this.ewColorPicker.setColor(currentColor);
           }
         }
       } else {

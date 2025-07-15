@@ -16,6 +16,7 @@ import {
   insertNode,
   ApplyOrder,
   hasClass,
+  isStrictColorFormat // 新增严格颜色格式校验
 } from "@ew-color-picker/utils";
 import { colorRgbaToHsva, colorToRgba, isValidColor, isAlphaColor } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -28,7 +29,6 @@ export interface PredefineColor {
 export interface PredefineOptions {
   predefineColor?: string[] | PredefineColor[];
   changeColor?: Function;
-  showPredefine?: boolean;
 }
 
 export default class ewColorPickerPredefinePlugin {
@@ -41,6 +41,8 @@ export default class ewColorPickerPredefinePlugin {
   private debouncedOnPredefineColorClick: (event: Event, color: string) => void;
   // 面板切换事件处理器
   private toggleHandler: ((isOpen: boolean) => void) | null = null;
+  // 颜色变化事件处理器
+  private changeHandler: ((color: string) => void) | null = null;
   // 标记是否已绑定事件
   private isEventBound: boolean = false;
 
@@ -63,15 +65,28 @@ export default class ewColorPickerPredefinePlugin {
   }
 
   run() {
-    // 检查是否显示预定义颜色
-    if (this.options.ewColorPickerPredefine === false) {
-      return;
-    }
-    
-    if (this.options.predefineColor && this.options.predefineColor.length > 0) {
+    // 检查是否显示预定义颜色：只根据 predefineColor 数组判断
+    const validColors = this.getValidPredefineColors();
+    if (validColors.length > 0) {
       this.render();
       this.bindEvents();
+      this.bindColorChangeEvent();
     }
+  }
+
+  // 获取有效的预定义颜色数组
+  private getValidPredefineColors(): (string | PredefineColor)[] {
+    if (!this.options.predefineColor || !Array.isArray(this.options.predefineColor)) {
+      return [];
+    }
+    
+    // 过滤掉无效的颜色
+    return this.options.predefineColor.filter(colorData => {
+      const { color } = this.parseColorData(colorData);
+      
+      // 使用更严格的颜色验证
+      return isStrictColorFormat(color);
+    });
   }
 
   render() {
@@ -94,8 +109,11 @@ export default class ewColorPickerPredefinePlugin {
       this.container.textContent = '';
       this.predefineItems = [];
       
+      // 获取有效的预定义颜色
+      const validColors = this.getValidPredefineColors();
+      
       // 渲染预定义色块
-      (this.options.predefineColor || []).forEach((colorData) => {
+      validColors.forEach((colorData) => {
         const { color } = this.parseColorData(colorData);
         const item = create('div');
         addClass(item, 'ew-color-picker-predefine-color');
@@ -142,6 +160,22 @@ export default class ewColorPickerPredefinePlugin {
     this.isEventBound = true;
   }
 
+  // 绑定颜色变化事件
+  private bindColorChangeEvent() {
+    // 如果已经绑定过颜色变化事件，先解绑
+    if (this.changeHandler) {
+      this.ewColorPicker.off('change', this.changeHandler);
+    }
+    
+    // 创建颜色变化事件处理器
+    this.changeHandler = (color: string) => {
+      this.updateActivePredefineColor(color);
+    };
+    
+    // 绑定事件
+    this.ewColorPicker.on('change', this.changeHandler);
+  }
+
   // 确保容器在正确位置
   private ensureContainerAtCorrectPosition(panelContainer: HTMLElement) {
     if (!this.container) return;
@@ -178,7 +212,8 @@ export default class ewColorPickerPredefinePlugin {
   bindEvents() {
    
     this.predefineItems.forEach((item, index) => {
-      const colorData = this.options.predefineColor![index];
+      const validColors = this.getValidPredefineColors();
+      const colorData = validColors[index];
       const { color, disabled } = this.parseColorData(colorData);
 
       if (disabled) {
@@ -276,6 +311,12 @@ export default class ewColorPickerPredefinePlugin {
       this.isEventBound = false;
     }
     
+    // 清理颜色变化事件监听器
+    if (this.changeHandler) {
+      this.ewColorPicker.off('change', this.changeHandler);
+      this.changeHandler = null;
+    }
+    
     // 清理DOM引用
     this.predefineItems = [];
     this.container = null;
@@ -286,24 +327,25 @@ export default class ewColorPickerPredefinePlugin {
     this.ewColorPicker = core;
     this.handleOptions();
     
-    // 注册事件监听器
-    if (core.on && typeof core.on === 'function') {
-      core.on('change', (color: string) => {
-        // 当颜色改变时，可以更新预定义颜色的激活状态
-        this.updateActivePredefineColor(color);
-      });
-    }
-    
     this.run?.();
   }
   
   // 更新激活的预定义颜色
   private updateActivePredefineColor(color: string) {
+    if (!color) return;
+    
+    // 将当前颜色转换为标准格式进行比较
+    const currentRgba = colorToRgba(color);
+    
     this.predefineItems.forEach((item, index) => {
-      const colorData = this.options.predefineColor![index];
+      const validColors = this.getValidPredefineColors();
+      const colorData = validColors[index];
       const { color: itemColor } = this.parseColorData(colorData);
       
-      if (itemColor === color) {
+      // 将预定义颜色也转换为标准格式进行比较
+      const itemRgba = colorToRgba(itemColor);
+      
+      if (currentRgba === itemRgba) {
         addClass(item, 'ew-color-picker-predefine-color-active');
       } else {
         removeClass(item, 'ew-color-picker-predefine-color-active');

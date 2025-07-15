@@ -606,3 +606,17 @@ export function parseRgbaString(rgbaString: string): RgbaColor | null {
     return null;
   }
 }
+
+/**
+ * 严格校验颜色字符串是否为标准格式（hex、rgb、rgba、hsl、hsla、transparent）
+ */
+export function isStrictColorFormat(color: string): boolean {
+  if (!color || typeof color !== 'string') return false;
+  if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(color)) return true;
+  if (/^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/.test(color)) return true;
+  if (/^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(0|1|0?\.\d+)\s*\)$/.test(color)) return true;
+  if (/^hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)$/.test(color)) return true;
+  if (/^hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*(0|1|0?\.\d+)\s*\)$/.test(color)) return true;
+  if (color === 'transparent') return true;
+  return false;
+}

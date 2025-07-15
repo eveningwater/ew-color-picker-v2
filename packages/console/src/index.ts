@@ -1,5 +1,5 @@
 import ewColorPicker from "@ew-color-picker/core";
-import { extend, log } from "@ew-color-picker/utils";
+import { extend, isFunction, log } from "@ew-color-picker/utils";
 import { ewColorPickerMergeOptionsData } from "packages/core/src/mergeOptions";
 export const tips = [
   `%c ew-color-picker@2.0.0%c 联系QQ：854806732 %c 联系微信：eveningwater %c github:https://github.com/eveningwater/ew-color-picker %c `,
@@ -26,22 +26,16 @@ export default class ewColorPickerConsolePlugin {
     }
   }
   run() {
-    const { isLog } = this.options;
-    if (isLog) {
-      log(...tips);
-    }
+    log(...tips);
   }
-  install(core: any) {
+  install(core: ewColorPicker) {
     this.ewColorPicker = core;
     this.handleOptions();
     
     // 注册事件监听器
-    if (core.on && typeof core.on === 'function') {
+    if (core.on && isFunction(core.on)) {
       core.on('change', (color: string) => {
         // 控制台插件可以在这里处理颜色变化事件
-        if (this.options.isLog) {
-          console.log('Color changed:', color);
-        }
       });
     }
     

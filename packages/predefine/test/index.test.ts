@@ -24,10 +24,8 @@ describe('Predefine Plugin', () => {
     panelContainer.appendChild(bottomRow);
     
     mockCore = createMockCore(container, {
-        showPredefine: true,
         ewColorPickerPredefine: {
-            predefineColor: ['#ff0000', '#00ff00', '#0000ff'],
-            showPredefine: true
+            predefineColor: ['#ff0000', '#00ff00', '#0000ff']
         }
     });
   });
@@ -56,8 +54,21 @@ describe('Predefine Plugin', () => {
       expect(predefineElement).toBeTruthy();
     });
 
-    it('should not create predefine element when showPredefine is false', () => {
-      mockCore.options.ewColorPickerPredefine = false;
+    it('should not create predefine element when predefineColor is empty', () => {
+      mockCore.options.ewColorPickerPredefine = {
+        predefineColor: []
+      };
+      const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
+      
+      const predefineElement = container.querySelector('.ew-color-picker-predefine-container');
+      expect(predefineElement).toBeFalsy();
+    });
+
+    it('should not create predefine element when predefineColor is invalid', () => {
+      mockCore.options.ewColorPickerPredefine = {
+        predefineColor: ['#invalid-color', 'not-a-color', 'rgb(invalid)']
+      };
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
       
@@ -108,13 +119,57 @@ describe('Predefine Plugin', () => {
       // 直接检查元素的 className 属性
       expect(firstPredefineColor.className).toContain('ew-color-picker-predefine-color-active');
     });
+
+    it('should update highlight when color changes', () => {
+      const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
+      plugin.render();
+      
+      const firstPredefineColor = plugin.predefineItems[0] as HTMLElement;
+      const secondPredefineColor = plugin.predefineItems[1] as HTMLElement;
+      
+      // 初始状态：没有高亮
+      expect(firstPredefineColor.className).not.toContain('ew-color-picker-predefine-color-active');
+      expect(secondPredefineColor.className).not.toContain('ew-color-picker-predefine-color-active');
+      
+      // 模拟颜色变化到第一个预定义颜色
+      (plugin as any).updateActivePredefineColor('#ff0000');
+      
+      // 第一个应该高亮，第二个不应该
+      expect(firstPredefineColor.className).toContain('ew-color-picker-predefine-color-active');
+      expect(secondPredefineColor.className).not.toContain('ew-color-picker-predefine-color-active');
+      
+      // 模拟颜色变化到第二个预定义颜色
+      (plugin as any).updateActivePredefineColor('#00ff00');
+      
+      // 第一个不应该高亮，第二个应该高亮
+      expect(firstPredefineColor.className).not.toContain('ew-color-picker-predefine-color-active');
+      expect(secondPredefineColor.className).toContain('ew-color-picker-predefine-color-active');
+    });
+
+    it('should remove highlight when color does not match any predefined color', () => {
+      const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
+      plugin.render();
+      
+      const firstPredefineColor = plugin.predefineItems[0] as HTMLElement;
+      
+      // 先设置高亮
+      (plugin as any).updateActivePredefineColor('#ff0000');
+      expect(firstPredefineColor.className).toContain('ew-color-picker-predefine-color-active');
+      
+      // 改变到不匹配的颜色
+      (plugin as any).updateActivePredefineColor('#ffffff');
+      
+      // 应该移除高亮
+      expect(firstPredefineColor.className).not.toContain('ew-color-picker-predefine-color-active');
+    });
   });
 
   describe('plugin options', () => {
     it('should respect custom predefine options', () => {
       mockCore.options.ewColorPickerPredefine = {
-        predefineColor: ['#ff0000', '#00ff00'],
-        showPredefine: true
+        predefineColor: ['#ff0000', '#00ff00']
       };
       const plugin = new PredefinePlugin(mockCore);
       plugin.install(mockCore);
@@ -128,8 +183,7 @@ describe('Predefine Plugin', () => {
 
     it('should handle empty color array', () => {
       mockCore.options.ewColorPickerPredefine = {
-        predefineColor: [],
-        showPredefine: true
+        predefineColor: []
       };
       
       const plugin = new PredefinePlugin(mockCore);
@@ -137,6 +191,19 @@ describe('Predefine Plugin', () => {
       
       const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
       expect(swatches.length).toBe(0);
+    });
+
+    it('should filter out invalid colors', () => {
+      mockCore.options.ewColorPickerPredefine = {
+        predefineColor: ['#ff0000', '#invalid-color', '#00ff00', 'not-a-color', 'rgb(invalid)']
+      };
+      
+      const plugin = new PredefinePlugin(mockCore);
+      plugin.install(mockCore);
+      plugin.render();
+      
+      const swatches = container.querySelectorAll('.ew-color-picker-predefine-color-item');
+      expect(swatches.length).toBe(2); // 只显示有效的颜色
     });
   });
 
