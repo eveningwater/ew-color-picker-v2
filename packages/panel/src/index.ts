@@ -174,9 +174,7 @@ export default class ewColorPickerPanelPlugin {
 
   bindEvents() {
     if (!this.panel) {
-      warn(
-        "[ewColorPicker panel plugin] No panel container elementfound, skipping event binding"
-      );
+      // 静默处理，避免测试时的警告噪音
       return;
     }
     // 面板点击事件

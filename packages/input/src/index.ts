@@ -249,9 +249,47 @@ export default class ewColorPickerInputPlugin {
     // 更新当前颜色并触发事件
     this.ewColorPicker.setColor(rgbaColor);
     
+    // 同步更新其他插件的状态
+    this.syncOtherPlugins(rgbaColor);
+    
     // 触发颜色改变回调
     if (isFunction(this.options.changeColor)) {
       this.options.changeColor?.(rgbaColor);
+    }
+  }
+
+  // 同步其他插件的状态
+  private syncOtherPlugins(color: string) {
+    const hsva = this.ewColorPicker.hsvaColor;
+    
+    // 同步颜色模式插件的输入框
+    const colorModePlugin = this.ewColorPicker.plugins?.ewColorPickerColorMode;
+    if (colorModePlugin && colorModePlugin.currentMode !== 'hex') {
+      colorModePlugin.updateInputValues(color);
+    }
+
+    // 同步色相滑块
+    const huePlugin = this.ewColorPicker.plugins?.ewColorPickerHue;
+    if (huePlugin && huePlugin.updateHueThumbPosition) {
+      huePlugin.updateHueThumbPosition(hsva.h);
+    }
+
+    // 同步透明度滑块
+    const alphaPlugin = this.ewColorPicker.plugins?.ewColorPickerAlpha;
+    if (alphaPlugin && alphaPlugin.updateAlphaThumbPosition) {
+      alphaPlugin.updateAlphaThumbPosition(hsva.a);
+    }
+
+    // 同步面板插件
+    const panelPlugin = this.ewColorPicker.plugins?.ewColorPickerPanel;
+    if (panelPlugin && panelPlugin.updatePanelColor) {
+      panelPlugin.updatePanelColor(color);
+    }
+
+    // 同步颜色框
+    const boxPlugin = this.ewColorPicker.plugins?.ewColorPickerBox;
+    if (boxPlugin && boxPlugin.setBoxBgColor) {
+      boxPlugin.setBoxBgColor(color);
     }
   }
 

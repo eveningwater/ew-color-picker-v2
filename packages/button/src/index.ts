@@ -136,9 +136,13 @@ export default class ewColorPickerButtonPlugin {
   }
 
   onClearColor() {
-    // 清空颜色
+    // 清空颜色 - 重置为默认红色
     this.ewColorPicker.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
-    this.ewColorPicker.updateColor('');
+    const defaultColor = this.ewColorPicker.options.alpha ? 'rgba(255, 0, 0, 1)' : '#ff0000';
+    this.ewColorPicker.setColor(defaultColor);
+    
+    // 同步更新所有相关插件的状态
+    this.syncAllPlugins(defaultColor);
     
     // 触发清空回调
     if (isFunction(this.options.clear)) {
@@ -147,6 +151,47 @@ export default class ewColorPickerButtonPlugin {
     
     // 触发事件
     this.ewColorPicker.trigger('clear');
+  }
+
+  // 同步所有相关插件的状态
+  private syncAllPlugins(color: string) {
+    // 同步输入框
+    const inputPlugin = this.ewColorPicker.plugins?.ewColorPickerInput;
+    if (inputPlugin && inputPlugin.update) {
+      inputPlugin.update(color);
+    }
+
+    // 同步颜色模式插件的输入框
+    const colorModePlugin = this.ewColorPicker.plugins?.ewColorPickerColorMode;
+    if (colorModePlugin && colorModePlugin.currentMode !== 'hex') {
+      colorModePlugin.updateInputValues(color);
+    }
+
+    // 同步面板插件
+    const panelPlugin = this.ewColorPicker.plugins?.ewColorPickerPanel;
+    if (panelPlugin && panelPlugin.updatePanelColor) {
+      panelPlugin.updatePanelColor(color);
+    }
+
+    // 同步色相滑块
+    const huePlugin = this.ewColorPicker.plugins?.ewColorPickerHue;
+    if (huePlugin && huePlugin.updateHueThumbPosition) {
+      const hsva = this.ewColorPicker.hsvaColor;
+      huePlugin.updateHueThumbPosition(hsva.h);
+    }
+
+    // 同步透明度滑块
+    const alphaPlugin = this.ewColorPicker.plugins?.ewColorPickerAlpha;
+    if (alphaPlugin && alphaPlugin.updateAlphaThumbPosition) {
+      const hsva = this.ewColorPicker.hsvaColor;
+      alphaPlugin.updateAlphaThumbPosition(hsva.a);
+    }
+
+    // 同步颜色框
+    const boxPlugin = this.ewColorPicker.plugins?.ewColorPickerBox;
+    if (boxPlugin && boxPlugin.setBoxBgColor) {
+      boxPlugin.setBoxBgColor(color);
+    }
   }
 
   onSureColor() {

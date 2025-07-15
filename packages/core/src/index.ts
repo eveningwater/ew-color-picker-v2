@@ -248,7 +248,7 @@ export default class ewColorPicker extends EventEmitter {
     tryErrorHandler(() => {
       // 确保 el 属性存在
       if (!this.options.el) {
-        console.warn('ewColorPicker: el is not defined, using document.body');
+        warn('[ewColorPicker warning]: el is not defined, using document.body');
         this.options.el = document.body;
       }
       
