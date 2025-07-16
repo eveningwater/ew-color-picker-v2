@@ -10,9 +10,7 @@ describe('Hue Plugin', () => {
     container = document.createElement('div');
     document.body.appendChild(container);
     
-    mockCore = createMockCore(container, {
-      showHue: true
-    });
+    mockCore = createMockCore(container, {});
   });
 
   afterEach(() => {
@@ -38,13 +36,12 @@ describe('Hue Plugin', () => {
       expect(hueElement).toBeTruthy();
     });
 
-    it('should not create hue element when showHue is false', () => {
-      mockCore.options.ewColorPickerHue = false;
+    it('should create hue element when plugin is installed', () => {
       const plugin = new HuePlugin(mockCore);
       plugin.install(mockCore);
       
       const hueElement = container.querySelector('.ew-color-picker-slider');
-      expect(hueElement).toBeFalsy();
+      expect(hueElement).toBeTruthy();
     });
   });
 
@@ -109,7 +106,7 @@ describe('Hue Plugin', () => {
   });
 
   describe('plugin options', () => {
-    it('should respect custom hue options', () => {
+    it('should respect custom hue direction options', () => {
       mockCore.options.hueDirection = 'horizontal';
       
       const plugin = new HuePlugin(mockCore);

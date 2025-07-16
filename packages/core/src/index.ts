@@ -246,12 +246,6 @@ export default class ewColorPicker extends EventEmitter {
 
   private init(): void {
     tryErrorHandler(() => {
-      // 确保 el 属性存在
-      if (!this.options.el) {
-        warn('[ewColorPicker warning]: el is not defined, using document.body');
-        this.options.el = document.body;
-      }
-      
       this.plugins = {};
       this.hooks = new EventEmitter([""]);
       this._color_picker_uid = this.generateUID();
@@ -271,14 +265,15 @@ export default class ewColorPicker extends EventEmitter {
     if (this.options.defaultColor) {
       let defaultColor = this.options.defaultColor;
       
-      // 如果开启了 alpha 配置，需要转换为 rgba 格式
-      if (this.options.alpha) {
-        // 如果默认颜色是 hex 格式，先转换为 rgba 格式
+      // 检查是否有 alpha 插件来决定颜色格式
+      const hasAlphaPlugin = this.plugins?.ewColorPickerAlpha;
+      if (hasAlphaPlugin) {
+        // 如果有 alpha 插件，转换为 rgba 格式
         if (defaultColor.startsWith('#')) {
           defaultColor = colorToRgba(defaultColor);
         }
       } else {
-        // 如果没有开启 alpha，确保是 hex 格式
+        // 如果没有 alpha 插件，确保是 hex 格式
         if (defaultColor.startsWith('rgba')) {
           defaultColor = colorRgbaToHex(defaultColor);
         }
@@ -625,6 +620,15 @@ export default class ewColorPicker extends EventEmitter {
     }
   }
 
+  // 公共方法：同步所有插件的颜色
+  public syncAllPlugins(color: string): void {
+    Object.values(this.plugins).forEach(plugin => {
+      if (typeof plugin.syncColor === 'function') {
+        plugin.syncColor(color);
+      }
+    });
+  }
+
   // 更新配置并重新渲染
   public updateOptions(newOptions: Record<string, any>): void {
     if (this.isDestroyed) return;
@@ -637,6 +641,18 @@ export default class ewColorPicker extends EventEmitter {
     
     // 确保 el 属性不被覆盖
     this.options.el = originalEl;
+    
+    // 如果更新了 defaultColor，需要同步更新当前颜色
+    if (newOptions.defaultColor !== undefined) {
+      // 验证颜色是否有效
+      const rgbaColor = colorToRgba(newOptions.defaultColor);
+      if (rgbaColor) {
+        this.setColor(newOptions.defaultColor);
+      } else {
+        // 如果颜色无效，使用 fallback 颜色
+        this.setColor('#ff0000');
+      }
+    }
     
     // 重新应用插件
     this.reapplyPlugins();

@@ -309,28 +309,7 @@ describe('ewColorPicker', () => {
     });
   });
 
-  describe('配置对象参数测试 - hasInput', () => {
-    it('should enable input when hasInput is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasInput: true 
-      });
-      expect(core.options.hasInput).toBe(true);
-    });
 
-    it('should disable input when hasInput is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasInput: false 
-      });
-      expect(core.options.hasInput).toBe(false);
-    });
-
-    it('should use default hasInput value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.hasInput).toBeDefined();
-    });
-  });
 
   describe('配置对象参数测试 - openChangeColorMode', () => {
     it('should enable color mode when openChangeColorMode is true', () => {
@@ -355,51 +334,9 @@ describe('ewColorPicker', () => {
     });
   });
 
-  describe('配置对象参数测试 - alpha', () => {
-    it('should enable alpha when alpha is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        alpha: true 
-      });
-      expect(core.options.alpha).toBe(true);
-    });
 
-    it('should disable alpha when alpha is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        alpha: false 
-      });
-      expect(core.options.alpha).toBe(false);
-    });
 
-    it('should use default alpha value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.alpha).toBeDefined();
-    });
-  });
 
-  describe('配置对象参数测试 - hue', () => {
-    it('should enable hue when hue is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hue: true 
-      });
-      expect(core.options.hue).toBe(true);
-    });
-
-    it('should disable hue when hue is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hue: false 
-      });
-      expect(core.options.hue).toBe(false);
-    });
-
-    it('should use default hue value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.hue).toBeDefined();
-    });
-  });
 
   describe('配置对象参数测试 - predefineColor', () => {
     it('should handle string array predefineColor', () => {
@@ -437,28 +374,7 @@ describe('ewColorPicker', () => {
     });
   });
 
-  describe('配置对象参数测试 - hasBox', () => {
-    it('should enable box when hasBox is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasBox: true 
-      });
-      expect(core.options.hasBox).toBe(true);
-    });
 
-    it('should disable box when hasBox is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasBox: false 
-      });
-      expect(core.options.hasBox).toBe(false);
-    });
-
-    it('should use default hasBox value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.hasBox).toBeDefined();
-    });
-  });
 
   describe('配置对象参数测试 - hasPanel', () => {
     it('should enable panel when hasPanel is true', () => {
@@ -484,51 +400,9 @@ describe('ewColorPicker', () => {
     });
   });
 
-  describe('配置对象参数测试 - hasClear', () => {
-    it('should enable clear button when hasClear is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasClear: true 
-      });
-      expect(core.options.hasClear).toBe(true);
-    });
 
-    it('should disable clear button when hasClear is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasClear: false 
-      });
-      expect(core.options.hasClear).toBe(false);
-    });
 
-    it('should use default hasClear value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.hasClear).toBeDefined();
-    });
-  });
 
-  describe('配置对象参数测试 - hasSure', () => {
-    it('should enable sure button when hasSure is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasSure: true 
-      });
-      expect(core.options.hasSure).toBe(true);
-    });
-
-    it('should disable sure button when hasSure is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasSure: false 
-      });
-      expect(core.options.hasSure).toBe(false);
-    });
-
-    it('should use default hasSure value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.hasSure).toBeDefined();
-    });
-  });
 
   describe('配置对象参数测试 - size', () => {
     it('should handle string size', () => {
@@ -676,28 +550,7 @@ describe('ewColorPicker', () => {
 
 
 
-  describe('配置对象参数测试 - boxDisabled', () => {
-    it('should disable box when boxDisabled is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        boxDisabled: true 
-      });
-      expect(core.options.boxDisabled).toBe(true);
-    });
 
-    it('should enable box when boxDisabled is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        boxDisabled: false 
-      });
-      expect(core.options.boxDisabled).toBe(false);
-    });
-
-    it('should use default boxDisabled value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-      expect(core.options.boxDisabled).toBeDefined();
-    });
-  });
 
   describe('配置对象参数测试 - isClickOutside', () => {
     it('should enable click outside when isClickOutside is true', () => {
@@ -841,7 +694,7 @@ describe('ewColorPicker', () => {
         sure: vi.fn(),
         clear: vi.fn(),
         isLog: true,
-        boxDisabled: false,
+
         isClickOutside: true,
         userDefineText: true,
         togglePickerAnimation: 'slide',
@@ -872,7 +725,7 @@ describe('ewColorPicker', () => {
       expect(core.options.sure).toBe(complexConfig.sure);
       expect(core.options.clear).toBe(complexConfig.clear);
       expect(core.options.isLog).toBe(true);
-      expect(core.options.boxDisabled).toBe(false);
+
       expect(core.options.isClickOutside).toBe(true);
       expect(core.options.userDefineText).toBe(true);
       expect(core.options.togglePickerAnimation).toBe('slide');
@@ -898,29 +751,19 @@ describe('ewColorPicker', () => {
       const colorConfig = {
         el: container,
         defaultColor: '#00ff00',
-        alpha: true,
-        hue: true,
         predefineColor: ['#ff0000', '#0000ff']
       };
 
       core = new ewColorPicker(colorConfig);
       
       expect(core.options.defaultColor).toBe('#00ff00');
-      expect(core.options.alpha).toBe(true);
-      expect(core.options.hue).toBe(true);
       expect(core.options.predefineColor).toEqual(['#ff0000', '#0000ff']);
-      // 开启了alpha配置，颜色会被转换为RGBA格式
-      expect(core.currentColor).toBe('rgba(0, 255, 0, 1)');
+      expect(core.currentColor).toBe('#00ff00');
     });
 
     it('should handle configuration with only UI-related options', () => {
       const uiConfig = {
         el: container,
-        hasInput: true,
-        hasBox: true,
-        hasPanel: true,
-        hasClear: true,
-        hasSure: true,
         size: 'large',
         clearText: '清空',
         sureText: '确认'
@@ -928,11 +771,6 @@ describe('ewColorPicker', () => {
 
       core = new ewColorPicker(uiConfig);
       
-      expect(core.options.hasInput).toBe(true);
-      expect(core.options.hasBox).toBe(true);
-      expect(core.options.hasPanel).toBe(true);
-      expect(core.options.hasClear).toBe(true);
-      expect(core.options.hasSure).toBe(true);
       expect(core.options.size).toBe('large');
       expect(core.options.clearText).toBe('清空');
       expect(core.options.sureText).toBe('确认');
@@ -1037,25 +875,19 @@ describe('ewColorPicker', () => {
     it('should update multiple options at once', () => {
       core = new ewColorPicker({ el: container });
       core.updateOptions({ 
-        hasInput: true, 
-        alpha: true, 
         clearText: '清空' 
       });
-      expect(core.options.hasInput).toBe(true);
-      expect(core.options.alpha).toBe(true);
       expect(core.options.clearText).toBe('清空');
     });
 
     it('should preserve existing options when updating', () => {
       core = new ewColorPicker({ 
         el: container, 
-        defaultColor: '#ff0000',
-        hasInput: true 
+        defaultColor: '#ff0000'
       });
-      core.updateOptions({ alpha: true });
+      core.updateOptions({ clearText: '清空' });
       expect(core.options.defaultColor).toBe('#ff0000');
-      expect(core.options.hasInput).toBe(true);
-      expect(core.options.alpha).toBe(true);
+      expect(core.options.clearText).toBe('清空');
     });
 
     it('should trigger optionsUpdate event when updating options', () => {
@@ -1065,7 +897,7 @@ describe('ewColorPicker', () => {
         eventTriggered = true;
       });
       
-      core.updateOptions({ hasInput: true });
+      core.updateOptions({ clearText: '清空' });
       expect(eventTriggered).toBe(true);
     });
   });

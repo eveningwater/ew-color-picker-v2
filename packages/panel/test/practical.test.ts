@@ -81,23 +81,16 @@ describe('Panel Plugin 实用功能测试', () => {
       expect(panelElement).toBeFalsy();
     });
 
-    it('应该支持hue配置', () => {
-      mockCore.options.hue = false;
+    it('应该支持hueDirection配置', () => {
+      mockCore.options.hueDirection = 'vertical';
       plugin = new PanelPlugin(mockCore);
       
-      // 当hue为false时，面板仍然应该存在，但可能没有色相滑块
+      // 方向配置主要影响内部逻辑，面板本身应该仍然存在
       const panelElement = container.querySelector('.ew-color-picker-panel');
       expect(panelElement).toBeTruthy();
     });
 
-    it('应该支持alpha配置', () => {
-      mockCore.options.alpha = false;
-      plugin = new PanelPlugin(mockCore);
-      
-      // 当alpha为false时，面板仍然应该存在，但可能没有透明度滑块
-      const panelElement = container.querySelector('.ew-color-picker-panel');
-      expect(panelElement).toBeTruthy();
-    });
+
 
     it('应该支持hueDirection配置', () => {
       mockCore.options.hueDirection = 'vertical';

@@ -42,7 +42,7 @@ describe('ewColorPicker 综合配置测试', () => {
         changeColor: vi.fn(),
         sure: vi.fn(),
         clear: vi.fn(),
-        boxDisabled: false,
+  
         isClickOutside: true,
         togglePickerAnimation: 'slide',
         pickerAnimationTime: 300,
@@ -54,15 +54,8 @@ describe('ewColorPicker 综合配置测试', () => {
       
       // 验证核心配置
       expect(core.options.defaultColor).toBe('#ff0000');
-      expect(core.options.hasInput).toBe(true);
       expect(core.options.openChangeColorMode).toBe(true);
-      expect(core.options.alpha).toBe(true);
-      expect(core.options.hue).toBe(true);
       expect(core.options.predefineColor).toEqual(['#ff0000', '#00ff00', '#0000ff']);
-      expect(core.options.hasBox).toBe(true);
-      expect(core.options.hasPanel).toBe(true);
-      expect(core.options.hasClear).toBe(true);
-      expect(core.options.hasSure).toBe(true);
       expect(core.options.size).toBe('small');
       expect(core.options.hueDirection).toBe('vertical');
       expect(core.options.alphaDirection).toBe('horizontal');
@@ -71,7 +64,7 @@ describe('ewColorPicker 综合配置测试', () => {
       expect(core.options.changeColor).toBe(config.changeColor);
       expect(core.options.sure).toBe(config.sure);
       expect(core.options.clear).toBe(config.clear);
-      expect(core.options.boxDisabled).toBe(false);
+  
       expect(core.options.isClickOutside).toBe(true);
       expect(core.options.togglePickerAnimation).toBe('slide');
       expect(core.options.pickerAnimationTime).toBe(300);
@@ -91,37 +84,22 @@ describe('ewColorPicker 综合配置测试', () => {
       core = new ewColorPicker({
         el: container,
         defaultColor: '#00ff00',
-        alpha: true,
-        hue: true,
         predefineColor: ['#ff0000', '#0000ff']
       });
       
       expect(core.options.defaultColor).toBe('#00ff00');
-      expect(core.options.alpha).toBe(true);
-      expect(core.options.hue).toBe(true);
       expect(core.options.predefineColor).toEqual(['#ff0000', '#0000ff']);
-      // 颜色会被转换为RGBA格式
-      expect(core.currentColor).toBe('rgba(0, 255, 0, 1)');
+      expect(core.currentColor).toBe('#00ff00');
     });
 
     it('应该处理UI相关配置', () => {
       core = new ewColorPicker({
         el: container,
-        hasInput: true,
-        hasBox: true,
-        hasPanel: true,
-        hasClear: true,
-        hasSure: true,
         size: 'large',
         clearText: '清空',
         sureText: '确认'
       });
       
-      expect(core.options.hasInput).toBe(true);
-      expect(core.options.hasBox).toBe(true);
-      expect(core.options.hasPanel).toBe(true);
-      expect(core.options.hasClear).toBe(true);
-      expect(core.options.hasSure).toBe(true);
       expect(core.options.size).toBe('large');
       expect(core.options.clearText).toBe('清空');
       expect(core.options.sureText).toBe('确认');
@@ -414,25 +392,19 @@ describe('ewColorPicker 综合配置测试', () => {
     it('应该同时更新多个配置', () => {
       core = new ewColorPicker({ el: container });
       core.updateOptions({
-        hasInput: true,
-        alpha: true,
         clearText: '清空'
       });
-      expect(core.options.hasInput).toBe(true);
-      expect(core.options.alpha).toBe(true);
       expect(core.options.clearText).toBe('清空');
     });
 
     it('应该保留现有配置', () => {
       core = new ewColorPicker({
         el: container,
-        defaultColor: '#ff0000',
-        hasInput: true
+        defaultColor: '#ff0000'
       });
-      core.updateOptions({ alpha: true });
+      core.updateOptions({ clearText: '清空' });
       expect(core.options.defaultColor).toBe('#ff0000');
-      expect(core.options.hasInput).toBe(true);
-      expect(core.options.alpha).toBe(true);
+      expect(core.options.clearText).toBe('清空');
     });
   });
 

@@ -22,20 +22,12 @@ export interface PredefineColor {
 
 export interface ewColorPickerOptions {
   el: WrapperElement;
-  hasBox?: boolean;
-  hue?: boolean;
-  alpha?: boolean;
   disabled?: boolean;
   predefineColor?: PredefineColor | string [];
   size?: string;
   defaultColor?: string;
-  hasClear?: boolean;
-  hasSure?: boolean;
-  hasInput?: boolean;
-  boxDisabled?: boolean;
   isClickOutside?: boolean;
   openChangeColorMode?: boolean;
-  boxBgColor?: boolean;
   hueDirection?: string;
   alphaDirection?: string;
   clearText?: string;
@@ -52,20 +44,12 @@ export interface ewColorPickerOptions {
 }
 
 export const defaultConfig: Omit<ewColorPickerOptions, "el"> = {
-  hasBox: true,
-  hue: true,
-  alpha: false,
   disabled: false,
   predefineColor: [],
   size: "normal",
   defaultColor: "",
-  hasClear: true,
-  hasSure: true,
-  hasInput: true,
-  boxDisabled: false,
   isClickOutside: true,
   openChangeColorMode: false,
-  boxBgColor: false,
   hueDirection: "vertical",
   alphaDirection: "vertical",
   clearText: "清空",

@@ -187,6 +187,13 @@ export default class ewColorPickerPanelPlugin {
   handlePanelClick(event: MouseEvent) {
     if (!this.panel || !this.cursor) return;
 
+    // 检查禁用状态
+    if (this.options.disabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
     const rect = getRect(this.panel);
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -202,6 +209,11 @@ export default class ewColorPickerPanelPlugin {
 
   handlePanelMouseDown() {
     if (!this.panel) return;
+
+    // 检查禁用状态
+    if (this.options.disabled) {
+      return;
+    }
 
     const handleMouseMove = (e: MouseEvent) => {
       this.handlePanelClick(e);

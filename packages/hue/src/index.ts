@@ -3,7 +3,6 @@ import {
   setStyle,
   addClass,
   removeClass,
-  hasClass,
   isFunction,
   insertNode,
   ApplyOrder,
@@ -33,6 +32,8 @@ export default class ewColorPickerHuePlugin {
 
   // 节流处理鼠标移动事件
   private throttledUpdateHue: (hue: number) => void;
+  // 内部状态控制
+  private _hasHue: boolean = true;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
@@ -53,6 +54,31 @@ export default class ewColorPickerHuePlugin {
     this.run();
   }
 
+  // 获取hue状态
+  get hasHue(): boolean {
+    return this._hasHue;
+  }
+
+  // 设置hue状态
+  set hasHue(value: boolean) {
+    if (this._hasHue !== value) {
+      this._hasHue = value;
+      if (value) {
+        this.render();
+      } else {
+        if (this.hueBar && this.hueBar.parentNode) {
+          this.hueBar.parentNode.removeChild(this.hueBar);
+          this.hueBar = null;
+        }
+      }
+    }
+  }
+
+  // 动态启用/禁用hue
+  enableHue(enable: boolean = true): void {
+    this.hasHue = enable;
+  }
+
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
       this.options = extend(this.options, this.ewColorPicker.options);
@@ -61,12 +87,9 @@ export default class ewColorPickerHuePlugin {
   }
 
   run() {
-    // 检查是否显示 hue 滑块
-    if (this.options.ewColorPickerHue === false) {
-      return;
+    if (this.hasHue) {
+      this.render();
     }
-
-    this.render();
     setTimeout(() => {
       this.bindEvents();
     }, 10);
@@ -130,6 +153,14 @@ export default class ewColorPickerHuePlugin {
 
   handleHueSliderClick(event: MouseEvent) {
     if (!this.hueBar) return;
+    
+    // 检查禁用状态
+    if (this.options.disabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    
     const rect = getRect(this.hueBar);
     const isHorizontal = this.isHorizontal;
     let hue: number;
@@ -145,6 +176,12 @@ export default class ewColorPickerHuePlugin {
 
   handleHueSliderMouseDown(event: MouseEvent) {
     if (!this.hueBar) return;
+    
+    // 检查禁用状态
+    if (this.options.disabled) {
+      return;
+    }
+    
     const slider = this.hueBar;
     const isHorizontal = this.isHorizontal;
     const moveHandler = (e: MouseEvent) => {

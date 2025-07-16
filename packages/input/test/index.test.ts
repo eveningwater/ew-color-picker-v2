@@ -29,8 +29,7 @@ describe('Input Plugin', () => {
     
     // 使用 mockCore 工厂函数创建完整的 mock 对象
     mockCore = createMockCore(container, {
-      hasInput: true,
-        defaultColor: '#ff0000'
+      defaultColor: '#ff0000'
     });
   });
 
@@ -53,12 +52,11 @@ describe('Input Plugin', () => {
       expect(inputElement).toBeTruthy();
     });
 
-    it('should not create input element when hasInput is false', () => {
-      mockCore.options.hasInput = false;
+    it('should create input element when plugin is installed', () => {
       const plugin = new InputPlugin(mockCore);
       
       const inputElement = container.querySelector('.ew-color-picker-input');
-      expect(inputElement).toBeFalsy();
+      expect(inputElement).toBeTruthy();
     });
   });
 

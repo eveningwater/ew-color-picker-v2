@@ -3,7 +3,6 @@ import {
   setStyle,
   addClass,
   removeClass,
-  hasClass,
   isFunction,
   insertNode,
   ApplyOrder,
@@ -33,6 +32,8 @@ export default class ewColorPickerAlphaPlugin {
 
   // 节流处理鼠标移动事件
   private throttledUpdateAlpha: (alpha: number) => void;
+  // 内部状态控制
+  private _hasAlpha: boolean = true;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
@@ -51,6 +52,31 @@ export default class ewColorPickerAlphaPlugin {
     this.run();
   }
 
+  // 获取alpha状态
+  get hasAlpha(): boolean {
+    return this._hasAlpha;
+  }
+
+  // 设置alpha状态
+  set hasAlpha(value: boolean) {
+    if (this._hasAlpha !== value) {
+      this._hasAlpha = value;
+      if (value) {
+        this.render();
+      } else {
+        if (this.alphaBar && this.alphaBar.parentNode) {
+          this.alphaBar.parentNode.removeChild(this.alphaBar);
+          this.alphaBar = null;
+        }
+      }
+    }
+  }
+
+  // 动态启用/禁用alpha
+  enableAlpha(enable: boolean = true): void {
+    this.hasAlpha = enable;
+  }
+
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
       this.options = extend({}, this.options, this.ewColorPicker.options);
@@ -59,12 +85,9 @@ export default class ewColorPickerAlphaPlugin {
   }
 
   run() {
-    // 检查是否显示 alpha 滑块
-    if (!this.options.alpha) {
-      return;
+    if (this.hasAlpha) {
+      this.render();
     }
-
-    this.render();
     setTimeout(() => {
       this.bindEvents();
     }, 10);
@@ -130,6 +153,14 @@ export default class ewColorPickerAlphaPlugin {
 
   handleAlphaSliderClick(event: MouseEvent) {
     if (!this.alphaBar) return;
+    
+    // 检查禁用状态
+    if (this.options.disabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    
     const rect = getRect(this.alphaBar);
     const isHorizontal = this.isHorizontal;
     let alpha: number;
@@ -145,6 +176,12 @@ export default class ewColorPickerAlphaPlugin {
 
   handleAlphaSliderMouseDown(event: MouseEvent) {
     if (!this.alphaBar) return;
+    
+    // 检查禁用状态
+    if (this.options.disabled) {
+      return;
+    }
+    
     const slider = this.alphaBar;
     const isHorizontal = this.isHorizontal;
     const moveHandler = (e: MouseEvent) => {

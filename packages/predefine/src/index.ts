@@ -247,6 +247,13 @@ export default class ewColorPickerPredefinePlugin {
       return; // 如果被禁用，直接返回，不执行任何操作
     }
     
+    // 检查全局禁用状态
+    if (this.options.disabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    
     // 添加激活状态
     addClass(target, 'ew-color-picker-predefine-color-active');
     

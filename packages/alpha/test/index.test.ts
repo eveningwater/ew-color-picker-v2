@@ -13,7 +13,6 @@ describe('Alpha Plugin', () => {
     
     // 使用通用的 mockCore 工厂函数
     mockCore = createMockCore(container, {
-        alpha: true,
       defaultColor: '#ff0000',
       alphaDirection: 'vertical'
     });
@@ -45,13 +44,12 @@ describe('Alpha Plugin', () => {
       expect(alphaElement).toBeTruthy();
     });
 
-    it('should not create alpha element when showAlpha is false', () => {
-      mockCore.options.alpha = false;
+    it('should create alpha element when plugin is installed', () => {
       const plugin = new AlphaPlugin(mockCore);
       plugin.install(mockCore);
       
       const alphaElement = container.querySelector('.ew-color-picker-slider.ew-alpha');
-      expect(alphaElement).toBeFalsy();
+      expect(alphaElement).toBeTruthy();
     });
   });
 
@@ -116,8 +114,8 @@ describe('Alpha Plugin', () => {
   });
 
   describe('plugin options', () => {
-    it('should respect custom alpha options', () => {
-      // Update mockCore options to include alpha options
+    it('should respect custom alpha direction options', () => {
+      // Update mockCore options to include alpha direction options
       mockCore.options.alphaDirection = 'horizontal';
       const plugin = new AlphaPlugin(mockCore);
       

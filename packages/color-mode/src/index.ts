@@ -191,11 +191,19 @@ export default class ewColorPickerColorModePlugin {
 
     // 上箭头按钮事件
     on(this.upButton, 'click', () => {
+      // 检查禁用状态
+      if (this.options.disabled) {
+        return;
+      }
       this.switchToPreviousMode();
     });
 
     // 下箭头按钮事件
     on(this.downButton, 'click', () => {
+      // 检查禁用状态
+      if (this.options.disabled) {
+        return;
+      }
       this.switchToNextMode();
     });
 

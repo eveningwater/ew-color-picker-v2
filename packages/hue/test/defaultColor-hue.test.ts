@@ -23,7 +23,6 @@ describe('Hue Plugin - defaultColor Integration', () => {
       const picker = new ewColorPicker({
         el: container,
         defaultColor: '#00ff00', // 绿色，hue = 120
-        hue: true,
         hasPanel: true // 确保面板插件被加载
       });
       expect(spy).toHaveBeenCalledWith(120);
@@ -35,7 +34,6 @@ describe('Hue Plugin - defaultColor Integration', () => {
       const picker = new ewColorPicker({
         el: container,
         defaultColor: '#ff0000', // 红色，hue = 0，与默认值相同
-        hue: true,
         hasPanel: true // 确保面板插件被加载
       });
       // 红色 hue = 0，与默认值相同，所以应该被调用但传入 0
@@ -47,7 +45,6 @@ describe('Hue Plugin - defaultColor Integration', () => {
       const spy = vi.spyOn(HuePlugin.prototype, 'updateHueThumbPosition');
       const picker = new ewColorPicker({
         el: container,
-        hue: true,
         hasPanel: true // 确保面板插件被加载
       });
       picker.showPanel();
@@ -70,7 +67,6 @@ describe('Hue Plugin - defaultColor Integration', () => {
         const picker = new ewColorPicker({
           el: testContainer,
           defaultColor: color,
-          hue: true,
           hasPanel: true // 确保面板插件被加载
         });
         const hsva = colorRgbaToHsva(colorToRgba(color));
@@ -86,12 +82,10 @@ describe('Hue Plugin - defaultColor Integration', () => {
       const picker = new ewColorPicker({
         el: container,
         defaultColor: '#00ff00',
-        alpha: true,
-        hue: true,
         hasPanel: true // 确保面板插件被加载
       });
       const currentColor = picker.getColor();
-      expect(currentColor).toMatch(/^rgba\(/); // 应该是 rgba 格式
+      expect(currentColor).toBe('#00ff00'); // 应该是 hex 格式
       const hsva = colorRgbaToHsva(colorToRgba(currentColor));
       expect(hsva.h).toBe(120); // 绿色应该是 120 度
       expect(spy).toHaveBeenCalledWith(120);
@@ -104,7 +98,6 @@ describe('Hue Plugin - defaultColor Integration', () => {
       const picker = new ewColorPicker({
         el: container,
         defaultColor: '#00ff00',
-        hue: true,
         hasPanel: true // 确保面板插件被加载
       });
 

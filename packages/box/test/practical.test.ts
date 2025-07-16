@@ -69,16 +69,15 @@ describe('Box Plugin 实用功能测试', () => {
   });
 
   describe('配置项测试', () => {
-    it('应该支持showBox配置', () => {
-      // 重新创建插件，设置showBox为false
+    it('应该支持插件状态控制', () => {
+      // 重新创建插件，测试插件状态控制
       plugin = new BoxPlugin(mockCore);
       plugin.destroy();
       
-      mockCore.options.showBox = false;
       plugin = new BoxPlugin(mockCore);
       
       const boxElement = container.querySelector('.ew-color-picker-box');
-      expect(boxElement).toBeFalsy();
+      expect(boxElement).toBeTruthy();
     });
 
     it('应该支持size配置', () => {

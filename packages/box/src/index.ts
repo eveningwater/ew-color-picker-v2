@@ -25,6 +25,9 @@ export default class ewColorPickerBoxPlugin {
   hasColor: boolean;
   _handlers: Array<() => void> = [];
   
+  // 内部状态控制
+  private _hasBox: boolean = true;
+  
   constructor(public ewColorPicker: ewColorPicker) {
     this.box = null;
     this.hasColor = false;
@@ -39,6 +42,32 @@ export default class ewColorPickerBoxPlugin {
     }
     
     this.run();
+  }
+
+  // 获取盒子状态
+  get hasBox(): boolean {
+    return this._hasBox;
+  }
+
+  // 设置盒子状态
+  set hasBox(value: boolean) {
+    if (this._hasBox !== value) {
+      this._hasBox = value;
+      if (value) {
+        this.render();
+      } else {
+        // 如果禁用了盒子，移除DOM
+        if (this.box && this.box.parentNode) {
+          removeElement(this.box);
+          this.box = null;
+        }
+      }
+    }
+  }
+
+  // 动态启用/禁用盒子
+  enableBox(enable: boolean = true): void {
+    this.hasBox = enable;
   }
   
   handleOptions() {
@@ -84,10 +113,10 @@ export default class ewColorPickerBoxPlugin {
   }
   
   render() {
-    const { className, style, showBox } = this.options;
+    const { className, style } = this.options;
     
     // 检查是否显示盒子
-    if (showBox === false) {
+    if (!this.hasBox) {
       return;
     }
     
@@ -185,6 +214,17 @@ export default class ewColorPickerBoxPlugin {
     
     // 绑定鼠标事件
     this.bindMouseEvents(onMouseEnter, onMouseLeave);
+  }
+
+  // 设置禁用状态
+  setDisabled(disabled: boolean) {
+    if (this.box) {
+      if (disabled) {
+        addClass(this.box, "is-disabled");
+      } else {
+        removeClass(this.box, "is-disabled");
+      }
+    }
   }
   
   bindMouseEvents(onMouseEnter?: (instance: ewColorPickerBoxPlugin) => void, onMouseLeave?: (instance: ewColorPickerBoxPlugin) => void) {

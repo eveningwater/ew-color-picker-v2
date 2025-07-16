@@ -24,11 +24,7 @@ describe('Button Plugin', () => {
     bottomRow.className = 'ew-color-picker-bottom-row';
     panelContainer.appendChild(bottomRow);
     
-    mockCore = createMockCore(container, {
-        showButton: true,
-      hasClear: true,
-      hasSure: true
-    });
+    mockCore = createMockCore(container, {});
   });
 
   afterEach(() => {
@@ -53,15 +49,6 @@ describe('Button Plugin', () => {
       
       const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
       expect(buttonElements.length).toBeGreaterThan(0);
-    });
-
-    it('should not create button elements when showButton is false', () => {
-      mockCore.options.showButton = false;
-      const plugin = new ButtonPlugin(mockCore);
-      plugin.install(mockCore);
-      
-      const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
-      expect(buttonElements.length).toBe(0);
     });
   });
 
@@ -110,8 +97,6 @@ describe('Button Plugin', () => {
 
   describe('plugin options', () => {
     it('should respect custom button options', () => {
-      mockCore.options.hasClear = true;
-      mockCore.options.hasSure = true;
       mockCore.options.clearText = 'Clear';
       mockCore.options.sureText = 'Sure';
       
@@ -128,14 +113,11 @@ describe('Button Plugin', () => {
     });
 
     it('should handle button size options', () => {
-      mockCore.options.hasClear = true;
-      mockCore.options.hasSure = true;
-      
       const plugin = new ButtonPlugin(mockCore);
       plugin.install(mockCore);
       
       const buttonElements = container.querySelectorAll('.ew-color-picker-drop-btn');
-      expect(buttonElements.length).toBe(2);
+      expect(buttonElements.length).toBeGreaterThan(0);
     });
   });
 

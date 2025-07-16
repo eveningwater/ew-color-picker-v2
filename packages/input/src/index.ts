@@ -29,7 +29,6 @@ import {
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 
 export interface InputOptions {
-  hasInput?: boolean;
   disabled?: boolean;
   changeColor?: Function;
 }
@@ -39,6 +38,9 @@ export default class ewColorPickerInputPlugin {
   static applyOrder = ApplyOrder.Post;
   options: InputOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
   input: HTMLInputElement | null = null;
+  
+  // 内部状态控制
+  private _hasInput: boolean = true;
   
   // 防抖处理输入事件
   private debouncedOnInputColor: (value: string) => void;
@@ -50,6 +52,33 @@ export default class ewColorPickerInputPlugin {
     this.run();
   }
 
+  // 获取输入框状态
+  get hasInput(): boolean {
+    return this._hasInput;
+  }
+
+  // 设置输入框状态
+  set hasInput(value: boolean) {
+    if (this._hasInput !== value) {
+      this._hasInput = value;
+      if (value) {
+        this.render();
+        this.bindEvents();
+      } else {
+        // 如果禁用了输入框，移除DOM
+        if (this.input && this.input.parentNode) {
+          removeElement(this.input);
+          this.input = null;
+        }
+      }
+    }
+  }
+
+  // 动态启用/禁用输入框
+  enableInput(enable: boolean = true): void {
+    this.hasInput = enable;
+  }
+
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
       this.options = extend(this.options, this.ewColorPicker.options);
@@ -59,7 +88,7 @@ export default class ewColorPickerInputPlugin {
   // 更新配置并重新渲染
   updateOptions(): void {
     this.handleOptions();
-    if (this.options.hasInput) {
+    if (this.hasInput) {
       this.render();
     } else {
       // 如果禁用了输入框，移除DOM
@@ -71,8 +100,8 @@ export default class ewColorPickerInputPlugin {
   }
 
   run() {
-    // options 已经通过 mergeOptions 完成了合并，直接使用即可
-    if (this.options.hasInput) {
+    // 根据内部状态决定是否渲染
+    if (this.hasInput) {
       this.render();
       this.bindEvents();
     }

@@ -1,4 +1,4 @@
-import ewColorPicker from "@ew-color-picker/core";
+import ewColorPicker, { HsvaColor } from "@ew-color-picker/core";
 import {
   on,
   setStyle,
@@ -15,12 +15,12 @@ import {
   off,
   setAttr,
   debounce,
+  colorToRgba,
+  colorRgbaToHsva,
 } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 
 export interface ButtonOptions {
-  hasClear?: boolean;
-  hasSure?: boolean;
   clearText?: string;
   sureText?: string;
   clear?: Function;
@@ -35,6 +35,10 @@ export default class ewColorPickerButtonPlugin {
   clearButton: HTMLButtonElement | null = null;
   sureButton: HTMLButtonElement | null = null;
   
+  // 内部状态控制
+  private _hasClear: boolean = true;
+  private _hasSure: boolean = true;
+  
   // 防抖处理按钮点击事件
   private debouncedOnClearColor: () => void;
   private debouncedOnSureColor: () => void;
@@ -45,6 +49,48 @@ export default class ewColorPickerButtonPlugin {
     this.debouncedOnClearColor = debounce(this.onClearColor.bind(this), 100);
     this.debouncedOnSureColor = debounce(this.onSureColor.bind(this), 100);
     this.run();
+  }
+
+  // 获取清空按钮状态
+  get hasClear(): boolean {
+    return this._hasClear;
+  }
+
+  // 设置清空按钮状态
+  set hasClear(value: boolean) {
+    if (this._hasClear !== value) {
+      this._hasClear = value;
+      this.render();
+    }
+  }
+
+  // 获取确定按钮状态
+  get hasSure(): boolean {
+    return this._hasSure;
+  }
+
+  // 设置确定按钮状态
+  set hasSure(value: boolean) {
+    if (this._hasSure !== value) {
+      this._hasSure = value;
+      this.render();
+    }
+  }
+
+  // 动态启用/禁用清空按钮
+  enableClear(enable: boolean = true): void {
+    this.hasClear = enable;
+  }
+
+  // 动态启用/禁用确定按钮
+  enableSure(enable: boolean = true): void {
+    this.hasSure = enable;
+  }
+
+  // 动态启用/禁用所有按钮
+  enableButtons(enable: boolean = true): void {
+    this.hasClear = enable;
+    this.hasSure = enable;
   }
 
   handleOptions() {
@@ -95,7 +141,7 @@ export default class ewColorPickerButtonPlugin {
     btnGroup.textContent = '';
     
     // 渲染清空按钮
-    if (this.options.hasClear) {
+    if (this.hasClear) {
       this.clearButton = create<HTMLButtonElement>('button');
       addClass(this.clearButton, 'ew-color-picker-clear-btn ew-color-picker-drop-btn');
       this.setClearText(this.options.clearText || '清空');
@@ -103,7 +149,7 @@ export default class ewColorPickerButtonPlugin {
     }
     
     // 渲染确认按钮
-    if (this.options.hasSure) {
+    if (this.hasSure) {
       this.sureButton = create<HTMLButtonElement>('button');
       addClass(this.sureButton, 'ew-color-picker-sure-btn ew-color-picker-drop-btn');
       this.setSureText(this.options.sureText || '确认');
@@ -136,62 +182,37 @@ export default class ewColorPickerButtonPlugin {
   }
 
   onClearColor() {
-    // 清空颜色 - 重置为默认红色
-    this.ewColorPicker.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
-    const defaultColor = this.ewColorPicker.options.alpha ? 'rgba(255, 0, 0, 1)' : '#ff0000';
-    this.ewColorPicker.setColor(defaultColor);
-    
-    // 同步更新所有相关插件的状态
-    this.syncAllPlugins(defaultColor);
-    
+    let resetColor: string;
+    let resetHsva: HsvaColor | undefined;
+    if (this.ewColorPicker.options.defaultColor) {
+      resetColor = this.ewColorPicker.options.defaultColor;
+      const rgbaColor = colorToRgba(resetColor);
+      if (rgbaColor) {
+        resetHsva = colorRgbaToHsva(rgbaColor);
+      }
+    } else {
+      resetColor = '';
+      resetHsva = undefined;
+    }
+    // 更新 HSV 颜色
+    if (resetHsva) {
+      this.ewColorPicker.hsvaColor = resetHsva;
+    } else {
+      // 清空时重置为初始状态
+      this.ewColorPicker.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
+    }
+    // 设置颜色
+    this.ewColorPicker.setColor(resetColor);
+    // 同步所有插件
+    this.ewColorPicker.syncAllPlugins(resetColor);
+    // 自动关闭颜色面板
+    this.ewColorPicker.hidePanel();
     // 触发清空回调
     if (isFunction(this.options.clear)) {
       this.options.clear?.(this.ewColorPicker);
     }
-    
     // 触发事件
     this.ewColorPicker.trigger('clear');
-  }
-
-  // 同步所有相关插件的状态
-  private syncAllPlugins(color: string) {
-    // 同步输入框
-    const inputPlugin = this.ewColorPicker.plugins?.ewColorPickerInput;
-    if (inputPlugin && inputPlugin.update) {
-      inputPlugin.update(color);
-    }
-
-    // 同步颜色模式插件的输入框
-    const colorModePlugin = this.ewColorPicker.plugins?.ewColorPickerColorMode;
-    if (colorModePlugin && colorModePlugin.currentMode !== 'hex') {
-      colorModePlugin.updateInputValues(color);
-    }
-
-    // 同步面板插件
-    const panelPlugin = this.ewColorPicker.plugins?.ewColorPickerPanel;
-    if (panelPlugin && panelPlugin.updatePanelColor) {
-      panelPlugin.updatePanelColor(color);
-    }
-
-    // 同步色相滑块
-    const huePlugin = this.ewColorPicker.plugins?.ewColorPickerHue;
-    if (huePlugin && huePlugin.updateHueThumbPosition) {
-      const hsva = this.ewColorPicker.hsvaColor;
-      huePlugin.updateHueThumbPosition(hsva.h);
-    }
-
-    // 同步透明度滑块
-    const alphaPlugin = this.ewColorPicker.plugins?.ewColorPickerAlpha;
-    if (alphaPlugin && alphaPlugin.updateAlphaThumbPosition) {
-      const hsva = this.ewColorPicker.hsvaColor;
-      alphaPlugin.updateAlphaThumbPosition(hsva.a);
-    }
-
-    // 同步颜色框
-    const boxPlugin = this.ewColorPicker.plugins?.ewColorPickerBox;
-    if (boxPlugin && boxPlugin.setBoxBgColor) {
-      boxPlugin.setBoxBgColor(color);
-    }
   }
 
   onSureColor() {

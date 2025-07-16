@@ -349,8 +349,6 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const picker = new ewColorPicker({
         el: container,
         defaultColor: '#ff0000',
-        hue: true,
-        alpha: false,
         hasPanel: true
       });
 
@@ -358,7 +356,6 @@ describe('ewColorPicker Hot Update Configuration', () => {
       picker.updateOptions({
         defaultColor: '#00ff00',
         hueDirection: 'horizontal',
-        alpha: true,
         alphaDirection: 'horizontal',
         size: { width: 300, height: 250 }
       });
@@ -367,14 +364,11 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const options = picker.getOptions();
       expect(options.defaultColor).toBe('#00ff00');
       expect(options.hueDirection).toBe('horizontal');
-      expect(options.alpha).toBe(true);
       expect(options.alphaDirection).toBe('horizontal');
       expect(options.size).toEqual({ width: 300, height: 250 });
 
-      // 验证颜色和插件状态
-      const hsva = picker.getHsvaColor();
-      // expect(hsva.h).toBe(120); // 绿色色相
-      // expect(picker.plugins.ewColorPickerAlpha).toBeDefined();
+      // 验证颜色
+      expect(picker.getColor()).toBe('#00ff00');
     });
   });
 }); 
