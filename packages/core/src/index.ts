@@ -203,10 +203,10 @@ export default class ewColorPicker extends EventEmitter {
     return ewColorPicker;
   }
 
-  constructor(options?: ewColorPickerConstructorOptions | string | HTMLElement, secondOptions?: Record<string, any>) {
+  constructor(options?: ewColorPickerConstructorOptions | string | HTMLElement, secondOptions?: ewColorPickerConstructorOptions) {
     super(EVENT_TYPES);
     
-    // 处理 new EWColorPicker(container, options) 的调用方式
+    // 处理 new ewColorPicker(container, options) 的调用方式
     let finalOptions: ewColorPickerConstructorOptions | string;
     if (options instanceof HTMLElement) {
       if (secondOptions) {
@@ -383,6 +383,8 @@ export default class ewColorPicker extends EventEmitter {
       if (this.options.togglePicker && isFunction(this.options.togglePicker)) {
         this.options.togglePicker(true);
       }
+
+      this.syncAllPlugins(this.currentColor);
       
       // 优化：合并嵌套的 setTimeout
       setTimeout(() => {
@@ -615,7 +617,7 @@ export default class ewColorPicker extends EventEmitter {
     this.trigger('change', color);
     
     // 可选：如果有 changeColor 回调，也可以调用
-    if (this.options.changeColor && isFunction(this.options.changeColor)) {
+    if (isFunction(this.options.changeColor)) {
       this.options.changeColor(color);
     }
   }
@@ -623,7 +625,7 @@ export default class ewColorPicker extends EventEmitter {
   // 公共方法：同步所有插件的颜色
   public syncAllPlugins(color: string): void {
     Object.values(this.plugins).forEach(plugin => {
-      if (typeof plugin.syncColor === 'function') {
+      if (isFunction(plugin.syncColor)) {
         plugin.syncColor(color);
       }
     });

@@ -10,9 +10,8 @@ export interface WrapperElement extends HTMLElement {
   isEwColorPickerContainer?: boolean;
 }
 
-export interface ewColorPickerConstructorOptions {
+export interface ewColorPickerConstructorOptions extends Omit<ewColorPickerOptions,'el'>{
   el: WrapperElement | string;
-  [key: string]: any;
 }
 
 export interface PredefineColor {
