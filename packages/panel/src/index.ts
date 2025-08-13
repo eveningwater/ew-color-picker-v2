@@ -232,6 +232,8 @@ export default class ewColorPickerPanelPlugin {
     if (!this.cursor || !this.panel) return;
 
     // 计算相对面板的坐标
+    // 饱和度：0-100 对应 left: 0-panelWidth
+    // 明度：0-100 对应 top: panelHeight-0（注意Y轴方向）
     const left = Math.max(
       0,
       Math.min((saturation / 100) * this.panelWidth, this.panelWidth)
@@ -241,9 +243,21 @@ export default class ewColorPickerPanelPlugin {
       Math.min((1 - value / 100) * this.panelHeight, this.panelHeight)
     );
 
+    // 考虑CSS中transform: translate(-6px, -6px)的影响
+    // 光标实际尺寸：4px + 6px * 2 = 16px
+    const cursorOffset = 6; // CSS中transform的偏移量
+    const adjustedLeft = Math.max(
+      cursorOffset,
+      Math.min(left, this.panelWidth - cursorOffset)
+    );
+    const adjustedTop = Math.max(
+      cursorOffset,
+      Math.min(top, this.panelHeight - cursorOffset)
+    );
+
     setStyle(this.cursor, {
-      left: `${left + 4}px`,
-      top: `${top + 4}px`,
+      left: `${adjustedLeft}px`,
+      top: `${adjustedTop}px`,
     });
   }
 
