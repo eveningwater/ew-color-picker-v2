@@ -23,10 +23,21 @@ describe('color-mode Plugin', () => {
     bottomRow.className = 'ew-color-picker-bottom-row';
     panelContainer.appendChild(bottomRow);
     
+    // 创建input容器
+    const inputContainer = create('div');
+    inputContainer.className = 'ew-color-picker-input-container';
+    bottomRow.appendChild(inputContainer);
+    
     mockCore = createMockCore(container, {
-        showColorMode: true,
+      showColorMode: true,
       colorMode: 'hex',
-      openChangeColorMode: true
+      alpha: true, // 启用alpha支持
+      plugins: {
+        ewColorPickerAlpha: {
+          // 模拟alpha插件
+          updateAlphaThumbPosition: vi.fn()
+        }
+      }
     });
   });
 
@@ -39,7 +50,8 @@ describe('color-mode Plugin', () => {
       const plugin = new ColorModePlugin(mockCore);
       
       expect(plugin).toBeInstanceOf(ColorModePlugin);
-      expect(mockCore.on).toHaveBeenCalled();
+      // 由于alpha插件存在，插件应该能正常安装
+      expect(plugin.options.alpha).toBe(true);
     });
 
     it('should create color mode element', () => {
@@ -104,16 +116,15 @@ describe('color-mode Plugin', () => {
       expect(upButton).toBeTruthy();
       expect(downButton).toBeTruthy();
       
-      // 直接调用 onModeChange 方法来测试功能
-      (plugin as any).onModeChange('hsl');
-      
-      // Should call trigger or update mode
-      expect(mockCore.trigger).toHaveBeenCalled();
+      // 测试模式切换 - 直接调用onModeChange方法，避免防抖延迟
+      (plugin as any).onModeChange('rgb');
+      expect(plugin.currentMode).toBe('rgb');
     });
   });
 
   describe('plugin options', () => {
     it('should respect custom color mode options', () => {
+      mockCore.options.defaultMode = 'rgb';
       const plugin = new ColorModePlugin(mockCore);
       
       const colorModeElement = container.querySelector('.ew-color-picker-mode-container');
@@ -121,24 +132,31 @@ describe('color-mode Plugin', () => {
       
       const modeButtons = container.querySelectorAll('.ew-color-picker-mode-up-btn, .ew-color-picker-mode-down-btn');
       expect(modeButtons.length).toBe(2);
+      
+      expect(plugin.currentMode).toBe('rgb');
     });
 
     it('should handle single mode option', () => {
+      mockCore.options.ewColorPickerColorMode = false;
       const plugin = new ColorModePlugin(mockCore);
       
       const modeButtons = container.querySelectorAll('.ew-color-picker-mode-up-btn, .ew-color-picker-mode-down-btn');
-      expect(modeButtons.length).toBe(2);
+      expect(modeButtons.length).toBe(0);
     });
   });
 
   describe('cleanup', () => {
-    it('should clean up event listeners on destroy', () => {
+    it('should clean up properly', () => {
       const plugin = new ColorModePlugin(mockCore);
       
-      // Simulate plugin destruction
+      // 确保插件已创建
+      expect(container.querySelector('.ew-color-picker-mode-container')).toBeTruthy();
+      
+      // 销毁插件
       plugin.destroy();
       
-      expect(plugin.modeContainer).toBeNull();
+      // 确保DOM已被清理
+      expect(container.querySelector('.ew-color-picker-mode-container')).toBeFalsy();
     });
   });
 }); 

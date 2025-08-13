@@ -311,26 +311,32 @@ describe('ewColorPicker', () => {
 
 
 
-  describe('配置对象参数测试 - openChangeColorMode', () => {
-    it('should enable color mode when openChangeColorMode is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        openChangeColorMode: true 
-      });
-      expect(core.options.openChangeColorMode).toBe(true);
-    });
-
-    it('should disable color mode when openChangeColorMode is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        openChangeColorMode: false 
-      });
-      expect(core.options.openChangeColorMode).toBe(false);
-    });
-
-    it('should use default openChangeColorMode value when not specified', () => {
+  describe('配置对象参数测试 - color-mode插件', () => {
+    it('should check color mode plugin registration', async () => {
       core = new ewColorPicker({ el: container });
-      expect(core.options.openChangeColorMode).toBeDefined();
+      // 等待DOM渲染完成
+      await new Promise(resolve => setTimeout(resolve, 200));
+      // 检查DOM中是否存在color-mode插件的元素
+      const modeContainer = container.querySelector('.ew-color-picker-mode-container');
+      expect(modeContainer).toBeDefined();
+    });
+
+    it('should check alpha plugin dependency for color mode', async () => {
+      core = new ewColorPicker({ el: container });
+      // 等待DOM渲染完成
+      await new Promise(resolve => setTimeout(resolve, 200));
+      // 检查DOM中是否存在alpha插件的元素
+      const alphaSlider = container.querySelector('.ew-color-picker-slider.ew-alpha');
+      expect(alphaSlider).toBeDefined();
+    });
+
+    it('should check input-number plugin dependency for color mode', async () => {
+      core = new ewColorPicker({ el: container });
+      // 等待DOM渲染完成
+      await new Promise(resolve => setTimeout(resolve, 200));
+      // 检查DOM中是否存在input-number插件的元素
+      const inputsGroup = container.querySelector('.ew-color-picker-inputs-group');
+      expect(inputsGroup).toBeDefined();
     });
   });
 

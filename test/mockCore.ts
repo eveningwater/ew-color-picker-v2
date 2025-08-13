@@ -77,7 +77,7 @@ export function createMockCore(
       showInputNumber: true,
       ...options,
     },
-    plugins: {},
+    plugins: options.plugins || {}, // 确保plugins能正确传递
     wrapper: container,
     hsvaColor: { h: 0, s: 100, v: 100, a: 1 }, // 添加默认的 hsvaColor
 

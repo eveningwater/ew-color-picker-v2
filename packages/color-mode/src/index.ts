@@ -34,7 +34,6 @@ import InputNumber from "@ew-color-picker/input-number";
 export type ColorMode = 'hex' | 'rgb' | 'hsl';
 
 export interface ColorModeOptions {
-  openChangeColorMode?: boolean;
   defaultMode?: ColorMode;
   changeMode?: Function;
   alpha?: boolean; // 是否支持 alpha 通道
@@ -63,18 +62,36 @@ export default class ewColorPickerColorModePlugin {
   
   // 防抖处理模式切换事件
   private debouncedOnModeChange: (mode: ColorMode) => void;
+  
+  // 事件处理函数引用，用于正确解绑
+  private boundEventHandlers: Array<{ element: HTMLElement; event: string; handler: EventListener }> = [];
 
   constructor(public ewColorPicker: ewColorPicker) {
-    console.log('colorMode plugin loaded', this);
     this.handleOptions();
     // 初始化防抖函数
     this.debouncedOnModeChange = debounce(this.onModeChange.bind(this), 100);
+    
+    // 检查插件依赖
+    this.checkPluginDependencies();
+    
     this.run();
+  }
+
+  // 检查插件依赖
+  private checkPluginDependencies(): void {
+    // 如果没有集成alpha插件，则不支持开启颜色模式
+    if (this.options.openChangeColorMode && !this.ewColorPicker.plugins?.ewColorPickerAlpha) {
+      warn('[ewColorPicker warning]: Color mode plugin requires alpha plugin. Please use ewColorPicker.use(ewColorPickerAlpha) to register the alpha plugin first.');
+      this.options.openChangeColorMode = false;
+    }
   }
 
   install(core: any) {
     this.ewColorPicker = core;
     this.handleOptions();
+    
+    // 检查插件依赖
+    this.checkPluginDependencies();
     
     // 注册事件监听器
     if (core.on && isFunction(core.on)) {
@@ -98,12 +115,11 @@ export default class ewColorPickerColorModePlugin {
   // 更新配置并重新渲染
   updateOptions(): void {
     this.handleOptions();
-    if (this.options.openChangeColorMode) {
-      this.render();
-    } else {
-      // 如果禁用了颜色模式转换，移除DOM
-      this.destroy();
-    }
+    
+    // 重新检查插件依赖
+    this.checkPluginDependencies();
+    
+    this.render();
   }
 
   run() {
@@ -112,12 +128,8 @@ export default class ewColorPickerColorModePlugin {
       return;
     }
     
-    if (this.options.openChangeColorMode) {
-      this.render();
-      this.bindEvents();
-    }
-    // 移除硬编码样式注入，样式已移到 SCSS 文件中
-    // this.injectInputNumberStyleFix();
+    this.render();
+    this.bindEvents();
   }
 
   render() {
@@ -137,8 +149,6 @@ export default class ewColorPickerColorModePlugin {
     // 更新模式显示
     this.updateModeDisplay();
   }
-
-
 
   createModeContainer(panelContainer: HTMLElement) {
     this.modeContainer = create('div');
@@ -190,40 +200,53 @@ export default class ewColorPickerColorModePlugin {
     if (!this.upButton || !this.downButton) return;
 
     // 上箭头按钮事件
-    on(this.upButton, 'click', () => {
+    const upClickHandler = () => {
       // 检查禁用状态
       if (this.options.disabled) {
         return;
       }
       this.switchToPreviousMode();
-    });
+    };
+    
+    on(this.upButton, 'click', upClickHandler);
+    this.boundEventHandlers.push({ element: this.upButton, event: 'click', handler: upClickHandler });
 
     // 下箭头按钮事件
-    on(this.downButton, 'click', () => {
+    const downClickHandler = () => {
       // 检查禁用状态
       if (this.options.disabled) {
         return;
       }
       this.switchToNextMode();
-    });
+    };
+    
+    on(this.downButton, 'click', downClickHandler);
+    this.boundEventHandlers.push({ element: this.downButton, event: 'click', handler: downClickHandler });
 
     // 添加悬停效果
     if (this.upButton) {
       on(this.upButton, 'mouseenter', this.handleUpButtonHover);
       on(this.upButton, 'mouseleave', this.handleUpButtonLeave);
+      this.boundEventHandlers.push({ element: this.upButton, event: 'mouseenter', handler: this.handleUpButtonHover });
+      this.boundEventHandlers.push({ element: this.upButton, event: 'mouseleave', handler: this.handleUpButtonLeave });
     }
 
     if (this.downButton) {
       on(this.downButton, 'mouseenter', this.handleDownButtonHover);
       on(this.downButton, 'mouseleave', this.handleDownButtonLeave);
+      this.boundEventHandlers.push({ element: this.downButton, event: 'mouseenter', handler: this.handleDownButtonHover });
+      this.boundEventHandlers.push({ element: this.downButton, event: 'mouseleave', handler: this.handleDownButtonLeave });
     }
 
     // 监听颜色变化事件，更新显示（只在非 hex 模式下）
-    this.ewColorPicker.on('change', (color: string) => {
+    const changeHandler = (color: string) => {
       if (this.currentMode !== 'hex') {
         this.updateInputValues(color);
       }
-    });
+    };
+    
+    this.ewColorPicker.on('change', changeHandler);
+    // 注意：这里不添加到 boundEventHandlers，因为这是 ewColorPicker 的事件，不是 DOM 事件
   }
 
   switchToPreviousMode() {
@@ -236,7 +259,7 @@ export default class ewColorPickerColorModePlugin {
   switchToNextMode() {
     const modes: ColorMode[] = ['hex', 'rgb', 'hsl'];
     const currentIndex = modes.indexOf(this.currentMode);
-    const nextIndex = currentIndex < modes.length - 1 ? currentIndex + 1 : 0;
+    const nextIndex = (currentIndex + 1) % modes.length;
     this.debouncedOnModeChange(modes[nextIndex]);
   }
 
@@ -605,17 +628,20 @@ export default class ewColorPickerColorModePlugin {
   // 统一的事件绑定函数
   private bindInputEvents(input: HTMLInputElement) {
     // 失焦事件
-    on(input, 'blur', (event: Event) => {
+    const blurHandler = (event: Event) => {
       const value = (event.target as HTMLInputElement).value;
       if (isValidColor(value)) {
         this.ewColorPicker.setColor(value);
         // 同步更新其他插件的状态
         this.syncOtherPlugins(value);
       }
-    });
+    };
+    
+    on(input, 'blur', blurHandler);
+    this.boundEventHandlers.push({ element: input, event: 'blur', handler: blurHandler });
 
     // 回车事件
-    on(input, 'keydown', (event: Event) => {
+    const keydownHandler = (event: Event) => {
       const keyboardEvent = event as KeyboardEvent;
       if (keyboardEvent.key === 'Enter') {
         const value = (keyboardEvent.target as HTMLInputElement).value;
@@ -625,12 +651,17 @@ export default class ewColorPickerColorModePlugin {
           this.syncOtherPlugins(value);
         }
       }
-    });
+    };
+    
+    on(input, 'keydown', keydownHandler);
+    this.boundEventHandlers.push({ element: input, event: 'keydown', handler: keydownHandler });
 
     // 监听颜色变化事件，自动更新输入框
-    this.ewColorPicker.on('change', (color: string) => {
+    const changeHandler = (color: string) => {
       input.value = color;
-    });
+    };
+    
+    this.ewColorPicker.on('change', changeHandler);
   }
 
   // 同步其他插件的状态
@@ -669,17 +700,11 @@ export default class ewColorPickerColorModePlugin {
   }
 
   destroy() {
-    // 移除事件监听 - 使用具体的函数引用而不是空函数
-    if (this.upButton) {
-      off(this.upButton, 'click', this.switchToPreviousMode.bind(this));
-      off(this.upButton, 'mouseenter', this.handleUpButtonHover.bind(this));
-      off(this.upButton, 'mouseleave', this.handleUpButtonLeave.bind(this));
-    }
-    if (this.downButton) {
-      off(this.downButton, 'click', this.switchToNextMode.bind(this));
-      off(this.downButton, 'mouseenter', this.handleDownButtonHover.bind(this));
-      off(this.downButton, 'mouseleave', this.handleDownButtonLeave.bind(this));
-    }
+    // 移除所有绑定的事件监听器
+    this.boundEventHandlers.forEach(({ element, event, handler }) => {
+      off(element, event, handler);
+    });
+    this.boundEventHandlers = [];
 
     // 移除模式切换器
     if (this.modeContainer && this.modeContainer.parentNode) {

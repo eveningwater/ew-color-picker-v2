@@ -502,24 +502,6 @@ export default class ewColorPickerPanelPlugin {
     const panelRightInViewport = panelLeftInViewport + this.containerWidth;
     const panelBottomInViewport = panelTopInViewport + this.containerHeight;
 
-    // 临时调试信息
-    console.log("🔍 Boundary Check Debug:");
-    console.log("position:", position);
-    console.log("align:", align);
-    console.log("rootRect:", rootRect);
-    console.log("viewportWidth:", viewportWidth);
-    console.log("viewportHeight:", viewportHeight);
-    console.log("window.innerHeight:", window.innerHeight);
-    console.log("document.documentElement.clientHeight:", document.documentElement.clientHeight);
-    console.log("document.body.clientHeight:", document.body.clientHeight);
-    console.log("panelLeftInViewport:", panelLeftInViewport);
-    console.log("panelTopInViewport:", panelTopInViewport);
-    console.log("panelRightInViewport:", panelRightInViewport);
-    console.log("panelBottomInViewport:", panelBottomInViewport);
-    console.log("containerWidth:", this.containerWidth);
-    console.log("containerHeight:", this.containerHeight);
-    console.log("margin:", margin);
-
     // 检测边界问题
     const boundaryIssues = {
       top: panelTopInViewport < margin,
@@ -528,8 +510,6 @@ export default class ewColorPickerPanelPlugin {
       right: panelRightInViewport > viewportWidth - margin,
     };
 
-    console.log("Boundary issues:", boundaryIssues);
-
     // 如果没有边界问题，直接返回原位置
     if (
       !boundaryIssues.top &&
@@ -537,7 +517,6 @@ export default class ewColorPickerPanelPlugin {
       !boundaryIssues.left &&
       !boundaryIssues.right
     ) {
-      console.log("✅ No boundary issues");
       return { left, top };
     }
 
@@ -545,10 +524,6 @@ export default class ewColorPickerPanelPlugin {
     const isSmallScreen = this.containerWidth > viewportWidth * 0.8;
 
     if (isSmallScreen) {
-      console.log(
-        "📱 Small screen detected, using mobile positioning strategy"
-      );
-
       // 获取box的尺寸
       const boxWidth = colorBox.offsetWidth;
       const boxHeight = colorBox.offsetHeight;
@@ -557,7 +532,6 @@ export default class ewColorPickerPanelPlugin {
       const mobileTop = boxHeight; // 面板顶部对齐box底部
       const mobileLeft = -(viewportWidth - this.containerWidth); // 水平定位在视口右侧
 
-      console.log("✅ Mobile position:", { left: mobileLeft, top: mobileTop });
       return { left: mobileLeft, top: mobileTop };
     }
 
@@ -601,9 +575,6 @@ export default class ewColorPickerPanelPlugin {
             bestIssuesCount = testIssuesCount;
             bestPosition = testPositionValue;
             bestPositionKey = testPositionKey;
-            console.log(
-              `🔄 Better position found: ${testPositionKey} (issues: ${testIssuesCount})`
-            );
           }
         }
       }
@@ -613,14 +584,10 @@ export default class ewColorPickerPanelPlugin {
     if (
       bestIssuesCount < Object.values(boundaryIssues).filter(Boolean).length
     ) {
-      console.log(
-        `✅ Final best position: ${bestPositionKey} (issues: ${bestIssuesCount})`
-      );
       return bestPosition;
     }
 
     // 如果所有位置都有问题，尝试强制居中
-    console.log("⚠️ All positions have boundary issues, trying forced center");
     const forcedCenterLeft = Math.max(
       margin,
       (viewportWidth - this.containerWidth) / 2
@@ -639,10 +606,6 @@ export default class ewColorPickerPanelPlugin {
       viewportHeight - this.containerHeight - margin
     );
 
-    console.log("✅ Forced center position:", {
-      left: finalLeft,
-      top: finalTop,
-    });
     return { left: finalLeft, top: finalTop };
   }
 

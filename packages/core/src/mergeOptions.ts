@@ -26,7 +26,6 @@ export interface ewColorPickerOptions {
   size?: string;
   defaultColor?: string;
   isClickOutside?: boolean;
-  openChangeColorMode?: boolean;
   hueDirection?: string;
   alphaDirection?: string;
   clearText?: string;
@@ -48,7 +47,6 @@ export const defaultConfig: Omit<ewColorPickerOptions, "el"> = {
   size: "normal",
   defaultColor: "",
   isClickOutside: true,
-  openChangeColorMode: false,
   hueDirection: "vertical",
   alphaDirection: "vertical",
   clearText: "清空",
@@ -107,16 +105,14 @@ export default class ewColorPickerMergeOptions
     else if (isShallowObject(options)) {
       // 检查是否包含 el 属性
       if ('el' in (options as any)) {
-      const { el, ...other } = options as ewColorPickerOptions;
-        console.log('[ewColorPicker merge] options with el:', options, 'el:', el);
+        const { el, ...other } = options as ewColorPickerOptions;
         result = extend({}, defaultConfig, {
-        el: checkContainer(el),
-        ...other,
-        ...pluginNameProp,
-      });
+          el: checkContainer(el),
+          ...other,
+          ...pluginNameProp,
+        });
       } else {
         // 如果没有 el 属性，说明第一个参数是容器，第二个参数是选项
-        console.log('[ewColorPicker merge] options without el:', options);
         result = extend({}, defaultConfig, {
           el: document.body, // 这里会被后续的 pluginNameProp 覆盖
           ...(options as Record<string, any>),

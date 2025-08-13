@@ -109,7 +109,7 @@ export enum PluginMountOrder {
 const DEFAULT_PLUGINS = {
   ewColorPickerConsole: true,
   ewColorPickerBox: true,
-  ewColorPickerPanel: true,
+  ewColorPickerPanel: true, // panel作为core的核心插件，默认集成
   ewColorPickerInput: true,
   ewColorPickerButton: true,
   ewColorPickerPredefine: true,
@@ -211,9 +211,10 @@ export default class ewColorPicker extends EventEmitter {
     if (options instanceof HTMLElement) {
       if (secondOptions) {
         // 第一个参数是容器，第二个参数是选项
+        const { el, ...otherOptions } = secondOptions;
         finalOptions = {
           el: options,
-          ...secondOptions
+          ...otherOptions
         };
       } else {
         // 只有一个参数，且是 HTMLElement，将其作为容器
@@ -228,9 +229,6 @@ export default class ewColorPicker extends EventEmitter {
     
     // 初始化配置
     this.options = new ewColorPickerMergeOptions().bindOptions(finalOptions, DEFAULT_PLUGINS);
-    
-    // 不设置默认颜色，让用户决定是否传递 defaultColor
-    // 只有在打开面板时才需要默认颜色
     
     // 处理 defaultColor
     let color = this.options.defaultColor;
@@ -565,13 +563,13 @@ export default class ewColorPicker extends EventEmitter {
     }
 
     // 检查颜色模式切换配置
-    if (this.options.openChangeColorMode && !ewColorPicker.pluginsMap['ewColorPickerColorMode']) {
-      warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerColorMode plugin is not injected. 请使用 ewColorPicker.use(ColorModePlugin) 注册 color-mode 插件。');
+    if (!ewColorPicker.pluginsMap['ewColorPickerColorMode']) {
+      warn('[ewColorPicker warning]: Color mode functionality requires ewColorPickerColorMode plugin. 请使用 ewColorPicker.use(ColorModePlugin) 注册 color-mode 插件。');
     }
 
     // 检查颜色模式切换配置下的 input-number 插件依赖
-    if (this.options.openChangeColorMode && !ewColorPicker.pluginsMap['ewColorPickerInputNumber']) {
-      warn('[ewColorPicker warning]: openChangeColorMode is enabled but ewColorPickerInputNumber plugin is not injected. color-mode 插件依赖 InputNumber 插件。请使用 ewColorPicker.use(InputNumberPlugin) 注册。');
+    if (ewColorPicker.pluginsMap['ewColorPickerColorMode'] && !ewColorPicker.pluginsMap['ewColorPickerInputNumber']) {
+      warn('[ewColorPicker warning]: Color mode plugin requires InputNumber plugin. color-mode 插件依赖 InputNumber 插件。请使用 ewColorPicker.use(InputNumberPlugin) 注册。');
     }
 
     // 检查盒子配置
@@ -579,9 +577,9 @@ export default class ewColorPicker extends EventEmitter {
       warn('[ewColorPicker warning]: hasBox is enabled but ewColorPickerBox plugin is not injected. Please use ewColorPicker.use(BoxPlugin) to register the plugin.');
     }
 
-    // 检查面板配置
-    if (this.options.hasPanel && !ewColorPicker.pluginsMap['ewColorPickerPanel']) {
-      warn('[ewColorPicker warning]: hasPanel is enabled but ewColorPickerPanel plugin is not injected. Please use ewColorPicker.use(PanelPlugin) to register the plugin.');
+    // panel插件是core的核心插件，必须始终存在
+    if (!ewColorPicker.pluginsMap['ewColorPickerPanel']) {
+      warn('[ewColorPicker warning]: Panel plugin is required as core plugin but not injected. Please use ewColorPicker.use(PanelPlugin) to register the plugin.');
     }
   }
 
@@ -635,14 +633,8 @@ export default class ewColorPicker extends EventEmitter {
   public updateOptions(newOptions: Record<string, any>): void {
     if (this.isDestroyed) return;
     
-    // 保存原有的 el 属性
-    const originalEl = this.options.el;
-    
     // 合并新配置
     this.options = extend({}, this.options, newOptions) as ewColorPickerMergeOptionsData;
-    
-    // 确保 el 属性不被覆盖
-    this.options.el = originalEl;
     
     // 如果更新了 defaultColor，需要同步更新当前颜色
     if (newOptions.defaultColor !== undefined) {
