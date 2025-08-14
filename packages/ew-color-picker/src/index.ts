@@ -4,7 +4,7 @@ import Panel from "@ew-color-picker/panel";
 import Hue from "@ew-color-picker/hue";
 import Alpha from "@ew-color-picker/alpha";
 import Input from "@ew-color-picker/input";
-import InputNumber, { ewColorPickerInputNumberPlugin } from "@ew-color-picker/input-number";
+import { ewColorPickerInputNumberPlugin } from "@ew-color-picker/input-number";
 import Button from "@ew-color-picker/button";
 import Predefine from "@ew-color-picker/predefine";
 import Console from "@ew-color-picker/console";

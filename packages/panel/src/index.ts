@@ -246,10 +246,14 @@ export default class ewColorPickerPanelPlugin {
     // 考虑CSS中transform: translate(-6px, -6px)的影响
     // 光标实际尺寸：4px + 6px * 2 = 16px
     const cursorOffset = 6; // CSS中transform的偏移量
+    
+    // 对于left，当饱和度为100%时，光标应该在最右边边缘
     const adjustedLeft = Math.max(
       cursorOffset,
       Math.min(left, this.panelWidth - cursorOffset)
     );
+    
+    // 对于top，当明度为100%时，光标应该在最上边边缘
     const adjustedTop = Math.max(
       cursorOffset,
       Math.min(top, this.panelHeight - cursorOffset)

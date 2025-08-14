@@ -68,11 +68,12 @@ export default class ewColorPickerColorModePlugin {
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
-    // 初始化防抖函数
-    this.debouncedOnModeChange = debounce(this.onModeChange.bind(this), 100);
     
     // 检查插件依赖
     this.checkPluginDependencies();
+    
+    // 初始化防抖函数
+    this.debouncedOnModeChange = debounce(this.onModeChange.bind(this), 100);
     
     this.run();
   }
@@ -108,7 +109,13 @@ export default class ewColorPickerColorModePlugin {
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
       this.options = extend({}, this.options, this.ewColorPicker.options);
-      this.currentMode = this.options.defaultMode || 'hex';
+      
+      // 如果集成了alpha插件，默认使用rgba模式；否则使用hex模式
+      if (this.ewColorPicker.plugins?.ewColorPickerAlpha) {
+        this.currentMode = this.options.defaultMode || 'rgb';
+      } else {
+        this.currentMode = this.options.defaultMode || 'hex';
+      }
     }
   }
 
