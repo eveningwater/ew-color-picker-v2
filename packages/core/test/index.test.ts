@@ -24,6 +24,7 @@ describe('ewColorPicker', () => {
   describe('initialization', () => {
     it('should create core instance with default options', () => {
       core = new ewColorPicker({ el: container });
+
       
       expect(core).toBeInstanceOf(ewColorPicker);
       expect(core.wrapper).toBeDefined(); // wrapper 是创建的主容器
@@ -40,6 +41,7 @@ describe('ewColorPicker', () => {
       };
       
       core = new ewColorPicker(options);
+
       
       expect(core.options.defaultColor).toBe('#ff0000');
       expect(core.options.showAlpha).toBe(true);
@@ -50,6 +52,7 @@ describe('ewColorPicker', () => {
   describe('plugin management', () => {
     it('should register plugins', () => {
       core = new ewColorPicker({ el: container });
+
       
       const mockPlugin = {
         name: 'test-plugin',
@@ -68,6 +71,7 @@ describe('ewColorPicker', () => {
       };
       
       core = new ewColorPicker({ el: container });
+
       core.use(mockPlugin);
       
       expect(mockPlugin.install).toHaveBeenCalled();
@@ -77,6 +81,7 @@ describe('ewColorPicker', () => {
   describe('color management', () => {
     it('should set and get color', () => {
       core = new ewColorPicker({ el: container });
+
       
       core.setColor('#00ff00');
       const color = core.getColor();
@@ -86,6 +91,7 @@ describe('ewColorPicker', () => {
 
     it('should emit color change events', () => {
       core = new ewColorPicker({ el: container });
+
       let eventEmitted = false;
       
       // 先监听事件，再设置颜色
@@ -111,18 +117,21 @@ describe('ewColorPicker', () => {
   describe('lifecycle methods', () => {
     it('should initialize properly', () => {
       core = new ewColorPicker({ el: container });
+
       
       expect(core).toBeDefined();
     });
 
     it('should destroy properly', () => {
       core = new ewColorPicker({ el: container });
+
       
       expect(() => core.destroy()).not.toThrow();
     });
 
     it('should handle multiple destroy calls', () => {
       core = new ewColorPicker({ el: container });
+
       core.destroy();
       
       expect(() => core.destroy()).not.toThrow();
@@ -132,6 +141,7 @@ describe('ewColorPicker', () => {
   describe('event handling', () => {
     it('should register event listeners', () => {
       core = new ewColorPicker({ el: container });
+
       let eventHandled = false;
       
       core.on('change', () => {
@@ -145,6 +155,7 @@ describe('ewColorPicker', () => {
 
     it('should remove event listeners', () => {
       core = new ewColorPicker({ el: container });
+
       let eventHandled = false;
       
       const handler = () => {
@@ -162,6 +173,7 @@ describe('ewColorPicker', () => {
   describe('utility methods', () => {
     it('should get container element', () => {
       core = new ewColorPicker({ el: container });
+
       
       expect(core.getContainer()).toBe(container);
     });
@@ -169,12 +181,14 @@ describe('ewColorPicker', () => {
     it('should get current options', () => {
       const options = { el: container, defaultColor: '#ff0000' };
       core = new ewColorPicker(options);
+
       
       expect(core.getOptions()).toEqual(expect.objectContaining(options));
     });
 
     it('should update options', () => {
       core = new ewColorPicker({ el: container });
+
       const newOptions = { showAlpha: true };
       
       core.updateOptions(newOptions);
@@ -186,6 +200,7 @@ describe('ewColorPicker', () => {
   describe('defaultColor handling', () => {
     it('should not set currentColor when defaultColor is not provided', () => {
       core = new ewColorPicker({ el: container });
+
       
       // 没有设置 defaultColor 时，currentColor 应该为空
       expect(core.currentColor).toBe('');
@@ -196,6 +211,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: '#00ff00' 
       });
+
       
       // 设置了 defaultColor 时，currentColor 应该等于 defaultColor
       // 颜色会被转换为RGBA格式
@@ -209,6 +225,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: '#0000ff' 
       });
+
       
       // 清空 currentColor
       core.currentColor = '';
@@ -221,6 +238,7 @@ describe('ewColorPicker', () => {
 
     it('should use fallback red color in showPanel when both currentColor and defaultColor are empty', () => {
       core = new ewColorPicker({ el: container });
+
       
       // 确保 currentColor 为空
       core.currentColor = '';
@@ -240,6 +258,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: '#ff0000' 
       });
+
       expect(core.currentColor).toBe('#ff0000');
     });
 
@@ -248,6 +267,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: 'rgb(255, 0, 0)' 
       });
+
       expect(core.currentColor).toBe('rgb(255, 0, 0)');
     });
 
@@ -256,6 +276,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: 'rgba(255, 0, 0, 0.5)' 
       });
+
       // RGBA颜色会被转换为HEX格式
       expect(core.currentColor).toBe('#FF0000');
     });
@@ -265,6 +286,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: 'hsl(0, 100%, 50%)' 
       });
+
       expect(core.currentColor).toBe('hsl(0, 100%, 50%)');
     });
 
@@ -273,6 +295,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: 'hsla(0, 100%, 50%, 0.5)' 
       });
+
       expect(core.currentColor).toBe('hsla(0, 100%, 50%, 0.5)');
     });
 
@@ -281,6 +304,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: 'red' 
       });
+
       expect(core.currentColor).toBe('red');
     });
 
@@ -289,6 +313,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: '' 
       });
+
       expect(core.currentColor).toBe('');
     });
 
@@ -297,6 +322,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: null as any 
       });
+
       expect(core.currentColor).toBe('');
     });
 
@@ -305,6 +331,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: undefined as any 
       });
+
       expect(core.currentColor).toBe('');
     });
   });
@@ -314,6 +341,7 @@ describe('ewColorPicker', () => {
   describe('配置对象参数测试 - color-mode插件', () => {
     it('should check color mode plugin registration', async () => {
       core = new ewColorPicker({ el: container });
+
       // 等待DOM渲染完成
       await new Promise(resolve => setTimeout(resolve, 200));
       // 检查DOM中是否存在color-mode插件的元素
@@ -323,6 +351,7 @@ describe('ewColorPicker', () => {
 
     it('should check alpha plugin dependency for color mode', async () => {
       core = new ewColorPicker({ el: container });
+
       // 等待DOM渲染完成
       await new Promise(resolve => setTimeout(resolve, 200));
       // 检查DOM中是否存在alpha插件的元素
@@ -332,6 +361,7 @@ describe('ewColorPicker', () => {
 
     it('should check input-number plugin dependency for color mode', async () => {
       core = new ewColorPicker({ el: container });
+
       // 等待DOM渲染完成
       await new Promise(resolve => setTimeout(resolve, 200));
       // 检查DOM中是否存在input-number插件的元素
@@ -351,6 +381,7 @@ describe('ewColorPicker', () => {
         el: container, 
         predefineColor: colors 
       });
+
       expect(core.options.predefineColor).toEqual(colors);
     });
 
@@ -359,6 +390,7 @@ describe('ewColorPicker', () => {
         el: container, 
         predefineColor: [] 
       });
+
       expect(core.options.predefineColor).toEqual([]);
     });
 
@@ -371,11 +403,13 @@ describe('ewColorPicker', () => {
         el: container, 
         predefineColor: colors 
       });
+
       expect(core.options.predefineColor).toEqual(colors);
     });
 
     it('should use default predefineColor value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.predefineColor).toBeDefined();
     });
   });
@@ -388,6 +422,7 @@ describe('ewColorPicker', () => {
         el: container, 
         hasPanel: true 
       });
+
       expect(core.options.hasPanel).toBe(true);
     });
 
@@ -396,11 +431,13 @@ describe('ewColorPicker', () => {
         el: container, 
         hasPanel: false 
       });
+
       expect(core.options.hasPanel).toBe(false);
     });
 
     it('should use default hasPanel value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       // hasPanel 可能不是默认配置项，检查其他相关配置
       expect(core.options).toBeDefined();
     });
@@ -416,6 +453,7 @@ describe('ewColorPicker', () => {
         el: container, 
         size: 'small' 
       });
+
       expect(core.options.size).toBe('small');
     });
 
@@ -425,11 +463,13 @@ describe('ewColorPicker', () => {
         el: container, 
         size: size 
       });
+
       expect(core.options.size).toEqual(size);
     });
 
     it('should use default size value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.size).toBeDefined();
     });
   });
@@ -440,6 +480,7 @@ describe('ewColorPicker', () => {
         el: container, 
         hueDirection: 'vertical' 
       });
+
       expect(core.options.hueDirection).toBe('vertical');
     });
 
@@ -448,11 +489,13 @@ describe('ewColorPicker', () => {
         el: container, 
         hueDirection: 'horizontal' 
       });
+
       expect(core.options.hueDirection).toBe('horizontal');
     });
 
     it('should use default hueDirection value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.hueDirection).toBeDefined();
     });
   });
@@ -463,6 +506,7 @@ describe('ewColorPicker', () => {
         el: container, 
         alphaDirection: 'vertical' 
       });
+
       expect(core.options.alphaDirection).toBe('vertical');
     });
 
@@ -471,11 +515,13 @@ describe('ewColorPicker', () => {
         el: container, 
         alphaDirection: 'horizontal' 
       });
+
       expect(core.options.alphaDirection).toBe('horizontal');
     });
 
     it('should use default alphaDirection value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.alphaDirection).toBeDefined();
     });
   });
@@ -486,11 +532,13 @@ describe('ewColorPicker', () => {
         el: container, 
         clearText: '清除' 
       });
+
       expect(core.options.clearText).toBe('清除');
     });
 
     it('should use default clearText value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.clearText).toBeDefined();
     });
   });
@@ -501,11 +549,13 @@ describe('ewColorPicker', () => {
         el: container, 
         sureText: '确定' 
       });
+
       expect(core.options.sureText).toBe('确定');
     });
 
     it('should use default sureText value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.sureText).toBeDefined();
     });
   });
@@ -517,6 +567,7 @@ describe('ewColorPicker', () => {
         el: container, 
         changeColor: changeColor 
       });
+
       expect(core.options.changeColor).toBe(changeColor);
     });
 
@@ -525,6 +576,7 @@ describe('ewColorPicker', () => {
       core = new ewColorPicker({ 
         el: container
       });
+
       
       core.on('change', changeHandler);
       core.setColor('#ff0000');
@@ -539,6 +591,7 @@ describe('ewColorPicker', () => {
         el: container, 
         sure: sure 
       });
+
       expect(core.options.sure).toBe(sure);
     });
   });
@@ -550,6 +603,7 @@ describe('ewColorPicker', () => {
         el: container, 
         clear: clear 
       });
+
       expect(core.options.clear).toBe(clear);
     });
   });
@@ -564,6 +618,7 @@ describe('ewColorPicker', () => {
         el: container, 
         isClickOutside: true 
       });
+
       expect(core.options.isClickOutside).toBe(true);
     });
 
@@ -572,11 +627,13 @@ describe('ewColorPicker', () => {
         el: container, 
         isClickOutside: false 
       });
+
       expect(core.options.isClickOutside).toBe(false);
     });
 
     it('should use default isClickOutside value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.isClickOutside).toBeDefined();
     });
   });
@@ -589,11 +646,13 @@ describe('ewColorPicker', () => {
         el: container, 
         togglePickerAnimation: 'fade' 
       });
+
       expect(core.options.togglePickerAnimation).toBe('fade');
     });
 
     it('should use default togglePickerAnimation value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.togglePickerAnimation).toBeDefined();
     });
   });
@@ -604,11 +663,13 @@ describe('ewColorPicker', () => {
         el: container, 
         pickerAnimationTime: 500 
       });
+
       expect(core.options.pickerAnimationTime).toBe(500);
     });
 
     it('should use default pickerAnimationTime value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.pickerAnimationTime).toBeDefined();
     });
   });
@@ -619,6 +680,7 @@ describe('ewColorPicker', () => {
         el: container, 
         autoPanelPosition: true 
       });
+
       expect(core.options.autoPanelPosition).toBe(true);
     });
 
@@ -627,11 +689,13 @@ describe('ewColorPicker', () => {
         el: container, 
         autoPanelPosition: false 
       });
+
       expect(core.options.autoPanelPosition).toBe(false);
     });
 
     it('should use default autoPanelPosition value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.autoPanelPosition).toBeDefined();
     });
   });
@@ -642,6 +706,7 @@ describe('ewColorPicker', () => {
         el: container, 
         panelPlacement: 'top-start' 
       });
+
       expect(core.options.panelPlacement).toBe('top-start');
     });
 
@@ -650,6 +715,7 @@ describe('ewColorPicker', () => {
         el: container, 
         panelPlacement: 'bottom-end' 
       });
+
       expect(core.options.panelPlacement).toBe('bottom-end');
     });
 
@@ -658,6 +724,7 @@ describe('ewColorPicker', () => {
         el: container, 
         panelPlacement: 'left' 
       });
+
       expect(core.options.panelPlacement).toBe('left');
     });
 
@@ -666,11 +733,13 @@ describe('ewColorPicker', () => {
         el: container, 
         panelPlacement: 'right' 
       });
+
       expect(core.options.panelPlacement).toBe('right');
     });
 
     it('should use default panelPlacement value when not specified', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.options.panelPlacement).toBeDefined();
     });
   });
@@ -711,6 +780,7 @@ describe('ewColorPicker', () => {
       };
 
       core = new ewColorPicker(complexConfig);
+
       
       expect(core.options.defaultColor).toBe('#ff0000');
       expect(core.options.hasInput).toBe(true);
@@ -747,6 +817,7 @@ describe('ewColorPicker', () => {
       };
 
       core = new ewColorPicker(minimalConfig);
+
       
       expect(core).toBeInstanceOf(ewColorPicker);
       expect(core.options.el).toBe(container);
@@ -761,6 +832,7 @@ describe('ewColorPicker', () => {
       };
 
       core = new ewColorPicker(colorConfig);
+
       
       expect(core.options.defaultColor).toBe('#00ff00');
       expect(core.options.predefineColor).toEqual(['#ff0000', '#0000ff']);
@@ -776,6 +848,7 @@ describe('ewColorPicker', () => {
       };
 
       core = new ewColorPicker(uiConfig);
+
       
       expect(core.options.size).toBe('large');
       expect(core.options.clearText).toBe('清空');
@@ -789,12 +862,14 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: '#000000' 
       });
+
       expect(core.currentColor).toBe('#000000');
 
       core = new ewColorPicker({ 
         el: container, 
         defaultColor: '#ffffff' 
       });
+
       expect(core.currentColor).toBe('#ffffff');
     });
 
@@ -804,6 +879,7 @@ describe('ewColorPicker', () => {
         el: container, 
         predefineColor: longColors 
       });
+
       expect(core.options.predefineColor).toEqual(longColors);
     });
 
@@ -812,6 +888,7 @@ describe('ewColorPicker', () => {
         el: container, 
         pickerAnimationTime: 0 
       });
+
       expect(core.options.pickerAnimationTime).toBe(0);
     });
 
@@ -820,6 +897,7 @@ describe('ewColorPicker', () => {
         el: container, 
         pickerAnimationTime: 10000 
       });
+
       expect(core.options.pickerAnimationTime).toBe(10000);
     });
   });
@@ -874,12 +952,14 @@ describe('ewColorPicker', () => {
   describe('配置对象参数测试 - 更新配置', () => {
     it('should update defaultColor', () => {
       core = new ewColorPicker({ el: container });
+
       core.updateOptions({ defaultColor: '#ff0000' });
       expect(core.options.defaultColor).toBe('#ff0000');
     });
 
     it('should update multiple options at once', () => {
       core = new ewColorPicker({ el: container });
+
       core.updateOptions({ 
         clearText: '清空' 
       });
@@ -891,6 +971,7 @@ describe('ewColorPicker', () => {
         el: container, 
         defaultColor: '#ff0000'
       });
+
       core.updateOptions({ clearText: '清空' });
       expect(core.options.defaultColor).toBe('#ff0000');
       expect(core.options.clearText).toBe('清空');
@@ -898,6 +979,7 @@ describe('ewColorPicker', () => {
 
     it('should trigger optionsUpdate event when updating options', () => {
       core = new ewColorPicker({ el: container });
+
       let eventTriggered = false;
       core.on('optionsUpdate', () => {
         eventTriggered = true;

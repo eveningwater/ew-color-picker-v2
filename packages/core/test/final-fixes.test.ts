@@ -17,14 +17,14 @@ describe('Final Fixes Verification', () => {
 
   describe('Console Warning Fix', () => {
     it('should use warn function instead of console.warn', () => {
-      // 这个测试验证我们修复了console.warn的使用
-      const picker = new ewColorPicker({
-        el: undefined as any, // 故意传入undefined来触发警告
-        hasBox: true
-      });
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      
+      const picker = new ewColorPicker({ container: container });
+      picker.mount();
       
       expect(picker).toBeDefined();
-      expect(picker.getOptions().el).toBe(document.body);
+      expect(picker.getOptions().container).toBe(container);
     });
   });
 

@@ -18,6 +18,7 @@ describe('Integration Tests', () => {
   describe('defaultColor integration scenarios', () => {
     it('should work correctly when no defaultColor is provided', () => {
       const picker = new ewColorPicker({ el: container });
+
       
       // 没有设置 defaultColor 时，currentColor 应该为空
       expect(picker.currentColor).toBe('');
@@ -35,6 +36,7 @@ describe('Integration Tests', () => {
         el: container, 
         defaultColor: '#00ff00' 
       });
+
       
       // 设置了 defaultColor 时，currentColor 应该等于 defaultColor
       expect(picker.currentColor).toBe('#00ff00');
@@ -52,6 +54,7 @@ describe('Integration Tests', () => {
         el: container, 
         defaultColor: '#ff0000' 
       });
+
       
       // 改变颜色
       picker.setColor('#0000ff');
@@ -67,6 +70,7 @@ describe('Integration Tests', () => {
 
     it('should handle showPanel with empty currentColor correctly', () => {
       const picker = new ewColorPicker({ el: container });
+
       
       // 确保 currentColor 为空
       expect(picker.currentColor).toBe('');
@@ -82,6 +86,7 @@ describe('Integration Tests', () => {
         el: container, 
         defaultColor: '#00ff00' 
       });
+
       
       // 清空 currentColor
       picker.currentColor = '';
@@ -96,6 +101,7 @@ describe('Integration Tests', () => {
   describe('plugin interaction scenarios', () => {
     it('should handle box click to toggle panel', async () => {
       const picker = new ewColorPicker({ el: container });
+
       const box = container.querySelector('.ew-color-picker-box') as HTMLElement;
       expect(box).toBeTruthy();
       const panelContainer = container.querySelector('.ew-color-picker-panel-container');
@@ -114,6 +120,7 @@ describe('Integration Tests', () => {
         el: container, 
         defaultColor: '#ff0000' 
       });
+
       
       let eventCount = 0;
       picker.on('change', () => {

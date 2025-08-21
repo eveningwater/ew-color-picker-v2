@@ -28,7 +28,7 @@ import {
 } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 import { upArrowIcon, downArrowIcon } from "@ew-color-picker/icon";
-import InputNumber from "@ew-color-picker/input-number";
+import { InputNumber } from "@ew-color-picker/input-number";
 
 // 颜色模式类型 - 只支持三种模式
 export type ColorMode = 'hex' | 'rgb' | 'hsl';
@@ -365,7 +365,8 @@ export default class ewColorPickerColorModePlugin {
       let input: HTMLElement;
       if (this.currentMode === 'rgb') {
         // 使用自定义InputNumber组件
-        input = new InputNumber({
+        // 创建 InputNumber 实例
+        const inputNumber = new InputNumber({
           value: 0,
           min: idx === 3 ? 0 : 0,
           max: idx === 3 ? 1 : 255,
@@ -376,7 +377,8 @@ export default class ewColorPickerColorModePlugin {
           onChange: () => {
             this.updateColorFromRgbInputs();
           }
-        }).getElement();
+        });
+        input = inputNumber.getElement();
         input.classList.add(`ew-color-picker-rgb-${label.toLowerCase()}-input`, 'ew-color-picker-input');
       } else if (this.currentMode === 'hsl') {
         input = idx === 0 || idx === 3

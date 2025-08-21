@@ -1,13 +1,27 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import ewColorPicker from '../src/index';
-import ButtonPlugin from '../../button/src/index';
-import InputPlugin from '../../input/src/index';
-import { ewColorPickerInputNumberPlugin } from '../../input-number/src/index';
-import PanelPlugin from '../../panel/src/index';
-import HuePlugin from '../../hue/src/index';
-import AlphaPlugin from '../../alpha/src/index';
-import PredefinePlugin from '../../predefine/src/index';
-import ColorModePlugin from '../../color-mode/src/index';
+import Box from '../../box/src/index';
+import Panel from '../../panel/src/index';
+import Hue from '../../hue/src/index';
+import Alpha from '../../alpha/src/index';
+import Input from '../../input/src/index';
+import Button from '../../button/src/index';
+import Predefine from '../../predefine/src/index';
+import Console from '../../console/src/index';
+import ColorMode from '../../color-mode/src/index';
+import InputNumber from '../../input-number/src/index';
+
+// 注册插件
+ewColorPicker.use(Console);
+ewColorPicker.use(Box);
+ewColorPicker.use(Panel);
+ewColorPicker.use(Hue);
+ewColorPicker.use(Alpha);
+ewColorPicker.use(Input);
+ewColorPicker.use(Button);
+ewColorPicker.use(Predefine);
+ewColorPicker.use(ColorMode);
+ewColorPicker.use(InputNumber);
 
 describe('禁用功能测试', () => {
   let container: HTMLElement;
@@ -15,16 +29,6 @@ describe('禁用功能测试', () => {
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
-    
-    // 注册所有插件
-    ewColorPicker.use(ButtonPlugin);
-    ewColorPicker.use(InputPlugin);
-    ewColorPicker.use(ewColorPickerInputNumberPlugin);
-    ewColorPicker.use(PanelPlugin);
-    ewColorPicker.use(HuePlugin);
-    ewColorPicker.use(AlphaPlugin);
-    ewColorPicker.use(PredefinePlugin);
-    ewColorPicker.use(ColorModePlugin);
   });
 
   afterEach(() => {
@@ -39,6 +43,7 @@ describe('禁用功能测试', () => {
       disabled: true
     });
 
+
     expect(core.options.disabled).toBe(true);
   });
 
@@ -48,6 +53,7 @@ describe('禁用功能测试', () => {
       disabled: false
     });
 
+
     expect(core.options.disabled).toBe(false);
   });
 
@@ -55,6 +61,7 @@ describe('禁用功能测试', () => {
     const core = new ewColorPicker({
       el: container
     });
+
 
     expect(core.options.disabled).toBe(false);
   });
@@ -64,6 +71,7 @@ describe('禁用功能测试', () => {
       el: container,
       disabled: false
     });
+
 
     expect(core.options.disabled).toBe(false);
 
@@ -82,6 +90,7 @@ describe('禁用功能测试', () => {
       disabled: true
     });
 
+
     // 模拟面板点击事件
     const panelPlugin = core.plugins.ewColorPickerPanel;
     expect(panelPlugin).toBeDefined();
@@ -96,6 +105,7 @@ describe('禁用功能测试', () => {
       disabled: true
     });
 
+
     const huePlugin = core.plugins.ewColorPickerHue;
     expect(huePlugin).toBeDefined();
     expect(huePlugin.options.disabled).toBe(true);
@@ -106,6 +116,7 @@ describe('禁用功能测试', () => {
       el: container,
       disabled: true
     });
+
 
     const alphaPlugin = core.plugins.ewColorPickerAlpha;
     expect(alphaPlugin).toBeDefined();

@@ -26,6 +26,7 @@ import {
   colorHsvaToRgba,
   colorRgbaToHex,
   colorToRgba,
+  checkContainer,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -206,8 +207,10 @@ export default class ewColorPicker extends EventEmitter {
   constructor(options?: ewColorPickerConstructorOptions | string | HTMLElement, secondOptions?: ewColorPickerConstructorOptions) {
     super(EVENT_TYPES);
     
-    // 处理 new ewColorPicker(container, options) 的调用方式
+    // 处理 new ewColorPicker(el, options) 的调用方式
     let finalOptions: ewColorPickerConstructorOptions | string;
+    let shouldAutoMount = false;
+    
     if (options instanceof HTMLElement) {
       if (secondOptions) {
         // 第一个参数是容器，第二个参数是选项
@@ -222,9 +225,21 @@ export default class ewColorPicker extends EventEmitter {
           el: options
         };
       }
+      shouldAutoMount = true;
     } else {
       // 第一个参数是选项或字符串选择器
-      finalOptions = options as ewColorPickerConstructorOptions | string;
+      if (typeof options === 'string') {
+        // 如果是字符串，将其作为 el 属性
+        finalOptions = { el: options };
+        shouldAutoMount = true;
+      } else {
+        finalOptions = options as ewColorPickerConstructorOptions;
+        
+        // 检查是否提供了 el 属性
+        if (finalOptions && typeof finalOptions === 'object' && finalOptions.el) {
+          shouldAutoMount = true;
+        }
+      }
     }
     
     // 初始化配置
@@ -240,6 +255,16 @@ export default class ewColorPicker extends EventEmitter {
     
     // 初始化实例
     this.init();
+    
+    // 如果提供了 el 属性，自动调用 mount 方法
+    if (shouldAutoMount && this.options.el) {
+      try {
+        this.mount(this.options.el);
+      } catch (error) {
+        // 在自动挂载失败时不抛出错误，以保持向后兼容性
+        warn(`[ewColorPicker warning]: Auto mount failed: ${error}`);
+      }
+    }
   }
 
   private init(): void {
@@ -249,10 +274,12 @@ export default class ewColorPicker extends EventEmitter {
       this._color_picker_uid = this.generateUID();
       
       this.initCoreProperties();
-      this.createMountPoints();
-      this.applyPlugins();
+      // 不在这里创建挂载点，等待mount方法调用时再创建
+      // this.createMountPoints();
+      // 不在这里应用插件，等待mount方法调用时再应用
+      // this.applyPlugins();
       // 插件挂载后，确保色相同步
-      this.notifyHuePluginUpdate(this.hsvaColor.h);
+      // this.notifyHuePluginUpdate(this.hsvaColor.h);
     });
   }
 
@@ -335,6 +362,50 @@ export default class ewColorPicker extends EventEmitter {
   public getMountPoint(pluginName: string): HTMLElement | undefined {
     if (this.isDestroyed) return undefined;
     return this.mountPoints.get(pluginName);
+  }
+
+  // 获取容器元素
+  public getContainer(): HTMLElement {
+    return this.options.el;
+  }
+
+  // 挂载到指定的DOM元素
+  public mount(el?: string | HTMLElement): ewColorPicker {
+    if (this.isDestroyed) return this;
+    
+    // 确定挂载容器
+    let mountContainer: HTMLElement;
+    if (el) {
+      // 使用 checkContainer 方法处理容器参数
+      mountContainer = checkContainer(el);
+    } else {
+      // 使用配置中的el或默认document.body
+      mountContainer = this.options.el || document.body;
+    }
+    
+    // 更新options中的el
+    this.options.el = mountContainer;
+    
+    // 创建挂载点
+    this.createMountPoints();
+    
+    // 应用插件（因为挂载点已创建）
+    this.applyPlugins();
+    
+    // 插件挂载后，确保色相同步
+    this.notifyHuePluginUpdate(this.hsvaColor.h);
+    
+    return this;
+  }
+
+  // 重新应用插件（挂载点创建后）
+  private reapplyPlugins(): void {
+    // 重新应用插件，确保它们能正确访问挂载点
+    Object.values(this.plugins).forEach(plugin => {
+      if (plugin && typeof plugin.run === 'function') {
+        plugin.run();
+      }
+    });
   }
 
   // 显示面板
@@ -655,12 +726,6 @@ export default class ewColorPicker extends EventEmitter {
     this.trigger('optionsUpdate', this.options);
   }
 
-  // 重新应用插件
-  private reapplyPlugins(): void {
-    // 更新现有插件的配置
-    this.updateExistingPlugins();
-  }
-
   public openPicker(): void {
     this.showPanel();
   }
@@ -752,7 +817,7 @@ export default class ewColorPicker extends EventEmitter {
 
   // 添加测试用例期望的方法
   public use(plugin: any): ewColorPicker {
-    if (plugin && typeof plugin.install === 'function') {
+    if (isFunction(plugin.install)) {
       plugin.install(this);
     }
     return this;
@@ -789,10 +854,6 @@ export default class ewColorPicker extends EventEmitter {
   public off(type?: string, fn?: Function): this | undefined {
     super.off(type, fn);
     return this;
-  }
-
-  public getContainer(): HTMLElement {
-    return this.options.el;
   }
 
   public getOptions(): ewColorPickerMergeOptionsData {

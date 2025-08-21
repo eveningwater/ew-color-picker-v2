@@ -1,19 +1,25 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import ewColorPicker from '../../core/src/index';
-import ewColorPickerButtonPlugin from '../../button/src/index';
-import ewColorPickerInputPlugin from '../../input/src/index';
-import ewColorPickerBoxPlugin from '../../box/src/index';
-import ewColorPickerPanelPlugin from '../../panel/src/index';
-import ewColorPickerHuePlugin from '../../hue/src/index';
-import ewColorPickerAlphaPlugin from '../../alpha/src/index';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import ewColorPicker from '../src/index';
+import Box from '../../box/src/index';
+import Panel from '../../panel/src/index';
+import Hue from '../../hue/src/index';
+import Alpha from '../../alpha/src/index';
+import Input from '../../input/src/index';
+import Button from '../../button/src/index';
+import Predefine from '../../predefine/src/index';
+import Console from '../../console/src/index';
+import ColorMode from '../../color-mode/src/index';
 
 // 注册插件
-ewColorPicker.use(ewColorPickerButtonPlugin);
-ewColorPicker.use(ewColorPickerInputPlugin);
-ewColorPicker.use(ewColorPickerBoxPlugin);
-ewColorPicker.use(ewColorPickerPanelPlugin);
-ewColorPicker.use(ewColorPickerHuePlugin);
-ewColorPicker.use(ewColorPickerAlphaPlugin);
+ewColorPicker.use(Console);
+ewColorPicker.use(Box);
+ewColorPicker.use(Panel);
+ewColorPicker.use(Hue);
+ewColorPicker.use(Alpha);
+ewColorPicker.use(Input);
+ewColorPicker.use(Button);
+ewColorPicker.use(Predefine);
+ewColorPicker.use(ColorMode);
 
 describe('Plugin State Control Tests', () => {
   let container: HTMLElement;
@@ -31,15 +37,11 @@ describe('Plugin State Control Tests', () => {
 
   describe('Button Plugin State Control', () => {
     it('should enable/disable clear button dynamically', () => {
-      const picker = new ewColorPicker({
-        el: container,
-        hasPanel: true
-      });
+      const picker = new ewColorPicker({ el: container });
 
+      
       const buttonPlugin = picker.plugins.ewColorPickerButton;
       expect(buttonPlugin).toBeDefined();
-
-      // 初始状态应该有清空按钮
       expect(buttonPlugin.hasClear).toBe(true);
       let clearButton = container.querySelector('.ew-color-picker-clear-btn');
       expect(clearButton).toBeTruthy();
@@ -58,15 +60,11 @@ describe('Plugin State Control Tests', () => {
     });
 
     it('should enable/disable sure button dynamically', () => {
-      const picker = new ewColorPicker({
-        el: container,
-        hasPanel: true
-      });
+      const picker = new ewColorPicker({ el: container });
 
+      
       const buttonPlugin = picker.plugins.ewColorPickerButton;
       expect(buttonPlugin).toBeDefined();
-
-      // 初始状态应该有确定按钮
       expect(buttonPlugin.hasSure).toBe(true);
       let sureButton = container.querySelector('.ew-color-picker-sure-btn');
       expect(sureButton).toBeTruthy();
@@ -85,14 +83,11 @@ describe('Plugin State Control Tests', () => {
     });
 
     it('should enable/disable all buttons dynamically', () => {
-      const picker = new ewColorPicker({
-        el: container,
-        hasPanel: true
-      });
+      const picker = new ewColorPicker({ el: container });
 
+      
       const buttonPlugin = picker.plugins.ewColorPickerButton;
-
-      // 初始状态应该有两个按钮
+      expect(buttonPlugin).toBeDefined();
       expect(buttonPlugin.hasClear).toBe(true);
       expect(buttonPlugin.hasSure).toBe(true);
       expect(container.querySelector('.ew-color-picker-clear-btn')).toBeTruthy();
@@ -116,15 +111,11 @@ describe('Plugin State Control Tests', () => {
 
   describe('Input Plugin State Control', () => {
     it('should enable/disable input dynamically', () => {
-      const picker = new ewColorPicker({
-        el: container,
-        hasPanel: true
-      });
+      const picker = new ewColorPicker({ el: container });
 
+      
       const inputPlugin = picker.plugins.ewColorPickerInput;
       expect(inputPlugin).toBeDefined();
-
-      // 初始状态应该有输入框
       expect(inputPlugin.hasInput).toBe(true);
       let input = container.querySelector('.ew-color-picker-input');
       expect(input).toBeTruthy();
@@ -145,14 +136,11 @@ describe('Plugin State Control Tests', () => {
 
   describe('Box Plugin State Control', () => {
     it('should enable/disable box dynamically', () => {
-      const picker = new ewColorPicker({
-        el: container
-      });
+      const picker = new ewColorPicker({ el: container });
 
+      
       const boxPlugin = picker.plugins.ewColorPickerBox;
       expect(boxPlugin).toBeDefined();
-
-      // 初始状态应该有颜色框
       expect(boxPlugin.hasBox).toBe(true);
       let box = container.querySelector('.ew-color-picker-box');
       expect(box).toBeTruthy();
@@ -197,29 +185,23 @@ describe('Plugin State Control Tests', () => {
   });
 
   describe('Hue Plugin State Control', () => {
-    it('should enable/disable hue dynamically', async () => {
-      const picker = new ewColorPicker({
-        el: container,
-        hasPanel: true
-      });
+    it('should enable/disable hue dynamically', () => {
+      const picker = new ewColorPicker({ el: container });
+
+      
       const huePlugin = picker.plugins.ewColorPickerHue;
       expect(huePlugin).toBeDefined();
-      // 打开面板，等待DOM渲染
-      picker.showPanel();
-      await new Promise(r => setTimeout(r, 50));
-      // 初始状态应该有hue滑块
       expect(huePlugin.hasHue).toBe(true);
       let hueBar = container.querySelector('.ew-color-picker-slider-bar');
       expect(hueBar).toBeTruthy();
       // 禁用hue滑块
       huePlugin.enableHue(false);
-      await new Promise(r => setTimeout(r, 10));
       expect(huePlugin.hasHue).toBe(false);
       hueBar = container.querySelector('.ew-color-picker-slider-bar');
       expect(hueBar).toBeFalsy();
+
       // 重新启用hue滑块
       huePlugin.enableHue(true);
-      await new Promise(r => setTimeout(r, 10));
       expect(huePlugin.hasHue).toBe(true);
       hueBar = container.querySelector('.ew-color-picker-slider-bar');
       expect(hueBar).toBeTruthy();
@@ -227,30 +209,23 @@ describe('Plugin State Control Tests', () => {
   });
 
   describe('Alpha Plugin State Control', () => {
-    it('should enable/disable alpha dynamically', async () => {
-      const picker = new ewColorPicker({
-        el: container,
-        hasPanel: true,
-        alpha: true
-      });
+    it('should enable/disable alpha dynamically', () => {
+      const picker = new ewColorPicker({ el: container });
+
+      
       const alphaPlugin = picker.plugins.ewColorPickerAlpha;
       expect(alphaPlugin).toBeDefined();
-      // 打开面板，等待DOM渲染
-      picker.showPanel();
-      await new Promise(r => setTimeout(r, 50));
-      // 初始状态应该有alpha滑块
       expect(alphaPlugin.hasAlpha).toBe(true);
       let alphaBar = container.querySelector('.ew-color-picker-alpha-slider-bar');
       expect(alphaBar).toBeTruthy();
       // 禁用alpha滑块
       alphaPlugin.enableAlpha(false);
-      await new Promise(r => setTimeout(r, 10));
       expect(alphaPlugin.hasAlpha).toBe(false);
       alphaBar = container.querySelector('.ew-color-picker-alpha-slider-bar');
       expect(alphaBar).toBeFalsy();
+
       // 重新启用alpha滑块
       alphaPlugin.enableAlpha(true);
-      await new Promise(r => setTimeout(r, 10));
       expect(alphaPlugin.hasAlpha).toBe(true);
       alphaBar = container.querySelector('.ew-color-picker-alpha-slider-bar');
       expect(alphaBar).toBeTruthy();

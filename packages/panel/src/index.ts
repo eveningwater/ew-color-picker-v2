@@ -57,6 +57,23 @@ export default class ewColorPickerPanelPlugin {
   isHueHorizontal: boolean = false;
   isAlphaHorizontal: boolean = false;
 
+  // 拖拽状态标记
+  isDragging: boolean = false;
+
+  // 节流相关
+  private lastUpdateTime: number = 0;
+  private readonly throttleDelay: number = 16; // 约60fps
+
+  // 节流函数，用于优化拖拽性能
+  private throttledUpdate = (saturation: number, value: number) => {
+    const now = Date.now();
+    if (now - this.lastUpdateTime >= this.throttleDelay) {
+      this.lastUpdateTime = now;
+      this.updateCursorPosition(saturation, value);
+      this.updateColor(saturation, value);
+    }
+  };
+
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
     
@@ -125,10 +142,6 @@ export default class ewColorPickerPanelPlugin {
     this.panelWidth = panelWidth;
     this.panelHeight = 180;
 
-    // // 使用 setProperty 直接设置 CSS 变量
-    // this.panel.style.setProperty("--panel-width", panelWidth + "px");
-    // this.panel.style.setProperty("--panel-height", this.panelHeight + "px");
-
     setStyle(this.panel, {
       '--panel-width': panelWidth + "px",
       '--panel-height': this.panelHeight + "px",
@@ -181,11 +194,73 @@ export default class ewColorPickerPanelPlugin {
       // 静默处理，避免测试时的警告噪音
       return;
     }
+    
     // 面板点击事件
     on(this.panel, "click", (event) =>
       this.handlePanelClick(event as MouseEvent)
     );
+    
+    // 鼠标拖拽事件
     on(this.panel, "mousedown", () => this.handlePanelMouseDown());
+    
+    // 触摸设备支持
+    on(this.panel, "touchstart", (event) => this.handlePanelTouchStart(event as TouchEvent));
+  }
+
+  handlePanelTouchStart(event: TouchEvent) {
+    if (!this.panel) return;
+
+    // 检查禁用状态
+    if (this.options.disabled) {
+      return;
+    }
+
+    // 阻止默认行为
+    event.preventDefault();
+
+    // 添加拖拽状态标记
+    this.isDragging = true;
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (this.isDragging && e.touches.length > 0) {
+        this.handlePanelTouchMove(e);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      this.isDragging = false;
+      off(document, "touchmove", handleTouchMove as EventListener);
+      off(document, "touchend", handleTouchEnd as EventListener);
+    };
+
+    on(document, "touchmove", handleTouchMove as EventListener);
+    on(document, "touchend", handleTouchEnd as EventListener);
+  }
+
+  handlePanelTouchMove(event: TouchEvent) {
+    if (!this.panel || !this.cursor) return;
+
+    // 检查禁用状态
+    if (this.options.disabled) {
+      return;
+    }
+
+    // 阻止默认行为
+    event.preventDefault();
+
+    if (event.touches.length > 0) {
+      const touch = event.touches[0];
+      const rect = getRect(this.panel);
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+
+      // 计算饱和度和明度，确保边界值准确
+      const saturation = Math.max(0, Math.min(100, (x / this.panelWidth) * 100));
+      const value = Math.max(0, Math.min(100, (1 - y / this.panelHeight) * 100));
+
+      // 使用节流函数更新，提升拖拽性能
+      this.throttledUpdate(saturation, value);
+    }
   }
 
   handlePanelClick(event: MouseEvent) {
@@ -219,11 +294,18 @@ export default class ewColorPickerPanelPlugin {
       return;
     }
 
+    // 添加拖拽状态标记
+    this.isDragging = true;
+
     const handleMouseMove = (e: MouseEvent) => {
-      this.handlePanelClick(e);
+      // 使用节流处理拖拽，提升性能
+      if (this.isDragging) {
+        this.handlePanelDrag(e);
+      }
     };
 
     const handleMouseUp = () => {
+      this.isDragging = false;
       off(document, "mousemove", handleMouseMove as EventListener);
       off(document, "mouseup", handleMouseUp as EventListener);
     };
@@ -232,40 +314,51 @@ export default class ewColorPickerPanelPlugin {
     on(document, "mouseup", handleMouseUp as EventListener);
   }
 
+  // 新增专门的拖拽处理函数
+  handlePanelDrag(event: MouseEvent) {
+    if (!this.panel || !this.cursor) return;
+
+    // 检查禁用状态
+    if (this.options.disabled) {
+      return;
+    }
+
+    // 阻止默认行为，避免选中文本
+    event.preventDefault();
+
+    const rect = getRect(this.panel);
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // 计算饱和度和明度，确保边界值准确
+    const saturation = Math.max(0, Math.min(100, (x / this.panelWidth) * 100));
+    const value = Math.max(0, Math.min(100, (1 - y / this.panelHeight) * 100));
+
+    // 使用节流函数更新，提升拖拽性能
+    this.throttledUpdate(saturation, value);
+  }
+
   updateCursorPosition(saturation: number, value: number) {
     if (!this.cursor || !this.panel) return;
+
+    // 重新计算面板尺寸，确保获取到正确的值
+    this.panelWidth = this.panel.offsetWidth;
+    this.panelHeight = this.panel.offsetHeight;
 
     // 计算相对面板的坐标
     // 饱和度：0-100 对应 left: 0-panelWidth
     // 明度：0-100 对应 top: panelHeight-0（注意Y轴方向）
-    const left = Math.max(
-      0,
-      Math.min((saturation / 100) * this.panelWidth, this.panelWidth)
-    );
-    const top = Math.max(
-      0,
-      Math.min((1 - value / 100) * this.panelHeight, this.panelHeight)
-    );
+    let left = (saturation / 100) * this.panelWidth;
+    let top = (1 - value / 100) * this.panelHeight;
 
-    // 考虑CSS中transform: translate(-6px, -6px)的影响
-    // 光标实际尺寸：4px + 6px * 2 = 16px
-    const cursorOffset = 6; // CSS中transform的偏移量
-    
-    // 对于left，当饱和度为100%时，光标应该在最右边边缘
-    const adjustedLeft = Math.max(
-      cursorOffset,
-      Math.min(left, this.panelWidth - cursorOffset)
-    );
-    
-    // 对于top，当明度为100%时，光标应该在最上边边缘
-    const adjustedTop = Math.max(
-      cursorOffset,
-      Math.min(top, this.panelHeight - cursorOffset)
-    );
-
+    // 确保边界值准确
+    // 当饱和度为100%时，光标应该在最右边
+    // 当明度为100%时，光标应该在最上边
+    left = Math.max(0, Math.min(left, this.panelWidth));
+    top = Math.max(0, Math.min(top, this.panelHeight));
     setStyle(this.cursor, {
-      left: `${adjustedLeft}px`,
-      top: `${adjustedTop}px`,
+      left: `${left}px`,
+      top: `${top}px`,
     });
   }
 

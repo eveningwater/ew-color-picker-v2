@@ -10,8 +10,8 @@ export interface WrapperElement extends HTMLElement {
   isEwColorPickerContainer?: boolean;
 }
 
-export interface ewColorPickerConstructorOptions extends Omit<ewColorPickerOptions,'el'>{
-  el: WrapperElement | string;
+export interface ewColorPickerConstructorOptions extends ewColorPickerOptions {
+  el?: WrapperElement | string;
 }
 
 export interface PredefineColor {
@@ -20,7 +20,7 @@ export interface PredefineColor {
 }
 
 export interface ewColorPickerOptions {
-  el: WrapperElement;
+  el?: WrapperElement;
   disabled?: boolean;
   predefineColor?: PredefineColor | string [];
   size?: string;
@@ -83,7 +83,7 @@ export default class ewColorPickerMergeOptions
   [
     k: string
   ]: ewColorPickerMergeOptionsData[keyof ewColorPickerMergeOptionsData];
-  el = document.body;
+  container = document.body;
   constructor() {
     super();
   }
@@ -95,26 +95,26 @@ export default class ewColorPickerMergeOptions
     
     // 处理字符串选择器的情况
     if (isString(options)) {
-      const el = checkContainer(options as string);
+      const container = checkContainer(options as string);
       result = extend({}, defaultConfig, {
-        el,
+        container,
         ...pluginNameProp,
       });
     }
     // 处理对象配置的情况
     else if (isShallowObject(options)) {
-      // 检查是否包含 el 属性
-      if ('el' in (options as any)) {
-        const { el, ...other } = options as ewColorPickerOptions;
+      // 检查是否包含 container 属性
+      if ('container' in (options as any)) {
+        const { container, ...other } = options as ewColorPickerOptions;
         result = extend({}, defaultConfig, {
-          el: checkContainer(el),
+          container: checkContainer(container),
           ...other,
           ...pluginNameProp,
         });
       } else {
-        // 如果没有 el 属性，说明第一个参数是容器，第二个参数是选项
+        // 如果没有 container 属性，说明第一个参数是容器，第二个参数是选项
         result = extend({}, defaultConfig, {
-          el: document.body, // 这里会被后续的 pluginNameProp 覆盖
+          container: document.body, // 这里会被后续的 pluginNameProp 覆盖
           ...(options as Record<string, any>),
           ...pluginNameProp,
         });
@@ -123,7 +123,7 @@ export default class ewColorPickerMergeOptions
     // 处理空值或未定义的情况
     else {
       result = extend({}, defaultConfig, {
-        el: document.body,
+        container: document.body,
         ...pluginNameProp,
       });
     }

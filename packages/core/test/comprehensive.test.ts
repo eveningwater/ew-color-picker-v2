@@ -440,17 +440,20 @@ describe('ewColorPicker 综合配置测试', () => {
   describe('生命周期测试', () => {
     it('应该正确初始化', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core).toBeDefined();
       expect(core.wrapper).toBeDefined();
     });
 
     it('应该正确销毁', () => {
       core = new ewColorPicker({ el: container });
+
       expect(() => core.destroy()).not.toThrow();
     });
 
     it('应该处理多次销毁调用', () => {
       core = new ewColorPicker({ el: container });
+
       core.destroy();
       expect(() => core.destroy()).not.toThrow();
     });
@@ -459,6 +462,7 @@ describe('ewColorPicker 综合配置测试', () => {
   describe('工具方法测试', () => {
     it('应该获取容器元素', () => {
       core = new ewColorPicker({ el: container });
+
       expect(core.getContainer()).toBe(container);
     });
 

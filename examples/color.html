@@ -62,13 +62,6 @@
 
     <script>
         const options = {
-            hasBox: true,
-            hasPanel: true,
-            hasInput: true,
-            hasClear: true,
-            hasSure: true,
-            hue: true,
-            alpha: true,
             predefineColor: [],
             // hueDirection: 'horizontal',    // vertical | horizontal
             alphaDirection: 'horizontal',  // vertical | horizontal
@@ -76,9 +69,8 @@
         }
         // 基础颜色选择器
         const colorPicker1 = new ewColorPicker({
-            el: '#colorPicker1',
             ...options,
-        });
+        }).mount('#colorPicker1');
 
         colorPicker1.on('change', function(color) {
             document.getElementById('result1').textContent = '选择的颜色: ' + color;
