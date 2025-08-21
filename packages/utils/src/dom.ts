@@ -1,4 +1,4 @@
-import { isShallowObject, isString, tryErrorHandler } from "./type";
+import { isNumber, isShallowObject, isString, isUndefined, tryErrorHandler } from "./type";
 import { supportsPassive } from "./env";
 import { extend } from "./base";
 import { warn } from "./assert";
@@ -51,24 +51,28 @@ export const isDom = <T extends HTMLElement>(el: T) =>
     el instanceof HTMLCollection ||
     el instanceof NodeList;
 
+export const baseSetStyle = (el: HTMLElement, property: string, value: string) => {
+  const prop = property.startsWith('--') ? property : property.replace(/([A-Z])/g, '-$1').toLowerCase();
+  el.style.setProperty(prop, value);
+};
+
 export const setStyle = (
   el: HTMLElement,
   style: Partial<SafeCSSStyleDeclaration> | string | Array<{ prop: string; value: string }> = {},
   value?: string | number
 ) => {
-  if (typeof style === 'string' && value !== undefined) {
-    // 兼容 setCss 的用法：setStyle(element, 'left', '10px')
-    const property = style;
-    const finalValue = typeof value === 'number' ? `${value}px` : value;
-    el.style[property as any] = finalValue;
+  if (isString(style) && !isUndefined(value)) {
+    const finalValue = isNumber(value) ? `${value}px` : value;
+    baseSetStyle(el, style, finalValue);
   } else if (Array.isArray(style)) {
-    // 兼容 setSomeCss 的用法：setStyle(element, [{ prop: 'left', value: '10px' }, { prop: 'top', value: '20px' }])
     style.forEach(({ prop, value }) => {
-      el.style[prop as any] = value;
+      baseSetStyle(el, prop, value);
     });
   } else {
-    // 原有的用法：setStyle(element, { left: '10px', top: '20px' })
-    extend(el.style, style as SafeCSSStyleDeclaration);
+    // 处理CSS变量和普通样式
+    for (const [key, value] of Object.entries(style)) {
+      baseSetStyle(el, key, value as string);
+    }
   }
 };
 export const removeStyle = (el: HTMLElement, props: string[] = []) => {

@@ -10,15 +10,14 @@ import {
   warn,
   off,
   $,
-  removeNode,
   create,
   addClass,
   insertNode,
+  isObject,
 } from "@ew-color-picker/utils";
 import {
   colorRgbaToHsva,
   colorHsvaToRgba,
-  colorRgbaToHex,
 } from "@ew-color-picker/utils";
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 
@@ -62,7 +61,7 @@ export default class ewColorPickerPanelPlugin {
     this.handleOptions();
     
     // 注册颜色变化事件监听器
-    if (this.ewColorPicker.on && typeof this.ewColorPicker.on === "function") {
+    if (isFunction(this.ewColorPicker.on)) {
       this.ewColorPicker.on("change", (color: string) => {
         // 当颜色改变时，更新面板背景色和光标位置
         if (color && this.panel) {
@@ -77,7 +76,7 @@ export default class ewColorPickerPanelPlugin {
   }
 
   handleOptions() {
-    if (this.ewColorPicker && this.ewColorPicker.options) {
+    if (isObject(this.ewColorPicker.options)) {
       this.options = extend(this.options, this.ewColorPicker.options);
       this.isHueHorizontal = this.options.hueDirection === "horizontal";
       this.isAlphaHorizontal = this.options.alphaDirection === "horizontal";
@@ -101,12 +100,12 @@ export default class ewColorPickerPanelPlugin {
     // 直接使用面板容器
     const panelContainer = this.ewColorPicker.getMountPoint("panelContainer");
     if (!panelContainer) {
-      warn("[ewColorPicker] Panel container not found");
+      warn("[ewColorPicker warning]: Panel container not found");
       return;
     }
-    // 只移除自己负责的 DOM
+
     const oldPanel = $(".ew-color-picker-panel", panelContainer);
-    if (oldPanel) removeNode(oldPanel);
+
 
     // 动态计算面板宽度
     let panelWidth = 285;
@@ -126,12 +125,17 @@ export default class ewColorPickerPanelPlugin {
     this.panelWidth = panelWidth;
     this.panelHeight = 180;
 
-    // 使用 setProperty 直接设置 CSS 变量
-    this.panel.style.setProperty("--panel-width", panelWidth + "px");
-    this.panel.style.setProperty("--panel-height", this.panelHeight + "px");
+    // // 使用 setProperty 直接设置 CSS 变量
+    // this.panel.style.setProperty("--panel-width", panelWidth + "px");
+    // this.panel.style.setProperty("--panel-height", this.panelHeight + "px");
+
+    setStyle(this.panel, {
+      '--panel-width': panelWidth + "px",
+      '--panel-height': this.panelHeight + "px",
+    });
 
     // 组装面板结构
-    insertNode(panelContainer, this.panel);
+    insertNode(panelContainer, this.panel, oldPanel);
 
     // 创建颜色面板
     this.whitePanel = create("div");
