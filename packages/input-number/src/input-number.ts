@@ -11,7 +11,10 @@ import {
   $,
   removeElement,
   insertNode,
+  isFunction,
 } from "@ew-color-picker/utils";
+import { upArrowIcon, downArrowIcon } from "@ew-color-picker/icon";
+import ewColorPicker from "@ew-color-picker/core";
 
 export interface InputNumberOptions {
   value?: number;
@@ -29,17 +32,17 @@ export interface InputNumberOptions {
 
 export default class InputNumber {
   private options: InputNumberOptions;
-  private container: HTMLElement;
-  private input: HTMLInputElement;
-  private upButton: HTMLButtonElement;
-  private downButton: HTMLButtonElement;
+  private container: HTMLElement | null;
+  private input: HTMLInputElement | null;
+  private upButton: HTMLButtonElement | null;
+  private downButton: HTMLButtonElement | null;
   private currentValue: number;
   private isFocused: boolean = false;
 
   // 防抖处理输入事件
   private debouncedOnChange: (value: number) => void;
 
-  ewColorPicker: any;
+  ewColorPicker: ewColorPicker;
   handleOptions?: () => void;
   run?: () => void;
 
@@ -94,14 +97,14 @@ export default class InputNumber {
     addClass(this.upButton, "ew-input-number__button");
     addClass(this.upButton, "ew-input-number__button--up");
     setAttr(this.upButton, { type: "button" });
-    this.upButton.innerHTML = "▲";
+    this.upButton.innerHTML = upArrowIcon();
 
     // 创建下按钮
     this.downButton = create<HTMLButtonElement>("button");
     addClass(this.downButton, "ew-input-number__button");
     addClass(this.downButton, "ew-input-number__button--down");
     setAttr(this.downButton, { type: "button" });
-    this.downButton.innerHTML = "▼";
+    this.downButton.innerHTML = downArrowIcon();
 
     // 组装DOM结构
     insertNode(buttonContainer, this.upButton);
@@ -114,12 +117,6 @@ export default class InputNumber {
   }
 
   private setStyles() {
-    // 容器样式
-    // 输入框样式
-    // 按钮容器样式
-    // 按钮样式
-    // 尺寸样式
-    // 禁用状态
     if (this.options.disabled) {
       this.setDisabled(true);
     }
@@ -127,17 +124,17 @@ export default class InputNumber {
 
   private bindEvents() {
     // 输入框事件
-    on(this.input, "input", this.handleInput.bind(this));
-    on(this.input, "blur", this.handleBlur.bind(this) as EventListener);
-    on(this.input, "focus", this.handleFocus.bind(this) as EventListener);
-    on(this.input, "keydown", this.handleKeydown.bind(this) as EventListener);
+    on(this.input!, "input", this.handleInput.bind(this));
+    on(this.input!, "blur", this.handleBlur.bind(this) as EventListener);
+    on(this.input!, "focus", this.handleFocus.bind(this) as EventListener);
+    on(this.input!, "keydown", this.handleKeydown.bind(this) as EventListener);
 
     // 按钮事件
-    on(this.upButton, "click", this.handleUpClick.bind(this));
-    on(this.downButton, "click", this.handleDownClick.bind(this));
+    on(this.upButton!, "click", this.handleUpClick.bind(this));
+    on(this.downButton!, "click", this.handleDownClick.bind(this));
 
     // 鼠标滚轮事件
-    on(this.container, "wheel", this.handleWheel.bind(this) as EventListener);
+    on(this.container!, "wheel", this.handleWheel.bind(this) as EventListener);
   }
 
   private handleInput(event: Event) {
@@ -153,7 +150,7 @@ export default class InputNumber {
     const numValue = parseFloat(value);
     if (isNaN(numValue)) {
       // 如果不是有效数字，恢复原值
-      this.input.value = this.currentValue.toString();
+      this.input!.value = this.currentValue.toString();
       return;
     }
 
@@ -167,7 +164,7 @@ export default class InputNumber {
 
   private handleBlur(event: FocusEvent) {
     this.isFocused = false;
-    this.removeClass(this.container, "ew-input-number--focused");
+    this.removeClass(this.container!, "ew-input-number--focused");
 
     // 格式化显示值
     this.formatDisplayValue();
@@ -178,7 +175,7 @@ export default class InputNumber {
 
   private handleFocus(event: FocusEvent) {
     this.isFocused = true;
-    this.addClass(this.container, "ew-input-number--focused");
+    this.addClass(this.container!, "ew-input-number--focused");
 
     // 触发focus回调
     this.options.onFocus!(event);
@@ -196,7 +193,7 @@ export default class InputNumber {
         break;
       case "Enter":
         event.preventDefault();
-        this.input.blur();
+        this.input!.blur();
         break;
     }
   }
@@ -261,7 +258,7 @@ export default class InputNumber {
 
   private formatDisplayValue() {
     const precision = this.options.precision!;
-    this.input.value = this.currentValue.toFixed(precision);
+    this.input!.value = this.currentValue.toFixed(precision);
   }
 
   private addClass(element: HTMLElement, className: string) {
@@ -289,45 +286,45 @@ export default class InputNumber {
     this.options.disabled = disabled;
 
     if (disabled) {
-      this.addClass(this.container, "ew-input-number--disabled");
-      setAttr(this.input, { disabled: "true" });
-      setAttr(this.upButton, { disabled: "true" });
-      setAttr(this.downButton, { disabled: "true" });
+      this.addClass(this.container!, "ew-input-number--disabled");
+      setAttr(this.input!, { disabled: "true" });
+      setAttr(this.upButton!, { disabled: "true" });
+      setAttr(this.downButton!, { disabled: "true" });
     } else {
-      this.removeClass(this.container, "ew-input-number--disabled");
-      setAttr(this.input, { disabled: "false" });
-      setAttr(this.upButton, { disabled: "false" });
-      setAttr(this.downButton, { disabled: "false" });
+      this.removeClass(this.container!, "ew-input-number--disabled");
+      setAttr(this.input!, { disabled: "false" });
+      setAttr(this.upButton!, { disabled: "false" });
+      setAttr(this.downButton!, { disabled: "false" });
     }
   }
 
   public getElement(): HTMLElement {
-    return this.container;
+    return this.container!;
   }
 
   public destroy() {
     // 清理事件监听器
-    off(this.input, "input", this.handleInput.bind(this));
-    off(this.input, "blur", this.handleBlur.bind(this) as EventListener);
-    off(this.input, "focus", this.handleFocus.bind(this) as EventListener);
-    off(this.input, "keydown", this.handleKeydown.bind(this) as EventListener);
-    off(this.upButton, "click", this.handleUpClick.bind(this));
-    off(this.downButton, "click", this.handleDownClick.bind(this));
-    off(this.container, "wheel", this.handleWheel.bind(this) as EventListener);
+    off(this.input!, "input", this.handleInput.bind(this));
+    off(this.input!, "blur", this.handleBlur.bind(this) as EventListener);
+    off(this.input!, "focus", this.handleFocus.bind(this) as EventListener);
+    off(this.input!, "keydown", this.handleKeydown.bind(this) as EventListener);
+    off(this.upButton!, "click", this.handleUpClick.bind(this));
+    off(this.downButton!, "click", this.handleDownClick.bind(this));
+    off(this.container!, "wheel", this.handleWheel.bind(this) as EventListener);
     
     // 移除DOM元素
-    if (this.container.parentNode) {
+    if (this.container?.parentNode) {
       removeElement(this.container);
     }
     
     // 清理引用
-    this.container = null as any;
-    this.input = null as any;
-    this.upButton = null as any;
-    this.downButton = null as any;
+    this.container = null;
+    this.input = null;
+    this.upButton = null;
+    this.downButton = null;
   }
 
-  install(core: any) {
+  install(core: ewColorPicker) {
     this.ewColorPicker = core;
     this.handleOptions?.();
     
@@ -337,11 +334,8 @@ export default class InputNumber {
     }
     
     // 注册事件监听器
-    if (core.on && typeof core.on === 'function') {
-      core.on('change', (color: string) => {
-        // 当颜色改变时，可以更新数字输入框的值
-        // 这里可以根据需要实现具体的更新逻辑
-      });
+    if (isFunction(core.on)) {
+      core.on('change', () => {});
     }
     
     this.run?.();
