@@ -88,49 +88,18 @@ export default class ewColorPickerMergeOptions
     super();
   }
   merge(
-    options?: ewColorPickerConstructorOptions | string,
+    options?: ewColorPickerConstructorOptions,
     pluginNameProp?: ewColorPickerBindPluginOptions
   ): ewColorPickerOptions {
-    let result: any;
-    
-    // 处理字符串选择器的情况
-    if (isString(options)) {
-      const el = checkContainer(options as string);
-      result = extend({}, defaultConfig, {
-        el,
-        ...pluginNameProp,
-      });
-    }
-    // 处理对象配置的情况
-    else if (isShallowObject(options)) {
-      // 检查是否包含 el 属性
-      if ('el' in (options as any)) {
-        const { el, ...other } = options as ewColorPickerOptions;
-        result = extend({}, defaultConfig, {
-          el: checkContainer(el),
-          ...other,
-          ...pluginNameProp,
-        });
-      } else {
-        // 如果没有 el 属性，说明第一个参数是容器，第二个参数是选项
-        result = extend({}, defaultConfig, {
-          el: document.body, // 这里会被后续的 pluginNameProp 覆盖
-          ...(options as Record<string, any>),
-          ...pluginNameProp,
-        });
-      }
-    }
-    // 处理空值或未定义的情况
-    else {
-      result = extend({}, defaultConfig, {
-        el: document.body,
-        ...pluginNameProp,
-      });
-    }
-    return result;
+    const { el, ...rest } = options || {};
+    return extend({}, defaultConfig, {
+      ...rest,
+      el: checkContainer(el),
+      ...pluginNameProp,
+    });
   }
   bindOptions(
-    options?: ewColorPickerConstructorOptions | string,
+    options?: ewColorPickerConstructorOptions,
     pluginNameProp: ewColorPickerBindPluginOptions = {}
   ) {
     const mergeOptions = this.merge(options, pluginNameProp);

@@ -55,3 +55,5 @@ export const basicDataTypeList = ["Number", "String", "Function", "Undefined", "
 export const objDataTypeList = ["Object", "Array", "RegExp"] as const;
 export type TypeKey = typeof basicDataTypeList[number] | typeof objDataTypeList[number];
 export type IsTypeUtil = Record<`is${TypeKey}`, <T>(v: T) => boolean>;
+
+export const isNotEmptyObject = <T>(obj: any): obj is NonNullable<T> => isObject(obj) && Object.keys(obj).length > 0;

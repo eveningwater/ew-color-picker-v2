@@ -122,12 +122,23 @@ export default class ewColorPickerHuePlugin {
     addClass(this.hueThumb, "ew-color-picker-slider-thumb");
     insertNode(this.hueBar, this.hueThumb);
     insertNode(hueSlider, this.hueBar);
-    // 插入到 bottom-row 之前
-    const bottomRow = $(".ew-color-picker-bottom-row", panelContainer);
-    if (bottomRow && bottomRow.parentNode) {
-      bottomRow.parentNode.insertBefore(hueSlider, bottomRow);
+    // 根据方向决定插入位置
+    if (this.isHorizontal) {
+      // 水平方向：插入到 bottom-row 之前（底部）
+      const bottomRow = $(".ew-color-picker-bottom-row", panelContainer);
+      if (bottomRow && bottomRow.parentNode) {
+        bottomRow.parentNode.insertBefore(hueSlider, bottomRow);
+      } else {
+        insertNode(panelContainer, hueSlider);
+      }
     } else {
-      insertNode(panelContainer, hueSlider);
+      // 垂直方向：插入到面板之后（顶部）
+      const panel = $(".ew-color-picker-panel", panelContainer);
+      if (panel && panel.parentNode) {
+        panel.parentNode.insertBefore(hueSlider, panel.nextSibling);
+      } else {
+        insertNode(panelContainer, hueSlider);
+      }
     }
     // 设置初始 thumb 位置
     const currentColor = this.ewColorPicker.getColor();

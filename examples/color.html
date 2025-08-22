@@ -61,16 +61,21 @@
     <script src="../packages/ew-color-picker/dist/index.js"></script>
 
     <script>
+        // 测试配置合并
+        console.log('🧪 测试配置合并逻辑');
+        console.log('🧪 ewColorPicker.plugins:', ewColorPicker.plugins);
+        console.log('🧪 ewColorPicker.pluginsMap:', ewColorPicker.pluginsMap);
+        
         const options = {
             predefineColor: [],
-            // hueDirection: 'horizontal',    // vertical | horizontal
-            alphaDirection: 'horizontal',  // vertical | horizontal
+            hueDirection: 'horizontal',    // vertical | horizontal
+            alphaDirection: 'verical',  // vertical | horizontal
             isClickOutside: true,
+            togglePickerAnimation: 'height'
         }
+            
         // 基础颜色选择器
-        const colorPicker1 = new ewColorPicker({
-            ...options,
-        }).mount('#colorPicker1');
+        const colorPicker1 = new ewColorPicker('#colorPicker1', options);
 
         colorPicker1.on('change', function(color) {
             document.getElementById('result1').textContent = '选择的颜色: ' + color;

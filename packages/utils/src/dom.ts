@@ -137,9 +137,6 @@ export const insertNode = (el: HTMLElement, node: Node, oldNode?: Node | null, b
   }
 };
 export const checkContainer = (el: string | HTMLElement | undefined): HTMLElement => {
-  if (!el) {
-    return document.body;
-  }
   if (isString(el)) {
     const element = $(el);
     if (!element) {
@@ -148,7 +145,10 @@ export const checkContainer = (el: string | HTMLElement | undefined): HTMLElemen
     }
     return element;
   }
-  return el;
+  if (isHTMLElement(el)) {
+    return el;
+  }
+  return document.body;
 };
 
 // 移除重复的 removeNode 函数，使用 removeElement 替代

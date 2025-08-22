@@ -126,14 +126,16 @@ export default class ewColorPickerPanelPlugin {
     // 动态计算面板宽度
     let panelWidth = 285;
     if (this.isAlphaHorizontal && this.isHueHorizontal) {
-      panelWidth = 300;
-    }
-    if (
+      // 如果都是水平方向，需要320px宽度（外层容器最小宽度）
+      panelWidth = 320;
+    } else if (
       (this.isAlphaHorizontal && !this.isHueHorizontal) ||
       (!this.isAlphaHorizontal && this.isHueHorizontal)
     ) {
-      panelWidth = 285 + 12;
+      // 如果一个是水平，一个是垂直，需要297px宽度,4px的margin-left,似乎要多1px的偏差
+      panelWidth = 285 + 12 + 5;
     }
+    // 如果都是垂直方向，保持285px宽度
     this.panel = create("div");
     addClass(this.panel, "ew-color-picker-panel");
     addClass(this.panel, "ew-color-picker-panel-dynamic-size");

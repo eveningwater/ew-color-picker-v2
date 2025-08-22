@@ -25,6 +25,7 @@ import {
   isObject,
   isString,
   isHTMLElement,
+  isNotEmptyObject,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -68,8 +69,6 @@ export interface HsvaColor {
   a: number;
 }
 
-
-
 // 重新导出类型
 export {
   ewColorPickerOptions,
@@ -81,6 +80,7 @@ export {
 const getRegisteredPlugins = () => {
   const plugins: Record<string, boolean> = {};
   ewColorPicker.plugins.forEach((plugin) => {
+    // 只设置插件启用状态，不覆盖其他配置
     plugins[plugin.name] = true;
   });
   return plugins;
@@ -186,7 +186,7 @@ export default class ewColorPicker extends EventEmitter {
   ) {
     super(EVENT_TYPES);
 
-    this.options = this.normalizeOptions(options, secondOptions);
+          this.options = this.normalizeOptions(options, secondOptions);
 
     // 初始化实例
     this.init();
@@ -208,12 +208,25 @@ export default class ewColorPicker extends EventEmitter {
     options?: ewColorPickerConstructorOptions | string | HTMLElement,
     secondOptions?: ewColorPickerConstructorOptions
   ) {
-    let finalOptions: ewColorPickerConstructorOptions | string;
+    let finalOptions: ewColorPickerConstructorOptions;
     if (isHTMLElement(options)) {
       if (secondOptions) {
         const { el, ...otherOptions } = secondOptions;
         finalOptions = {
+          el: options,  // 第一个参数是容器
+          ...otherOptions,
+        };
+      } else {
+        finalOptions = {
           el: options,
+        };
+      }
+      this.shouldAutoMount = true;
+    } else if (isString(options)) {
+      if (secondOptions) {
+        const { el, ...otherOptions } = secondOptions;
+        finalOptions = {
+          el: options,  // 第一个参数是选择器字符串
           ...otherOptions,
         };
       } else {
@@ -223,14 +236,9 @@ export default class ewColorPicker extends EventEmitter {
       }
       this.shouldAutoMount = true;
     } else {
-      if (isString(options)) {
-        finalOptions = { el: options };
+      finalOptions = options as ewColorPickerConstructorOptions;
+      if (isObject(finalOptions) && finalOptions.el) {
         this.shouldAutoMount = true;
-      } else {
-        finalOptions = options as ewColorPickerConstructorOptions;
-        if (isObject(finalOptions) && finalOptions.el) {
-          this.shouldAutoMount = true;
-        }
       }
     }
 
@@ -525,10 +533,10 @@ export default class ewColorPicker extends EventEmitter {
     // 检测插件依赖和注入状态
     this.checkPluginDependencies();
 
-    // 实例化插件
+    // 实例化插件 - 自动启用所有已注册的插件
     sortedPlugins.forEach(({ ctor, name }) => {
       tryErrorHandler(() => {
-        if (this.options[name] && isFunction(ctor)) {
+        if (isFunction(ctor)) {
           this.plugins[name] = new ctor(this);
         }
       });

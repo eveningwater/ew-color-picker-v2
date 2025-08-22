@@ -127,12 +127,23 @@ export default class ewColorPickerAlphaPlugin {
     insertNode(this.alphaBar, this.alphaThumb);
     insertNode(alphaSlider, this.alphaBar);
 
-    // 插入到 bottom-row 之前
-    const bottomRow = $(".ew-color-picker-bottom-row", panelContainer);
-    if (bottomRow && bottomRow.parentNode) {
-      bottomRow.parentNode.insertBefore(alphaSlider, bottomRow);
+    // 根据方向决定插入位置
+    if (this.isHorizontal) {
+      // 水平方向：插入到 bottom-row 之前（底部）
+      const bottomRow = $(".ew-color-picker-bottom-row", panelContainer);
+      if (bottomRow && bottomRow.parentNode) {
+        bottomRow.parentNode.insertBefore(alphaSlider, bottomRow);
+      } else {
+        insertNode(panelContainer, alphaSlider);
+      }
     } else {
-      insertNode(panelContainer, alphaSlider);
+      // 垂直方向：插入到面板之后（顶部）
+      const panel = $(".ew-color-picker-panel", panelContainer);
+      if (panel && panel.parentNode) {
+        panel.parentNode.insertBefore(alphaSlider, panel.nextSibling);
+      } else {
+        insertNode(panelContainer, alphaSlider);
+      }
     }
 
     // 设置初始 thumb 位置

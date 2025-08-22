@@ -203,7 +203,7 @@ export const ani = {
 
 // 获取动画类型
 export function getAnimationType(scope: any): string {
-  return scope.config?.pickerAnimation || 'default';
+  return scope.config?.togglePickerAnimation || 'default';
 }
 
 // 打开动画
