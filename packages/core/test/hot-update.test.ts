@@ -20,8 +20,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const picker = new ewColorPicker({
         el: container,
         defaultColor: '#ff0000', // 红色
-        hue: true,
-        hasPanel: true
+
       });
 
       // 获取初始色相
@@ -46,8 +45,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const picker = new ewColorPicker({
         el: container,
         defaultColor: '#ff0000',
-        alpha: true,
-        hasPanel: true
+
       });
 
       // 初始 alpha 应该是 1
@@ -67,8 +65,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
     it('should handle invalid defaultColor gracefully', () => {
       const picker = new ewColorPicker({
         el: container,
-        defaultColor: '#ff0000',
-        hasPanel: true
+        defaultColor: '#ff0000'
       });
 
       const initialColor = picker.getColor();
@@ -89,9 +86,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
     it('should update hue direction from vertical to horizontal', () => {
       const picker = new ewColorPicker({
         el: container,
-        hue: true,
-        hueDirection: 'vertical',
-        hasPanel: true
+        hueDirection: 'vertical'
       });
 
       // 验证初始方向
@@ -109,8 +104,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
     it('should enable/disable hue plugin dynamically', () => {
       const picker = new ewColorPicker({
         el: container,
-        hue: false,
-        hasPanel: true
+
       });
 
       // 初始时 hue 插件应该未加载
@@ -118,7 +112,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
 
       // 热更新启用 hue
       picker.updateOptions({
-        hue: true
+
       });
 
       // 验证 hue 插件已加载
@@ -129,9 +123,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
   describe('alpha configuration hot update', () => {
     it('should update alpha direction and enable alpha plugin', () => {
       const picker = new ewColorPicker({
-        el: container,
-        alpha: false,
-        hasPanel: true
+        el: container
       });
 
       // 初始时 alpha 插件应该未加载
@@ -139,7 +131,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
 
       // 热更新启用 alpha 并设置方向
       picker.updateOptions({
-        alpha: true,
+
         alphaDirection: 'horizontal'
       });
 
@@ -152,8 +144,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const picker = new ewColorPicker({
         el: container,
         defaultColor: '#ff0000',
-        alpha: false,
-        hasPanel: true
+
       });
 
       // 初始应该是 hex 格式
@@ -162,7 +153,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
 
       // 热更新启用 alpha
       picker.updateOptions({
-        alpha: true
+
       });
 
       // 应该转换为 rgba 格式
@@ -185,8 +176,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const initialColors = ['#ff0000', '#00ff00', '#0000ff'];
       const picker = new ewColorPicker({
         el: container,
-        predefineColor: initialColors,
-        hasPanel: true
+        predefineColor: initialColors
       });
 
       // 验证初始预设颜色
@@ -205,8 +195,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
     it('should handle empty predefined colors array', () => {
       const picker = new ewColorPicker({
         el: container,
-        predefineColor: ['#ff0000', '#00ff00'],
-        hasPanel: true
+        predefineColor: ['#ff0000', '#00ff00']
       });
 
       // 热更新为空数组
@@ -223,8 +212,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
     it('should update size configuration', () => {
       const picker = new ewColorPicker({
         el: container,
-        size: { width: 200, height: 200 },
-        hasPanel: true
+        size: { width: 200, height: 200 }
       });
 
       // 验证初始尺寸
@@ -243,8 +231,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const picker = new ewColorPicker({
         el: container,
         clearText: 'Clear',
-        sureText: 'OK',
-        hasPanel: true
+        sureText: 'OK'
       });
 
       // 验证初始文本
@@ -266,8 +253,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const picker = new ewColorPicker({
         el: container,
         togglePickerAnimation: 'fade',
-        pickerAnimationTime: 300,
-        hasPanel: true
+        pickerAnimationTime: 300
       });
 
       // 验证初始动画配置
@@ -293,8 +279,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
 
       const picker = new ewColorPicker({
         el: container,
-        changeColor: initialCallback,
-        hasPanel: true
+        changeColor: initialCallback
       });
 
       // 触发颜色变化
@@ -319,8 +304,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
       const picker = new ewColorPicker({
         el: container,
         sure: sureCallback,
-        clear: clearCallback,
-        hasPanel: true
+        clear: clearCallback
       });
 
       // 验证回调已设置
@@ -348,8 +332,7 @@ describe('ewColorPicker Hot Update Configuration', () => {
     it('should update multiple configurations simultaneously', () => {
       const picker = new ewColorPicker({
         el: container,
-        defaultColor: '#ff0000',
-        hasPanel: true
+        defaultColor: '#ff0000'
       });
 
       // 同时更新多个配置

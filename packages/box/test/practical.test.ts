@@ -13,7 +13,7 @@ describe('Box Plugin 实用功能测试', () => {
     // 创建模拟的核心实例
     mockCore = {
       options: {
-        hasBox: true,
+
         size: 'normal',
         disabled: false,
         readonly: false,

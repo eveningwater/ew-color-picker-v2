@@ -24,8 +24,8 @@ describe('InputNumber Plugin', () => {
     panelContainer.appendChild(bottomRow);
     
     mockCore = createMockCore(container, {
-      hasInputNumber: true,
-      showInputNumber: true
+      
+      
     });
   });
 

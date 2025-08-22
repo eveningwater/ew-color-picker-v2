@@ -22,8 +22,7 @@ describe('Hue Plugin - defaultColor Integration', () => {
       const spy = vi.spyOn(HuePlugin.prototype, 'updateHueThumbPosition');
       const picker = new ewColorPicker({
         el: container,
-        defaultColor: '#00ff00', // 绿色，hue = 120
-        hasPanel: true // 确保面板插件被加载
+        defaultColor: '#00ff00' // 绿色，hue = 120
       });
       expect(spy).toHaveBeenCalledWith(120);
       spy.mockRestore();
@@ -33,8 +32,7 @@ describe('Hue Plugin - defaultColor Integration', () => {
       const spy = vi.spyOn(HuePlugin.prototype, 'updateHueThumbPosition');
       const picker = new ewColorPicker({
         el: container,
-        defaultColor: '#ff0000', // 红色，hue = 0，与默认值相同
-        hasPanel: true // 确保面板插件被加载
+        defaultColor: '#ff0000' // 红色，hue = 0，与默认值相同
       });
       // 红色 hue = 0，与默认值相同，所以应该被调用但传入 0
       expect(spy).toHaveBeenCalledWith(0);
@@ -44,8 +42,7 @@ describe('Hue Plugin - defaultColor Integration', () => {
     it('should update hue thumb position when showPanel is called with different defaultColor', () => {
       const spy = vi.spyOn(HuePlugin.prototype, 'updateHueThumbPosition');
       const picker = new ewColorPicker({
-        el: container,
-        hasPanel: true // 确保面板插件被加载
+        el: container
       });
       picker.showPanel();
       expect(spy).toHaveBeenCalled();
@@ -67,7 +64,7 @@ describe('Hue Plugin - defaultColor Integration', () => {
         const picker = new ewColorPicker({
           el: testContainer,
           defaultColor: color,
-          hasPanel: true // 确保面板插件被加载
+
         });
         const hsva = colorRgbaToHsva(colorToRgba(color));
         expect(hsva.h).toBe(expectedHue);
@@ -81,8 +78,7 @@ describe('Hue Plugin - defaultColor Integration', () => {
       const spy = vi.spyOn(HuePlugin.prototype, 'updateHueThumbPosition');
       const picker = new ewColorPicker({
         el: container,
-        defaultColor: '#00ff00',
-        hasPanel: true // 确保面板插件被加载
+        defaultColor: '#00ff00'
       });
       const currentColor = picker.getColor();
       expect(currentColor).toBe('#00ff00'); // 应该是 hex 格式
@@ -97,8 +93,7 @@ describe('Hue Plugin - defaultColor Integration', () => {
     it('should expose updateHueThumbPosition method', () => {
       const picker = new ewColorPicker({
         el: container,
-        defaultColor: '#00ff00',
-        hasPanel: true // 确保面板插件被加载
+        defaultColor: '#00ff00'
       });
 
       const huePlugin = picker.plugins.ewColorPickerHue;

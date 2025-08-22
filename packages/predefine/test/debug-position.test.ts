@@ -32,15 +32,7 @@ describe('Predefine Plugin - DOM Position Debug (Real Page Config)', () => {
 
     // 使用与实际页面相同的配置
     const baseOptions = {
-      hasBox: true,
-      hasPanel: true,
-      hasInput: true,
-      hasClear: true,
-      hasSure: true,
-      hue: true,
-      alpha: true,
       isClickOutside: true,
-      openChangeColorMode: true,
       autoPanelPosition: true,
       panelPlacement: 'bottom-start'
     };
@@ -50,7 +42,7 @@ describe('Predefine Plugin - DOM Position Debug (Real Page Config)', () => {
       el: container,
       ...baseOptions,
       predefineColor: ['#ff0000', '#00ff00', '#0000ff'],
-      showPredefine: true
+
     });
 
     // 获取预定义插件实例

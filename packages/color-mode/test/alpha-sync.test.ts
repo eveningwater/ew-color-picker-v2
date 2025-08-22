@@ -20,10 +20,7 @@ describe('Color Mode Plugin - Alpha Synchronization', () => {
     it('should sync alpha input with alpha slider when alpha input changes', () => {
       const picker = new ewColorPicker({
         el: container,
-        alpha: true,
-        openChangeColorMode: true,
-        defaultMode: 'rgb',
-        hasPanel: true
+        defaultMode: 'rgb'
       });
 
       // 等待插件初始化
@@ -52,10 +49,7 @@ describe('Color Mode Plugin - Alpha Synchronization', () => {
     it('should sync alpha slider with alpha input when alpha slider changes', () => {
       const picker = new ewColorPicker({
         el: container,
-        alpha: true,
-        openChangeColorMode: true,
-        defaultMode: 'rgb',
-        hasPanel: true
+        defaultMode: 'rgb'
       });
 
       // 等待插件初始化
@@ -89,10 +83,7 @@ describe('Color Mode Plugin - Alpha Synchronization', () => {
     it('should sync alpha input with alpha slider when alpha input changes in HSL mode', () => {
       const picker = new ewColorPicker({
         el: container,
-        alpha: true,
-        openChangeColorMode: true,
-        defaultMode: 'hsl',
-        hasPanel: true
+        defaultMode: 'hsl'
       });
 
       // 等待插件初始化
@@ -121,10 +112,7 @@ describe('Color Mode Plugin - Alpha Synchronization', () => {
     it('should sync alpha slider with alpha input when alpha slider changes in HSL mode', () => {
       const picker = new ewColorPicker({
         el: container,
-        alpha: true,
-        openChangeColorMode: true,
-        defaultMode: 'hsl',
-        hasPanel: true
+        defaultMode: 'hsl'
       });
 
       // 等待插件初始化
@@ -158,10 +146,7 @@ describe('Color Mode Plugin - Alpha Synchronization', () => {
     it('should maintain alpha sync when switching between RGB and HSL modes', () => {
       const picker = new ewColorPicker({
         el: container,
-        alpha: true,
-        openChangeColorMode: true,
-        defaultMode: 'rgb',
-        hasPanel: true
+        defaultMode: 'rgb'
       });
 
       // 等待插件初始化
