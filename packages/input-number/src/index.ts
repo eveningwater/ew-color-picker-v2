@@ -2,15 +2,13 @@ import { ApplyOrder, isUndefined } from "@ew-color-picker/utils";
 import InputNumber, { InputNumberOptions } from "./input-number";
 import ewColorPicker from "@ew-color-picker/core";
 
-export interface InputNumberPluginOptions {
-  disabled?: boolean;
-}
+
 
 export class ewColorPickerInputNumberPlugin {
   static pluginName = "ewColorPickerInputNumber";
   static applyOrder = ApplyOrder.Post;
 
-  options: InputNumberPluginOptions = {};
+  options: { disabled?: boolean } = {};
   private instances: Map<string, InputNumber> = new Map();
   private ewColorPicker: ewColorPicker | null;
 

@@ -32,6 +32,14 @@ afterAll(() => {
   console.log = originalConsole.log;
 }); 
 
+// 创建通用的测试配置
+export function createTestConfig(container: HTMLElement, options: any = {}) {
+  return {
+    el: container,
+    ...options
+  };
+}
+
 // 创建通用的 mockCore 工厂函数
 export function createMockCore(container: HTMLElement, options: any = {}) {
   // 创建完整的 DOM 结构
@@ -50,20 +58,8 @@ export function createMockCore(container: HTMLElement, options: any = {}) {
   return {
     container,
     options: {
-      showBox: true,
-      showPanel: true,
-      showConsole: true,
-      showHue: true,
-      showAlpha: true,
-      showInput: true,
-      showInputNumber: true,
-      showPredefine: true,
-      showColorMode: true,
-      showButton: true,
-      hasInputNumber: true,
-      openChangeColorMode: true,
       defaultColor: '#ff0000',
-      predefineColors: ['#ff0000', '#00ff00', '#0000ff'],
+      predefineColor: ['#ff0000', '#00ff00', '#0000ff'],
       ...options
     },
     on: vi.fn(),

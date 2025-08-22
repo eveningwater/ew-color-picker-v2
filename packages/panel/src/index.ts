@@ -14,11 +14,10 @@ import {
   addClass,
   insertNode,
   isObject,
-} from "@ew-color-picker/utils";
-import {
   colorRgbaToHsva,
   colorHsvaToRgba,
 } from "@ew-color-picker/utils";
+
 import { ewColorPickerOptions } from "@ew-color-picker/core";
 
 export interface PanelOptions {

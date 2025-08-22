@@ -1,7 +1,8 @@
 import ewColorPickerBoxPlugin from ".";
-import { SizeType } from "@ew-color-picker/core";
 
-export interface BoxProps extends SizeType {
+export interface BoxProps {
+  width?: string | number;
+  height?: string | number;
   defaultColor: string;
   container: HTMLElement;
   boxNoColorIcon: string;

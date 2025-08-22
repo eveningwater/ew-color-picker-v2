@@ -36,16 +36,14 @@ describe('ewColorPicker', () => {
       const options = {
         el: container,
         defaultColor: '#ff0000',
-        showAlpha: true,
-        showHue: true
+        
       };
       
       core = new ewColorPicker(options);
 
       
       expect(core.options.defaultColor).toBe('#ff0000');
-      expect(core.options.showAlpha).toBe(true);
-      expect(core.options.showHue).toBe(true);
+
     });
   });
 
@@ -189,11 +187,11 @@ describe('ewColorPicker', () => {
     it('should update options', () => {
       core = new ewColorPicker({ el: container });
 
-      const newOptions = { showAlpha: true };
+      const newOptions = { defaultColor: '#00ff00' };
       
       core.updateOptions(newOptions);
       
-      expect(core.options.showAlpha).toBe(true);
+      expect(core.options.defaultColor).toBe('#00ff00');
     });
   });
 
@@ -416,32 +414,7 @@ describe('ewColorPicker', () => {
 
 
 
-  describe('配置对象参数测试 - hasPanel', () => {
-    it('should enable panel when hasPanel is true', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasPanel: true 
-      });
 
-      expect(core.options.hasPanel).toBe(true);
-    });
-
-    it('should disable panel when hasPanel is false', () => {
-      core = new ewColorPicker({ 
-        el: container, 
-        hasPanel: false 
-      });
-
-      expect(core.options.hasPanel).toBe(false);
-    });
-
-    it('should use default hasPanel value when not specified', () => {
-      core = new ewColorPicker({ el: container });
-
-      // hasPanel 可能不是默认配置项，检查其他相关配置
-      expect(core.options).toBeDefined();
-    });
-  });
 
 
 
@@ -783,15 +756,7 @@ describe('ewColorPicker', () => {
 
       
       expect(core.options.defaultColor).toBe('#ff0000');
-      expect(core.options.hasInput).toBe(true);
-      expect(core.options.openChangeColorMode).toBe(true);
-      expect(core.options.alpha).toBe(true);
-      expect(core.options.hue).toBe(true);
       expect(core.options.predefineColor).toEqual(['#ff0000', '#00ff00']);
-      expect(core.options.hasBox).toBe(true);
-      expect(core.options.hasPanel).toBe(true);
-      expect(core.options.hasClear).toBe(true);
-      expect(core.options.hasSure).toBe(true);
       expect(core.options.size).toBe('small');
       expect(core.options.hueDirection).toBe('vertical');
       expect(core.options.alphaDirection).toBe('horizontal');

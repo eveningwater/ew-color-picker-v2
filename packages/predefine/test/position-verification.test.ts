@@ -84,7 +84,7 @@ describe('Predefine Plugin Position Verification', () => {
       // 验证mode-container在bottom-row之前
       expect(modeIndex).toBeLessThan(bottomRowIndex);
       
-      console.log('DOM结构顺序:', children.map(child => child.className));
+      
     });
 
     it('should handle existing predefine container and move it to correct position', () => {
@@ -132,7 +132,7 @@ describe('Predefine Plugin Position Verification', () => {
       // 验证predefine容器被移动到了正确位置（在mode-container之前）
       expect(predefineIndex).toBeLessThan(modeIndex);
       
-      console.log('移动后的DOM结构顺序:', children.map(child => child.className));
+      
     });
 
     it('should maintain correct position after multiple renders', () => {
@@ -189,7 +189,7 @@ describe('Predefine Plugin Position Verification', () => {
       expect(predefineIndex2).toBe(predefineIndex1);
       expect(modeIndex2).toBe(modeIndex1);
       
-      console.log('多次渲染后的DOM结构顺序:', children.map(child => child.className));
+      
     });
   });
 }); 

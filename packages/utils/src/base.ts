@@ -77,7 +77,11 @@ export const removeAllSpace = (value: string) => value.replace(/\s+/g, "");
  * @param value
  * @returns
  */
-export const isPromise = (value: any): value is Promise<unknown> => !isUndefined(value) && !isNull(value) && isFunction((value as any).then) && isFunction((value as any).catch);
+export const isPromise = (value: any): value is Promise<unknown> => {
+  if (isUndefined(value) || isNull(value)) return false;
+  const obj = value as any;
+  return isFunction(obj.then) && isFunction(obj.catch);
+};
 
 /**
  * 处理类名

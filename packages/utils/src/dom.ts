@@ -106,7 +106,7 @@ export const getStyle = (
   });
   return result || el.style[styleName];
 };
-// export const getStyle = (el: HTMLElement, prop: keyof CSSStyleDeclaration, pseudoElt?: string) => window.getComputedStyle(el, pseudoElt)[prop];
+
 export const setAttr = <T>(el: HTMLElement, values: Record<string, T>) => {
   if (!isShallowObject(values)) {
     return;

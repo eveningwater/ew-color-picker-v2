@@ -60,12 +60,6 @@ export interface ewColorPickerPluginInstances {
   [name: string]: ewColorPickerPlugin;
 }
 
-// 尺寸类型
-export interface SizeType {
-  width: string | number;
-  height: string | number;
-}
-
 // 颜色类型定义
 export interface HsvaColor {
   h: number;
@@ -74,19 +68,7 @@ export interface HsvaColor {
   a: number;
 }
 
-export interface HslaColor {
-  h: number;
-  s: number;
-  l: number;
-  a: number;
-}
 
-export interface RgbaColor {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-}
 
 // 重新导出类型
 export {
@@ -159,7 +141,6 @@ export default class ewColorPicker extends EventEmitter {
   isAlphaHorizontal: boolean;
   colorMode: readonly string[];
   currentMode: string;
-  modeCount: number;
   pickerFlag: boolean;
   _color_picker_uid: string;
 
@@ -317,7 +298,6 @@ export default class ewColorPicker extends EventEmitter {
     this.isAlphaHorizontal = this.options.alphaDirection === "horizontal";
     this.colorMode = ["Hex", "RGB", "HSV"] as const;
     this.currentMode = "Hex";
-    this.modeCount = 0;
     this.pickerFlag = false;
   }
 
@@ -483,10 +463,7 @@ export default class ewColorPicker extends EventEmitter {
         this.trigger("toggle", false);
 
         // 调用 togglePicker 回调
-        if (
-          this.options.togglePicker &&
-          isFunction(this.options.togglePicker)
-        ) {
+        if (isFunction(this.options?.togglePicker)) {
           this.options.togglePicker(false);
         }
 
