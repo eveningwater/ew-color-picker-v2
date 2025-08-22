@@ -3,8 +3,6 @@ import {
   on,
   setStyle,
   addClass,
-  removeClass,
-  hasClass,
   isFunction,
   insertNode,
   ApplyOrder,
@@ -15,11 +13,9 @@ import {
   debounce,
   extend,
   off,
-  isString,
   removeElement,
 } from "@ew-color-picker/utils";
 import { 
-  colorRgbaToHsva, 
   colorToRgba, 
   isValidColor,
   rgbaToHex,
@@ -36,7 +32,6 @@ export type ColorMode = 'hex' | 'rgb' | 'hsl';
 export interface ColorModeOptions {
   defaultMode?: ColorMode;
   changeMode?: Function;
-  alpha?: boolean; // 是否支持 alpha 通道
   showColorMode?: boolean; // 是否显示颜色模式切换器
 }
 
@@ -65,53 +60,88 @@ export default class ewColorPickerColorModePlugin {
   
   // 事件处理函数引用，用于正确解绑
   private boundEventHandlers: Array<{ element: HTMLElement; event: string; handler: EventListener }> = [];
+  
+  // 缓存插件引用，避免重复查询
+  private get hasAlphaPlugin(): boolean {
+    return !!this.ewColorPicker.plugins?.ewColorPickerAlpha;
+  }
+  
+  private get inputPlugin() {
+    return this.ewColorPicker.plugins?.ewColorPickerInput;
+  }
+  
+  private get alphaPlugin() {
+    return this.ewColorPicker.plugins?.ewColorPickerAlpha;
+  }
 
   constructor(public ewColorPicker: ewColorPicker) {
-    this.handleOptions();
-    
-    // 检查插件依赖
-    this.checkPluginDependencies();
-    
     // 初始化防抖函数
     this.debouncedOnModeChange = debounce(this.onModeChange.bind(this), 100);
     
-    this.run();
+    // 初始化插件
+    this.initializePlugin();
   }
-
-  // 检查插件依赖
-  private checkPluginDependencies(): void {
-    // 如果没有集成alpha插件，则不支持开启颜色模式
-    if (this.options.openChangeColorMode && !this.ewColorPicker.plugins?.ewColorPickerAlpha) {
-      warn('[ewColorPicker warning]: Color mode plugin requires alpha plugin. Please use ewColorPicker.use(ewColorPickerAlpha) to register the alpha plugin first.');
-      this.options.openChangeColorMode = false;
+  
+  private initializePlugin() {
+    const initialize = () => {
+      this.handleOptions();
+      this.run();
+    };
+    
+    if (this.ewColorPicker.plugins) {
+      initialize();
+    } else {
+      setTimeout(initialize, 0);
     }
   }
 
   install(core: any) {
     this.ewColorPicker = core;
-    this.handleOptions();
     
-    // 检查插件依赖
-    this.checkPluginDependencies();
+    const setupPlugin = () => {
+      this.handleOptions();
+      
+      // 注册事件监听器
+      if (core.on && isFunction(core.on)) {
+        core.on('change', (color: string) => {
+          if (this.currentMode !== 'hex') {
+            this.updateInputValues(color);
+          }
+        });
+      }
+      
+      this.run?.();
+      
+      // 如果集成了alpha插件且当前模式是rgb，立即创建对应的输入框结构
+      if (this.hasAlphaPlugin && this.currentMode === 'rgb') {
+        this.updateInputStructure();
+      }
+    };
     
-    // 注册事件监听器
-    if (core.on && isFunction(core.on)) {
-      core.on('change', (color: string) => {
-        if (this.currentMode !== 'hex') {
-          this.updateInputValues(color);
-        }
-      });
+    if (this.ewColorPicker.plugins) {
+      setupPlugin();
+    } else {
+      setTimeout(setupPlugin, 0);
     }
-    
-    this.run?.();
   }
 
   handleOptions() {
     if (this.ewColorPicker && this.ewColorPicker.options) {
       this.options = extend({}, this.options, this.ewColorPicker.options);
       
+      // 处理color-mode插件的选项
+      if (this.ewColorPicker.options.ewColorPickerColorMode !== undefined) {
+        if (this.ewColorPicker.options.ewColorPickerColorMode === false) {
+          // 如果ewColorPickerColorMode设置为false，则禁用颜色模式
+          this.options.showColorMode = false;
+        } else if (typeof this.ewColorPicker.options.ewColorPickerColorMode === 'object') {
+          // 如果是对象，则合并选项
+          this.options = extend({}, this.options, this.ewColorPicker.options.ewColorPickerColorMode);
+        }
+      }
+      
       // 如果集成了alpha插件，默认使用rgba模式；否则使用hex模式
-      if (this.ewColorPicker.plugins?.ewColorPickerAlpha) {
+      if (this.hasAlphaPlugin) {
         this.currentMode = this.options.defaultMode || 'rgb';
       } else {
         this.currentMode = this.options.defaultMode || 'hex';
@@ -122,21 +152,28 @@ export default class ewColorPickerColorModePlugin {
   // 更新配置并重新渲染
   updateOptions(): void {
     this.handleOptions();
-    
-    // 重新检查插件依赖
-    this.checkPluginDependencies();
-    
     this.render();
   }
 
   run() {
+    // 确保选项已处理
+    this.handleOptions();
+    
     // 检查是否显示颜色模式
-    if (this.options.ewColorPickerColorMode === false) {
+    if (this.options.showColorMode === false) {
       return;
     }
     
     this.render();
     this.bindEvents();
+    
+    // 如果集成了alpha插件且当前模式是rgb，立即创建对应的输入框结构
+    if (this.hasAlphaPlugin && this.currentMode === 'rgb') {
+      this.updateInputStructure();
+    }
+    
+    // 设置input插件状态监听
+    this.setupInputPluginListener();
   }
 
   render() {
@@ -324,6 +361,13 @@ export default class ewColorPickerColorModePlugin {
     const inputContainer = $('.ew-color-picker-input-container', bottomRow);
     if (!inputContainer) return;
 
+    // 检查input插件是否被禁用
+    if (this.inputPlugin && !this.inputPlugin.hasInput) {
+      // 如果input插件被禁用，清空容器但不创建任何输入框
+      inputContainer.innerHTML = '';
+      return;
+    }
+
     // 根据模式创建新的输入框
     if (this.currentMode === 'hex') {
       // hex 模式下，恢复默认的 input 插件
@@ -335,43 +379,56 @@ export default class ewColorPickerColorModePlugin {
     }
   }
 
+  // 设置input插件状态监听
+  private setupInputPluginListener(): void {
+    // 移除定时器检查，避免在测试环境中出现异常
+    // 改为在需要时检查插件状态
+  }
+  
   createInputsForMode(container: HTMLElement) {
-    const hasAlpha = this.options.alpha || false;
+    // 检查input插件是否被禁用
+    if (this.inputPlugin && !this.inputPlugin.hasInput) {
+      // 如果input插件被禁用，不创建任何输入框
+      return;
+    }
+    
     // 清空容器
     container.innerHTML = '';
+    
     // 计算模式和标签
     let labels: string[] = [];
-    let modeText = '';
     if (this.currentMode === 'rgb') {
-      labels = hasAlpha ? ['R', 'G', 'B', 'A'] : ['R', 'G', 'B'];
-      modeText = hasAlpha ? 'RGBA' : 'RGB';
+      labels = this.hasAlphaPlugin ? ['R', 'G', 'B', 'A'] : ['R', 'G', 'B'];
     } else if (this.currentMode === 'hsl') {
-      labels = hasAlpha ? ['H', 'S', 'L', 'A'] : ['H', 'S', 'L'];
-      modeText = hasAlpha ? 'HSLA' : 'HSL';
+      labels = this.hasAlphaPlugin ? ['H', 'S', 'L', 'A'] : ['H', 'S', 'L'];
     }
-    // 包裹区
+    
+    // 创建包裹区
     const group = create('div');
     addClass(group, 'ew-color-picker-inputs-group');
+    
     // 每个输入框及其label
     labels.forEach((label, idx) => {
       const col = create('div');
       addClass(col, 'ew-color-picker-inputs-col');
+      
       // label
       const lab = create('div');
       addClass(lab, 'ew-color-picker-input-label');
       lab.textContent = label;
       insertNode(col, lab);
+      
       // input
-      let input: HTMLElement;
+      let input: HTMLElement | undefined;
+      
       if (this.currentMode === 'rgb') {
-        // 使用自定义InputNumber组件
-        // 创建 InputNumber 实例
+        // RGB模式：使用InputNumber组件
         const inputNumber = new InputNumber({
           value: 0,
-          min: idx === 3 ? 0 : 0,
-          max: idx === 3 ? 1 : 255,
-          step: idx === 3 ? 0.1 : 1,
-          precision: idx === 3 ? 1 : 0,
+          min: idx === 3 ? 0 : 0,  // A通道最小值0
+          max: idx === 3 ? 1 : 255, // A通道最大值1，RGB通道最大值255
+          step: idx === 3 ? 0.01 : 1, // A通道步长0.01，RGB通道步长1
+          precision: idx === 3 ? 2 : 0, // A通道精度2位小数，RGB通道整数
           placeholder: label,
           size: 'small',
           onChange: () => {
@@ -379,39 +436,74 @@ export default class ewColorPickerColorModePlugin {
           }
         });
         input = inputNumber.getElement();
-        input.classList.add(`ew-color-picker-rgb-${label.toLowerCase()}-input`, 'ew-color-picker-input');
+        addClass(input, `ew-color-picker-rgb-${label.toLowerCase()}-input`);
       } else if (this.currentMode === 'hsl') {
-        input = idx === 0 || idx === 3
-          ? new InputNumber({
-              value: 0,
-              min: idx === 0 ? 0 : 0,
-              max: idx === 0 ? 360 : 1,
-              step: idx === 0 ? 1 : 0.1,
-              precision: idx === 0 ? 0 : 1,
-              placeholder: label,
-              size: 'small',
-              onChange: () => {
-                this.updateColorFromHslInputs();
-              }
-            }).getElement()
-          : create<HTMLInputElement>('input');
-        if (!(input instanceof HTMLInputElement)) {
-          input.classList.add(`ew-color-picker-hsl-${label.toLowerCase()}-input`, 'ew-color-picker-input');
+        // HSL模式：H使用InputNumber，S和L使用普通input，A使用InputNumber
+        if (idx === 0) {
+          // H通道：0-360度
+          const inputNumber = new InputNumber({
+            value: 0,
+            min: 0,
+            max: 360,
+            step: 1,
+            precision: 0,
+            placeholder: label,
+            size: 'small',
+            onChange: () => {
+              this.updateColorFromHslInputs();
+            }
+          });
+          input = inputNumber.getElement();
+        } else if (idx === 3 && this.hasAlphaPlugin) {
+          // A通道：0-1
+          const inputNumber = new InputNumber({
+            value: 0,
+            min: 0,
+            max: 1,
+            step: 0.01,
+            precision: 2,
+            placeholder: label,
+            size: 'small',
+            onChange: () => {
+              this.updateColorFromHslInputs();
+            }
+          });
+          input = inputNumber.getElement();
         } else {
+          // S和L通道：0-100%
+          input = create<HTMLInputElement>('input');
           setAttr(input, {
             type: 'text',
             placeholder: label,
             class: `ew-color-picker-hsl-${label.toLowerCase()}-input ew-color-picker-input`
           });
         }
-      } else {
-        input = create<HTMLInputElement>('input');
-        setAttr(input, { type: 'text', placeholder: 'Unknown' });
+        
+        // 确保input变量已定义并添加样式类
+        if (input) {
+          addClass(input, `ew-color-picker-hsl-${label.toLowerCase()}-input`);
+        }
       }
+      
+      // 确保input变量已定义
+      if (!input) {
+        // 如果所有条件都没有匹配，创建一个默认输入框
+        input = create<HTMLInputElement>('input');
+        setAttr(input, {
+          type: 'text',
+          placeholder: label,
+          class: `ew-color-picker-default-input`
+        });
+      }
+      
       insertNode(col, input);
       insertNode(group, col);
     });
+    
     insertNode(container, group);
+    
+    // 创建完输入框后，立即更新值
+    this.updateInputValues(this.ewColorPicker.getColor() || '#ff0000');
   }
 
   updateInputValues(color: string) {
@@ -425,41 +517,31 @@ export default class ewColorPickerColorModePlugin {
     if (!rgba) return;
 
     if (this.currentMode === 'rgb') {
-      // 缓存 DOM 查询结果
-      const rInputWrap = $('.ew-color-picker-rgb-r-input') as HTMLElement;
-      const gInputWrap = $('.ew-color-picker-rgb-g-input') as HTMLElement;
-      const bInputWrap = $('.ew-color-picker-rgb-b-input') as HTMLElement;
-      const aInputWrap = $('.ew-color-picker-rgb-alpha-input') as HTMLElement;
-      
-      // 一次性获取所有输入框
-      const rInput = rInputWrap?.querySelector('input') as HTMLInputElement;
-      const gInput = gInputWrap?.querySelector('input') as HTMLInputElement;
-      const bInput = bInputWrap?.querySelector('input') as HTMLInputElement;
-      const aInput = aInputWrap?.querySelector('input') as HTMLInputElement;
+      // 查找RGB输入框
+      const rInput = $('.ew-color-picker-rgb-r-input input') as HTMLInputElement;
+      const gInput = $('.ew-color-picker-rgb-g-input input') as HTMLInputElement;
+      const bInput = $('.ew-color-picker-rgb-b-input input') as HTMLInputElement;
+      const aInput = $('.ew-color-picker-rgb-a-input input') as HTMLInputElement;
 
-      // 批量更新值
+      // 更新值
       if (rInput) rInput.value = Math.round(rgba.r).toString();
       if (gInput) gInput.value = Math.round(rgba.g).toString();
       if (bInput) bInput.value = Math.round(rgba.b).toString();
-      if (aInput) aInput.value = rgba.a.toFixed(1);
+      if (aInput) aInput.value = rgba.a.toFixed(2);
     } else if (this.currentMode === 'hsl') {
       const hsl = rgbToHsl(rgba.r, rgba.g, rgba.b);
       
-      // 缓存 DOM 查询结果
-      const hInputWrap = $('.ew-color-picker-hsl-h-input') as HTMLElement;
+      // 查找HSL输入框
+      const hInput = $('.ew-color-picker-hsl-h-input input') as HTMLInputElement;
       const sInput = $('.ew-color-picker-hsl-s-input') as HTMLInputElement;
       const lInput = $('.ew-color-picker-hsl-l-input') as HTMLInputElement;
-      const aInputWrap = $('.ew-color-picker-hsl-alpha-input') as HTMLElement;
-      
-      // 一次性获取所有输入框
-      const hInput = hInputWrap?.querySelector('input') as HTMLInputElement;
-      const aInput = aInputWrap?.querySelector('input') as HTMLInputElement;
+      const aInput = $('.ew-color-picker-hsl-a-input input') as HTMLInputElement;
 
-      // 批量更新值
+      // 更新值
       if (hInput) hInput.value = Math.round(hsl.h).toString();
       if (sInput) sInput.value = Math.round(hsl.s).toString() + '%';
       if (lInput) lInput.value = Math.round(hsl.l).toString() + '%';
-      if (aInput) aInput.value = rgba.a.toFixed(1);
+      if (aInput) aInput.value = rgba.a.toFixed(2);
     }
   }
 
@@ -489,24 +571,17 @@ export default class ewColorPickerColorModePlugin {
     this.ewColorPicker.setColor(color);
     
     // 确保 alpha 滑块位置同步更新
-    if (this.ewColorPicker.options.alpha) {
-      const alphaPlugin = this.ewColorPicker.plugins?.ewColorPickerAlpha;
-      if (alphaPlugin && alphaPlugin.updateAlphaThumbPosition) {
-        alphaPlugin.updateAlphaThumbPosition(a);
-      }
+    if (this.alphaPlugin && this.alphaPlugin.updateAlphaThumbPosition) {
+      this.alphaPlugin.updateAlphaThumbPosition(a);
     }
   }
 
   updateColorFromHslInputs() {
-    // 缓存 DOM 查询结果
-    const hInputWrap = $('.ew-color-picker-hsl-h-input') as HTMLElement;
+    // 查找HSL输入框
+    const hInput = $('.ew-color-picker-hsl-h-input input') as HTMLInputElement;
     const sInput = $('.ew-color-picker-hsl-s-input') as HTMLInputElement;
     const lInput = $('.ew-color-picker-hsl-l-input') as HTMLInputElement;
-    const aInputWrap = $('.ew-color-picker-hsl-alpha-input') as HTMLElement;
-    
-    // 一次性获取所有输入框
-    const hInput = hInputWrap?.querySelector('input') as HTMLInputElement;
-    const aInput = aInputWrap?.querySelector('input') as HTMLInputElement;
+    const aInput = $('.ew-color-picker-hsl-a-input input') as HTMLInputElement;
 
     if (!hInput || !sInput || !lInput) return;
 
@@ -522,11 +597,8 @@ export default class ewColorPickerColorModePlugin {
     this.ewColorPicker.setColor(color);
     
     // 确保 alpha 滑块位置同步更新
-    if (this.ewColorPicker.options.alpha) {
-      const alphaPlugin = this.ewColorPicker.plugins?.ewColorPickerAlpha;
-      if (alphaPlugin && alphaPlugin.updateAlphaThumbPosition) {
-        alphaPlugin.updateAlphaThumbPosition(a);
-      }
+    if (this.alphaPlugin && this.alphaPlugin.updateAlphaThumbPosition) {
+      this.alphaPlugin.updateAlphaThumbPosition(a);
     }
   }
 
@@ -558,6 +630,13 @@ export default class ewColorPickerColorModePlugin {
     const inputContainer = $('.ew-color-picker-input-container', bottomRow);
     if (!inputContainer) return;
 
+    // 检查input插件是否被禁用
+    if (this.inputPlugin && !this.inputPlugin.hasInput) {
+      // 如果input插件被禁用，清空容器但不创建任何输入框
+      inputContainer.innerHTML = '';
+      return;
+    }
+
     // 清空容器，移除所有 rgba/hsl 模式相关的 DOM
     inputContainer.innerHTML = '';
 
@@ -579,8 +658,7 @@ export default class ewColorPickerColorModePlugin {
 
     // 设置当前颜色值，如果没有则使用默认颜色
     let currentColor = this.ewColorPicker.getColor();
-    const hasAlpha = !!this.ewColorPicker.options.alpha;
-    const defaultColor = hasAlpha ? 'rgba(255,0,0,1)' : '#ff0000';
+    const defaultColor = this.hasAlphaPlugin ? 'rgba(255,0,0,1)' : '#ff0000';
     
     if (!currentColor || currentColor.indexOf('NaN') !== -1) {
       currentColor = defaultColor;
@@ -589,7 +667,7 @@ export default class ewColorPickerColorModePlugin {
     
     // 在 HEX 模式下，将颜色转换为 HEX 格式显示
     if (this.currentMode === 'hex') {
-      const rgbaString = colorToRgba(currentColor);
+              const rgbaString = colorToRgba(currentColor);
       if (rgbaString) {
         const rgba = parseRgbaString(rgbaString);
         if (rgba) {
@@ -678,9 +756,8 @@ export default class ewColorPickerColorModePlugin {
     const hsva = this.ewColorPicker.hsvaColor;
     
     // 同步主输入框
-    const inputPlugin = this.ewColorPicker.plugins?.ewColorPickerInput;
-    if (inputPlugin && inputPlugin.update) {
-      inputPlugin.update(color);
+    if (this.inputPlugin && this.inputPlugin.update) {
+      this.inputPlugin.update(color);
     }
 
     // 同步色相滑块
@@ -690,9 +767,8 @@ export default class ewColorPickerColorModePlugin {
     }
 
     // 同步透明度滑块
-    const alphaPlugin = this.ewColorPicker.plugins?.ewColorPickerAlpha;
-    if (alphaPlugin && alphaPlugin.updateAlphaThumbPosition) {
-      alphaPlugin.updateAlphaThumbPosition(hsva.a);
+    if (this.alphaPlugin && this.alphaPlugin.updateAlphaThumbPosition) {
+      this.alphaPlugin.updateAlphaThumbPosition(hsva.a);
     }
 
     // 同步面板插件

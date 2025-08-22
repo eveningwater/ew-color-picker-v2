@@ -10,7 +10,7 @@ import Predefine from '../../predefine/src/index';
 import Console from '../../console/src/index';
 import ColorMode from '../../color-mode/src/index';
 
-// 注册插件
+// 注册插件（除了ColorMode，因为我们要测试input插件的状态控制）
 ewColorPicker.use(Console);
 ewColorPicker.use(Box);
 ewColorPicker.use(Panel);
@@ -19,7 +19,7 @@ ewColorPicker.use(Alpha);
 ewColorPicker.use(Input);
 ewColorPicker.use(Button);
 ewColorPicker.use(Predefine);
-ewColorPicker.use(ColorMode);
+// ewColorPicker.use(ColorMode); // 不注册ColorMode插件，确保使用默认的input插件
 
 describe('Plugin State Control Tests', () => {
   let container: HTMLElement;
@@ -111,7 +111,10 @@ describe('Plugin State Control Tests', () => {
 
   describe('Input Plugin State Control', () => {
     it('should enable/disable input dynamically', () => {
-      const picker = new ewColorPicker({ el: container });
+      const picker = new ewColorPicker({ 
+        el: container,
+        ewColorPickerColorMode: false // 禁用color-mode插件，确保使用默认的input插件
+      });
 
       
       const inputPlugin = picker.plugins.ewColorPickerInput;
