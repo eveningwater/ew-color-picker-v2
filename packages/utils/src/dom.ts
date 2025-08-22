@@ -41,9 +41,10 @@ export const removeClass = (el: HTMLElement, className: string) => {
   el.className = el.className.replace(reg, " ");
 };
 
+export const isHTMLElement = (el: any): el is HTMLElement => el instanceof HTMLElement;
 export const isDom = <T extends HTMLElement>(el: T) =>
   isShallowObject(HTMLElement)
-    ? el instanceof HTMLElement
+    ? isHTMLElement(el)
     : (el &&
       isShallowObject(el) &&
       el.nodeType === 1 &&

@@ -38,10 +38,14 @@ export const throwError = (message: string): never => {
   throw new Error(`[ewColorPicker error]: ${message}`);
 };
 
-export const tryErrorHandler = (fn: () => void) => {
+export const tryErrorHandler = (fn: () => void, onError?: (error: any) => void) => {
   try {
     fn();
   } catch (err) {
+    if (isFunction(onError)) {
+      onError(err);
+      return;
+    }
     error(`[ewColorPicker error]: ${err}`);
   }
 };

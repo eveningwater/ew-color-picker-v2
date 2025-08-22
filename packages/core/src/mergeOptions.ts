@@ -20,7 +20,7 @@ export interface PredefineColor {
 }
 
 export interface ewColorPickerOptions {
-  el?: WrapperElement;
+  el?: WrapperElement | string;
   disabled?: boolean;
   predefineColor?: PredefineColor | string [];
   size?: string;
@@ -83,7 +83,7 @@ export default class ewColorPickerMergeOptions
   [
     k: string
   ]: ewColorPickerMergeOptionsData[keyof ewColorPickerMergeOptionsData];
-  container = document.body;
+  el: ewColorPickerMountedElement = document.body as ewColorPickerMountedElement;
   constructor() {
     super();
   }
@@ -95,26 +95,26 @@ export default class ewColorPickerMergeOptions
     
     // 处理字符串选择器的情况
     if (isString(options)) {
-      const container = checkContainer(options as string);
+      const el = checkContainer(options as string);
       result = extend({}, defaultConfig, {
-        container,
+        el,
         ...pluginNameProp,
       });
     }
     // 处理对象配置的情况
     else if (isShallowObject(options)) {
-      // 检查是否包含 container 属性
-      if ('container' in (options as any)) {
-        const { container, ...other } = options as ewColorPickerOptions;
+      // 检查是否包含 el 属性
+      if ('el' in (options as any)) {
+        const { el, ...other } = options as ewColorPickerOptions;
         result = extend({}, defaultConfig, {
-          container: checkContainer(container),
+          el: checkContainer(el),
           ...other,
           ...pluginNameProp,
         });
       } else {
-        // 如果没有 container 属性，说明第一个参数是容器，第二个参数是选项
+        // 如果没有 el 属性，说明第一个参数是容器，第二个参数是选项
         result = extend({}, defaultConfig, {
-          container: document.body, // 这里会被后续的 pluginNameProp 覆盖
+          el: document.body, // 这里会被后续的 pluginNameProp 覆盖
           ...(options as Record<string, any>),
           ...pluginNameProp,
         });
@@ -123,7 +123,7 @@ export default class ewColorPickerMergeOptions
     // 处理空值或未定义的情况
     else {
       result = extend({}, defaultConfig, {
-        container: document.body,
+        el: document.body,
         ...pluginNameProp,
       });
     }
