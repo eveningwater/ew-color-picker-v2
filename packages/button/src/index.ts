@@ -129,12 +129,18 @@ export default class ewColorPickerButtonPlugin {
     }
     
     // 查找或创建按钮容器
-    let btnGroup = $('.ew-color-picker-drop-btn-group', bottomRow);
+    let btnGroup = $('.ew-color-picker-drop-btn-group', panelContainer);
     if (!btnGroup) {
       btnGroup = create('div');
       addClass(btnGroup, 'ew-color-picker-drop-btn-group');
-      // 直接插入到 bottomRow
-      insertNode(bottomRow, btnGroup);
+      // 插入到 bottomRow 之后
+      if (bottomRow.nextSibling) {
+        // 如果 bottomRow 有下一个兄弟节点，在它之前插入
+        insertNode(panelContainer, btnGroup, undefined, bottomRow.nextSibling);
+      } else {
+        // 如果没有下一个兄弟节点，追加到末尾
+        insertNode(panelContainer, btnGroup);
+      }
     }
     
     // 清空旧内容
@@ -270,7 +276,7 @@ export default class ewColorPickerButtonPlugin {
     const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
     if (!bottomRow) return;
     
-    const btnGroup = $('.ew-color-picker-drop-btn-group', bottomRow);
+    const btnGroup = $('.ew-color-picker-drop-btn-group', panelContainer);
     if (!btnGroup) return;
     
     // 检查当前颜色模式
