@@ -25,7 +25,6 @@ import {
   isObject,
   isString,
   isHTMLElement,
-  isNotEmptyObject,
 } from "@ew-color-picker/utils";
 import ewColorPickerMergeOptions, {
   ewColorPickerMergeOptionsData,
@@ -33,7 +32,6 @@ import ewColorPickerMergeOptions, {
   ewColorPickerOptions,
   ewColorPickerConstructorOptions,
   WrapperElement,
-  defaultConfig,
 } from "./mergeOptions";
 
 // 插件构造函数接口
@@ -112,8 +110,8 @@ const EVENT_TYPES = [
   "sure",
   "clear",
   "toggle",
-  "optionsUpdate",
-  "modeChange",
+  "options-update",
+  "mode-change",
 ];
 
 // 默认动画时间
@@ -186,7 +184,7 @@ export default class ewColorPicker extends EventEmitter {
   ) {
     super(EVENT_TYPES);
 
-          this.options = this.normalizeOptions(options, secondOptions);
+    this.options = this.normalizeOptions(options, secondOptions);
 
     // 初始化实例
     this.init();
@@ -213,7 +211,7 @@ export default class ewColorPicker extends EventEmitter {
       if (secondOptions) {
         const { el, ...otherOptions } = secondOptions;
         finalOptions = {
-          el: options,  // 第一个参数是容器
+          el: options, // 第一个参数是容器
           ...otherOptions,
         };
       } else {
@@ -226,7 +224,7 @@ export default class ewColorPicker extends EventEmitter {
       if (secondOptions) {
         const { el, ...otherOptions } = secondOptions;
         finalOptions = {
-          el: options,  // 第一个参数是选择器字符串
+          el: options, // 第一个参数是选择器字符串
           ...otherOptions,
         };
       } else {
@@ -262,37 +260,33 @@ export default class ewColorPicker extends EventEmitter {
   private initCoreProperties(): void {
     this.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
 
-    // 如果没有设置默认颜色，则不设置 currentColor
-    if (this.options.defaultColor) {
-      let defaultColor = this.options.defaultColor;
+    const { defaultColor, alphaDirection, hueDirection } = this.options;
 
-      // 检查是否有 alpha 插件来决定颜色格式
+    if (defaultColor) {
+      let defaultColorValue = defaultColor;
       const hasAlphaPlugin = this.plugins?.ewColorPickerAlpha;
       if (hasAlphaPlugin) {
-        // 如果有 alpha 插件，转换为 rgba 格式
+        // 如果 defaultColor 是 hex 格式，转换为 rgba 格式
         if (defaultColor.startsWith("#")) {
-          defaultColor = colorToRgba(defaultColor);
+          defaultColorValue = colorToRgba(defaultColor);
         }
       } else {
-        // 如果没有 alpha 插件，确保是 hex 格式
+        // 如果 defaultColor 是 rgba 格式，转换为 hex 格式
         if (defaultColor.startsWith("rgba")) {
-          defaultColor = colorRgbaToHex(defaultColor);
+          defaultColorValue = colorRgbaToHex(defaultColor);
         }
       }
 
-      this.currentColor = defaultColor;
+      this.currentColor = defaultColorValue;
 
-      // 统一转为 rgba 后再转 hsva
-      let rgbaColor = colorToRgba(defaultColor);
-      // 如果 colorToRgba 返回空字符串，使用 fallback
+      let rgbaColor = colorToRgba(defaultColorValue);
+      // 如果 colorToRgba 返回空字符串
       if (!rgbaColor) {
         rgbaColor = "rgba(255, 0, 0, 1)";
       }
       const newHsva = colorRgbaToHsva(rgbaColor);
       if (!isNaN(newHsva.h)) {
         this.hsvaColor = newHsva;
-        // 通知 hue 插件更新滑块位置（如果插件已加载）
-        this.notifyHuePluginUpdate(newHsva.h);
       }
     } else {
       // 没有默认颜色时，设置为空字符串
@@ -302,8 +296,8 @@ export default class ewColorPicker extends EventEmitter {
     this.panelHeight = 0;
     this.panelLeft = 0;
     this.panelTop = 0;
-    this.isHueHorizontal = this.options.hueDirection === "horizontal";
-    this.isAlphaHorizontal = this.options.alphaDirection === "horizontal";
+    this.isHueHorizontal = hueDirection === "horizontal";
+    this.isAlphaHorizontal = alphaDirection === "horizontal";
     this.colorMode = ["Hex", "RGB", "HSV"] as const;
     this.currentMode = "Hex";
     this.pickerFlag = false;
@@ -316,7 +310,7 @@ export default class ewColorPicker extends EventEmitter {
       class: "ew-color-picker",
       "data-uid": this._color_picker_uid,
     });
-    insertNode(this.options.el, rootElement);
+    insertNode(this.getContainer(), rootElement);
 
     // 设置 wrapper 为创建的主容器
     this.wrapper = rootElement;
@@ -622,48 +616,14 @@ export default class ewColorPicker extends EventEmitter {
         "[ewColorPicker warning]: predefineColor is configured but ewColorPickerPredefine plugin is not injected. Please use ewColorPicker.use(PredefinePlugin) to register the plugin."
       );
     }
-
-    // 检查输入框配置
-    if (
-      this.options.hasInput &&
-      !ewColorPicker.pluginsMap["ewColorPickerInput"]
-    ) {
-      warn(
-        "[ewColorPicker warning]: hasInput is enabled but ewColorPickerInput plugin is not injected. Please use ewColorPicker.use(InputPlugin) to register the plugin."
-      );
-    }
-
-    // 检查按钮配置
-    if (
-      (this.options.hasClear || this.options.hasSure) &&
-      !ewColorPicker.pluginsMap["ewColorPickerButton"]
-    ) {
-      warn(
-        "[ewColorPicker warning]: hasClear or hasSure is enabled but ewColorPickerButton plugin is not injected. Please use ewColorPicker.use(ButtonPlugin) to register the plugin."
-      );
-    }
-
-    // 检查颜色模式切换配置
-    if (!ewColorPicker.pluginsMap["ewColorPickerColorMode"]) {
-      warn(
-        "[ewColorPicker warning]: Color mode functionality requires ewColorPickerColorMode plugin. 请使用 ewColorPicker.use(ColorModePlugin) 注册 color-mode 插件。"
-      );
-    }
-
+   
     // 检查颜色模式切换配置下的 input-number 插件依赖
     if (
       ewColorPicker.pluginsMap["ewColorPickerColorMode"] &&
       !ewColorPicker.pluginsMap["ewColorPickerInputNumber"]
     ) {
       warn(
-        "[ewColorPicker warning]: Color mode plugin requires InputNumber plugin. color-mode 插件依赖 InputNumber 插件。请使用 ewColorPicker.use(InputNumberPlugin) 注册。"
-      );
-    }
-
-    // 检查盒子配置
-    if (this.options.hasBox && !ewColorPicker.pluginsMap["ewColorPickerBox"]) {
-      warn(
-        "[ewColorPicker warning]: hasBox is enabled but ewColorPickerBox plugin is not injected. Please use ewColorPicker.use(BoxPlugin) to register the plugin."
+        "[ewColorPicker warning]: Color mode plugin requires InputNumber plugin. color-mode plugin requires InputNumber plugin. Please use ewColorPicker.use(InputNumberPlugin) to register the plugin."
       );
     }
 
@@ -675,26 +635,14 @@ export default class ewColorPicker extends EventEmitter {
     }
   }
 
-  // 更新现有插件的配置
-  private updateExistingPlugins(): void {
-    if (this.plugins) {
-      Object.values(this.plugins).forEach((plugin) => {
-        tryErrorHandler(() => {
-          if (isFunction(plugin?.updateOptions)) {
-            plugin.updateOptions();
-          }
-        });
-      });
-    }
-  }
-
   // 公共方法
   public updateColor(color: string): void {
     if (this.isDestroyed) return;
 
+    const { changeColor } = this.options || {};
+
     this.currentColor = color;
 
-    // 新增：同步 hsvaColor，确保面板、hue、alpha 等 UI 组件能正确响应
     if (color) {
       const rgbaColor = colorToRgba(color);
       if (rgbaColor) {
@@ -707,12 +655,11 @@ export default class ewColorPicker extends EventEmitter {
     this.trigger("change", color);
 
     // 可选：如果有 changeColor 回调，也可以调用
-    if (isFunction(this.options?.changeColor)) {
-      this.options.changeColor(color);
+    if (isFunction(changeColor)) {
+      changeColor(color);
     }
   }
 
-  // 公共方法：同步所有插件的颜色
   public syncAllPlugins(color: string): void {
     Object.values(this.plugins).forEach((plugin) => {
       if (isFunction(plugin.syncColor)) {
@@ -722,7 +669,7 @@ export default class ewColorPicker extends EventEmitter {
   }
 
   // 更新配置并重新渲染
-  public updateOptions(newOptions: Record<string, any>): void {
+  public updateOptions<T extends string>(newOptions: Record<string, T>): void {
     if (this.isDestroyed) return;
 
     // 合并新配置
@@ -733,13 +680,13 @@ export default class ewColorPicker extends EventEmitter {
     ) as ewColorPickerMergeOptionsData;
 
     // 如果更新了 defaultColor，需要同步更新当前颜色
-    if (newOptions.defaultColor !== undefined) {
+    const { defaultColor } = this.options || {};
+    if (!isUndefined(defaultColor)) {
       // 验证颜色是否有效
-      const rgbaColor = colorToRgba(newOptions.defaultColor);
+      const rgbaColor = colorToRgba(defaultColor);
       if (rgbaColor) {
-        this.setColor(newOptions.defaultColor);
+        this.setColor(defaultColor);
       } else {
-        // 如果颜色无效，使用 fallback 颜色
         this.setColor("#ff0000");
       }
     }
@@ -748,7 +695,7 @@ export default class ewColorPicker extends EventEmitter {
     this.reapplyPlugins();
 
     // 触发配置更新事件
-    this.trigger("optionsUpdate", this.options);
+    this.trigger("options-update", this.options);
   }
 
   public openPicker(): void {
@@ -840,30 +787,31 @@ export default class ewColorPicker extends EventEmitter {
   }
 
   // 添加测试用例期望的方法
-  public use(plugin: any): ewColorPicker {
+  public use(plugin: ewColorPickerPlugin): ewColorPicker {
     if (isFunction(plugin.install)) {
       plugin.install(this);
     }
     return this;
   }
 
-  public emit(event: string, ...args: any[]): void {
+  public emit<T>(event: string, ...args: T[]): void {
     this.trigger(event, ...args);
 
+    const { clear, sure, togglePicker } = this.options || {};
     switch (event) {
       case "clear":
-        if (isFunction(this.options?.clear)) {
-          this.options.clear();
+        if (isFunction(clear)) {
+          clear();
         }
         break;
       case "sure":
-        if (isFunction(this.options?.sure)) {
-          this.options.sure();
+        if (isFunction(sure)) {
+          sure();
         }
         break;
       case "toggle":
-        if (isFunction(this.options?.togglePicker)) {
-          this.options.togglePicker(...args);
+        if (isFunction(togglePicker)) {
+          togglePicker(...args);
         }
         break;
     }

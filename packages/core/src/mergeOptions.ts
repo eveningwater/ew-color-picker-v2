@@ -1,11 +1,8 @@
 import {
   checkContainer,
-  extend,
-  isShallowObject,
-  isString,
+  extend
 } from "@ew-color-picker/utils";
 
-// 定义类型接口，避免循环导入
 export interface WrapperElement extends HTMLElement {
   isEwColorPickerContainer?: boolean;
 }

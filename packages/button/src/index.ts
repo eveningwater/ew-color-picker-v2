@@ -182,7 +182,7 @@ export default class ewColorPickerButtonPlugin {
     }
     
     // 监听颜色模式变化事件
-    this.ewColorPicker.on('modeChange', () => {
+    this.ewColorPicker.on('mode-change', () => {
       this.adjustButtonGroupStyle();
     });
   }

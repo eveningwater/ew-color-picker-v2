@@ -87,8 +87,8 @@ describe('color-mode Plugin', () => {
       const upButton = container.querySelector('.ew-color-picker-mode-up-btn') as HTMLElement;
       expect(upButton).toBeTruthy();
       
-      // 直接调用 onModeChange 方法来测试功能
-      (plugin as any).onModeChange('rgb');
+      // 直接调用 onmode-change 方法来测试功能
+      (plugin as any).onmode-change('rgb');
       
       // Should call trigger or update mode
       expect(mockCore.trigger).toHaveBeenCalled();
@@ -116,8 +116,8 @@ describe('color-mode Plugin', () => {
       expect(upButton).toBeTruthy();
       expect(downButton).toBeTruthy();
       
-      // 测试模式切换 - 直接调用onModeChange方法，避免防抖延迟
-      (plugin as any).onModeChange('rgb');
+      // 测试模式切换 - 直接调用onmode-change方法，避免防抖延迟
+      (plugin as any).onmode-change('rgb');
       expect(plugin.currentMode).toBe('rgb');
     });
   });

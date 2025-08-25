@@ -942,11 +942,11 @@ describe('ewColorPicker', () => {
       expect(core.options.clearText).toBe('清空');
     });
 
-    it('should trigger optionsUpdate event when updating options', () => {
+    it('should trigger options-update event when updating options', () => {
       core = new ewColorPicker({ el: container });
 
       let eventTriggered = false;
-      core.on('optionsUpdate', () => {
+      core.on('options-update', () => {
         eventTriggered = true;
       });
       
