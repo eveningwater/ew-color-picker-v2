@@ -386,23 +386,17 @@ export default class ewColorPicker extends EventEmitter {
 
     // 只有在面板真正需要显示时才设置默认颜色
     // 如果当前没有颜色，且没有设置默认颜色，则设置默认的红色
+    const { defaultColor, pickerAnimationTime, togglePicker } = this.options || {};
     if (!this.currentColor) {
-      let defaultColor = this.options.defaultColor || "#ff0000";
-
-      // 如果开启了 alpha 配置，转换为 rgba 格式
-      if (this.options.alpha) {
-        defaultColor = colorToRgba(defaultColor);
-      }
-
-      this.currentColor = defaultColor;
-      let rgbaColor = colorToRgba(defaultColor);
+      let defaultColorValue = defaultColor || "#ff0000";
+      this.currentColor = defaultColorValue;
+      let rgbaColor = colorToRgba(defaultColorValue);
       if (!rgbaColor) {
         rgbaColor = "rgba(255, 0, 0, 1)";
       }
       const newHsva = colorRgbaToHsva(rgbaColor);
       this.hsvaColor = newHsva;
 
-      // 检查 h 值是否有效，如果有效则通知 hue 插件更新滑块位置
       if (!isNaN(newHsva.h)) {
         this.notifyHuePluginUpdate(newHsva.h);
       }
@@ -410,23 +404,23 @@ export default class ewColorPicker extends EventEmitter {
 
     const type = animationType || getAnimationType(this);
     const time =
-      duration || this.options.pickerAnimationTime || DEFAULT_ANIMATION_TIME;
+      duration || pickerAnimationTime || DEFAULT_ANIMATION_TIME;
 
     open(type, panelContainer, time)
       .then(() => {
         this.pickerFlag = true;
         this.trigger("toggle", true);
 
-        // 调用 togglePicker 回调
-        if (isFunction(this.options.togglePicker)) {
-          this.options.togglePicker(true);
+        if (isFunction(togglePicker)) {
+          togglePicker(true);
         }
 
         this.syncAllPlugins(this.currentColor);
 
         setTimeout(() => {
-          if (isFunction(this.plugins.ewColorPickerPanel?.handleAutoPosition)) {
-            this.plugins.ewColorPickerPanel.handleAutoPosition();
+          const { handleAutoPosition } = this.plugins.ewColorPickerPanel || {};
+          if (isFunction(handleAutoPosition)) {
+            handleAutoPosition();
           }
           on(document, "mousedown", this._onDocumentClick, { capture: true });
         }, 0);
@@ -443,16 +437,18 @@ export default class ewColorPicker extends EventEmitter {
     const panelContainer = this.mountPoints.get("panelContainer");
     if (!panelContainer) return;
 
+    const { pickerAnimationTime, togglePicker, autoPanelPosition } = this.options || {};
+    const hasBox = this.plugins.ewColorPickerBox || false;
     const type = animationType || getAnimationType(this);
     const time =
-      duration || this.options.pickerAnimationTime || DEFAULT_ANIMATION_TIME;
+      duration || pickerAnimationTime || DEFAULT_ANIMATION_TIME;
 
     close(type, panelContainer, time)
       .then(() => {
         if (this.isDestroyed) return;
 
         // 重置自动定位样式
-        if (this.options.autoPanelPosition && this.options.hasBox) {
+        if (autoPanelPosition && hasBox) {
           setStyle(panelContainer, {
             position: "absolute",
             left: "0",
@@ -465,8 +461,8 @@ export default class ewColorPicker extends EventEmitter {
         this.trigger("toggle", false);
 
         // 调用 togglePicker 回调
-        if (isFunction(this.options?.togglePicker)) {
-          this.options.togglePicker(false);
+        if (isFunction(togglePicker)) {
+          togglePicker(false);
         }
 
         off(document, "mousedown", this._onDocumentClick, { capture: true });
@@ -502,7 +498,7 @@ export default class ewColorPicker extends EventEmitter {
   private generateUID(): string {
     return `ew-color-picker-${Date.now()}-${Math.random()
       .toString(36)
-      .substr(2, 9)}`;
+      .substring(2, 11)}`;
   }
 
   private applyPlugins(): void {
