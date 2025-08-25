@@ -56,7 +56,7 @@ export default class ewColorPickerColorModePlugin {
   downButton: HTMLButtonElement | null = null;
   
   // 防抖处理模式切换事件
-  private debouncedOnmode-change: (mode: ColorMode) => void;
+  private debouncedOnModeChange: (mode: ColorMode) => void;
   
   // 事件处理函数引用，用于正确解绑
   private boundEventHandlers: Array<{ element: HTMLElement; event: string; handler: EventListener }> = [];
@@ -76,7 +76,7 @@ export default class ewColorPickerColorModePlugin {
 
   constructor(public ewColorPicker: ewColorPicker) {
     // 初始化防抖函数
-    this.debouncedOnmode-change = debounce(this.onmode-change.bind(this), 100);
+    this.debouncedOnModeChange = debounce(this.onModeChange.bind(this), 100);
     
     // 初始化插件
     this.initializePlugin();
@@ -297,17 +297,17 @@ export default class ewColorPickerColorModePlugin {
     const modes: ColorMode[] = ['hex', 'rgb', 'hsl'];
     const currentIndex = modes.indexOf(this.currentMode);
     const previousIndex = currentIndex > 0 ? currentIndex - 1 : modes.length - 1;
-    this.debouncedOnmode-change(modes[previousIndex]);
+    this.debouncedOnModeChange(modes[previousIndex]);
   }
 
   switchToNextMode() {
     const modes: ColorMode[] = ['hex', 'rgb', 'hsl'];
     const currentIndex = modes.indexOf(this.currentMode);
     const nextIndex = (currentIndex + 1) % modes.length;
-    this.debouncedOnmode-change(modes[nextIndex]);
+    this.debouncedOnModeChange(modes[nextIndex]);
   }
 
-  onmode-change(mode: ColorMode) {
+  onModeChange(mode: ColorMode) {
     this.currentMode = mode;
     
     // 更新模式显示
@@ -616,7 +616,7 @@ export default class ewColorPickerColorModePlugin {
   }
 
   setMode(mode: ColorMode) {
-    this.debouncedOnmode-change(mode);
+    this.debouncedOnModeChange(mode);
   }
 
   // 恢复默认的 input 插件
