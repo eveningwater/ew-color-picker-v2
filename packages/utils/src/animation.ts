@@ -1,3 +1,5 @@
+import { getStyle, setStyle } from "./dom";
+
 // 动画工具模块
 export interface AnimationOptions {
   duration?: number;
@@ -23,7 +25,9 @@ export class Animation {
   // 显示动画
   show(): Promise<void> {
     return new Promise((resolve) => {
-      this.element.style.display = 'block';
+      setStyle(this.element, {
+        display: 'block'
+      });
       resolve();
     });
   }
@@ -31,7 +35,9 @@ export class Animation {
   // 隐藏动画
   hide(): Promise<void> {
     return new Promise((resolve) => {
-      this.element.style.display = 'none';
+      setStyle(this.element, {
+        display: 'none'
+      });
       resolve();
     });
   }
@@ -40,31 +46,38 @@ export class Animation {
   slideDown(): Promise<void> {
     return new Promise((resolve) => {
       // 先设置为 block 以获取真实高度
-      this.element.style.display = 'block';
-      this.element.style.visibility = 'hidden';
-      
+      setStyle(this.element, {
+        display: 'block',
+        visibility: 'hidden'
+      });     
       // 获取元素的完整高度（包括 padding 和 border）
-      const computedStyle = window.getComputedStyle(this.element);
+      const marginTop = getStyle(this.element, 'marginTop') as string;
+      const marginBottom = getStyle(this.element, 'marginBottom') as string;
       const height = this.element.offsetHeight + 
-        parseInt(computedStyle.marginTop) + 
-        parseInt(computedStyle.marginBottom);
+        parseInt(marginTop) + 
+        parseInt(marginBottom);
       
-      // 重置样式
-      this.element.style.height = '0px';
-      this.element.style.overflow = 'hidden';
-      this.element.style.visibility = 'visible';
+      setStyle(this.element, {
+        height: '0px',
+        overflow: 'hidden',
+        visibility: 'visible'
+      });
       
       // 强制重排
       this.element.offsetHeight;
       
       setTimeout(() => {
-        this.element.style.transition = `height ${this.options.duration}ms ${this.options.easing}`;
-        this.element.style.height = `${height}px`;
+        setStyle(this.element, {
+          transition: `height ${this.options.duration}ms ${this.options.easing}`,
+          height: `${height}px`
+        });
         
         setTimeout(() => {
-          this.element.style.height = '';
-          this.element.style.overflow = '';
-          this.element.style.transition = '';
+          setStyle(this.element, {
+            height: '',
+            overflow: '',
+            transition: ''
+          });
           resolve();
         }, this.options.duration!);
       }, this.options.delay);
@@ -75,27 +88,34 @@ export class Animation {
   slideUp(): Promise<void> {
     return new Promise((resolve) => {
       // 获取元素的完整高度
-      const computedStyle = window.getComputedStyle(this.element);
+      const marginTop = getStyle(this.element, 'marginTop') as string;
+      const marginBottom = getStyle(this.element, 'marginBottom') as string;
       const height = this.element.offsetHeight + 
-        parseInt(computedStyle.marginTop) + 
-        parseInt(computedStyle.marginBottom);
+        parseInt(marginTop) + 
+        parseInt(marginBottom);
       
       // 设置初始状态
-      this.element.style.height = `${height}px`;
-      this.element.style.overflow = 'hidden';
+      setStyle(this.element, {
+        height: `${height}px`,
+        overflow: 'hidden'
+      });
       
       // 强制重排
       this.element.offsetHeight;
       
       setTimeout(() => {
-        this.element.style.transition = `height ${this.options.duration}ms ${this.options.easing}`;
-        this.element.style.height = '0px';
+        setStyle(this.element, {
+          height: '0px',
+          transition: `height ${this.options.duration}ms ${this.options.easing}`
+        });
         
         setTimeout(() => {
-          this.element.style.display = 'none';
-          this.element.style.height = '';
-          this.element.style.overflow = '';
-          this.element.style.transition = '';
+          setStyle(this.element, {
+            height: '',
+            overflow: '',
+            transition: '',
+            display: 'none'
+          });
           resolve();
         }, this.options.duration!);
       }, this.options.delay);
@@ -109,8 +129,11 @@ export class Animation {
       const duration = this.options.duration!;
       
       // 设置初始状态
-      element.style.display = 'block';
-      element.style.opacity = '0';
+      setStyle(element, {
+        display: 'block',
+        opacity: '0'
+      });
+
       
       // 强制重排
       element.offsetHeight;
@@ -123,12 +146,16 @@ export class Animation {
         
         // 使用 ease-out 缓动函数
         const easeProgress = 1 - Math.pow(1 - progress, 3);
-        element.style.opacity = easeProgress.toString();
+        setStyle(element, {
+          opacity: easeProgress.toString()
+        });
         
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
-          element.style.opacity = '1';
+          setStyle(element, {
+            opacity: '1'
+          });
           resolve();
         }
       };
@@ -144,8 +171,10 @@ export class Animation {
       const duration = this.options.duration!;
       
       // 确保元素可见
-      element.style.display = 'block';
-      element.style.opacity = '1';
+      setStyle(element, {
+        display: 'block',
+        opacity: '1'
+      });
       
       // 强制重排
       element.offsetHeight;
@@ -158,13 +187,17 @@ export class Animation {
         
         // 使用 ease-in 缓动函数
         const easeProgress = Math.pow(progress, 3);
-        element.style.opacity = (1 - easeProgress).toString();
-        
+        setStyle(element, {
+          opacity: (1 - easeProgress).toString()
+        });
+
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
-          element.style.display = 'none';
-          element.style.opacity = '0';
+          setStyle(element, {
+            display: 'none',
+            opacity: '0'
+          });
           resolve();
         }
       };
