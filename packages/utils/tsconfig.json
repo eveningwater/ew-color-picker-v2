@@ -1,11 +1,18 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "composite": false,
-    "declaration": true,
-    "declarationDir": "dist/types",
     "outDir": "dist",
-    "rootDir": "src"
+    "declarationDir": "dist",
+    "composite": true,
+    "importHelpers": true,
+    "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": [
+    "src/**/*",
+    "../core/src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 } 

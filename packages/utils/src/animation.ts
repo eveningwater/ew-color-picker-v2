@@ -1,4 +1,5 @@
 import { getStyle, setStyle } from "./dom";
+import ewColorPicker  from "@ew-color-picker/core";
 
 // 动画工具模块
 export interface AnimationOptions {
@@ -235,8 +236,8 @@ export const ani = {
 };
 
 // 获取动画类型
-export function getAnimationType(scope: any): string {
-  return scope.config?.togglePickerAnimation || 'default';
+export function getAnimationType(scope: ewColorPicker): string {
+  return scope.options?.togglePickerAnimation || 'default';
 }
 
 // 打开动画
