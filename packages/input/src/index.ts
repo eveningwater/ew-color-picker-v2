@@ -44,12 +44,14 @@ export default class ewColorPickerInputPlugin {
   
   // 防抖处理输入事件
   private debouncedOnInputColor: (value: string) => void;
+  hasAlpha: boolean;
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
     // 初始化防抖函数
     this.debouncedOnInputColor = debounce(this.onInputColor.bind(this), 300);
     this.run();
+    this.hasAlpha = !!this.ewColorPicker.plugins.ewColorPickerAlpha;
   }
 
   // 获取输入框状态
@@ -160,28 +162,10 @@ export default class ewColorPickerInputPlugin {
     
     // 设置当前值
     let currentColor = this.ewColorPicker.getColor();
-    const hasAlpha = !!this.ewColorPicker.options.alpha;
-    const openChangeColorMode = !!this.ewColorPicker.options.openChangeColorMode;
-    
-    // 根据配置确定默认颜色格式
-    let defaultColor: string;
-    if (hasAlpha) {
-      defaultColor = 'rgba(255,0,0,1)';
-    } else if (this.ewColorPicker.plugins?.ewColorPickerColorMode) {
-      // 如果集成了颜色模式插件，根据当前模式设置格式
-      const currentMode = this.ewColorPicker.currentMode || 'HSV';
-      if (currentMode === 'HSL') {
-        defaultColor = 'hsl(0, 100%, 50%)';
-      } else {
-        defaultColor = '#ff0000';
-      }
-    } else {
-      defaultColor = '#ff0000';
-    }
     
     // 检查当前颜色是否有效
     if (!currentColor || currentColor.indexOf('NaN') !== -1) {
-      currentColor = defaultColor;
+      currentColor = this.getDefaultColor();
       // 只有在真正需要时才设置颜色，避免在初始化时强制设置
       if (this.ewColorPicker.currentColor === '') {
         // 如果 currentColor 为空，说明用户没有设置 defaultColor，不应该强制设置
@@ -191,42 +175,8 @@ export default class ewColorPickerInputPlugin {
       }
     }
     
-    // 根据配置格式化颜色显示
-    let displayColor = currentColor;
-    
-    // 检查是否集成了颜色模式插件，并且当前模式是 HEX
-    if (this.ewColorPicker.plugins?.ewColorPickerColorMode) {
-      const colorModePlugin = this.ewColorPicker.plugins.ewColorPickerColorMode;
-      if (colorModePlugin && colorModePlugin.getCurrentMode() === 'hex') {
-        // HEX 模式下，将颜色转换为 HEX 格式显示
-        if (displayColor && !displayColor.startsWith('#')) {
-          const rgbaString = colorToRgba(displayColor);
-          if (rgbaString) {
-            const rgba = parseRgbaString(rgbaString);
-            if (rgba) {
-              displayColor = rgbaToHex(rgba);
-            }
-          }
-        }
-      } else if (hasAlpha && !displayColor.startsWith('rgba')) {
-        // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
-        const hsva = colorRgbaToHsva(displayColor);
-        displayColor = colorHsvaToRgba(hsva);
-      } else if (!hasAlpha && displayColor.startsWith('rgba')) {
-        // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
-        displayColor = colorRgbaToHex(displayColor);
-      }
-    } else {
-      // 没有集成颜色模式插件时的原有逻辑
-      if (hasAlpha && !displayColor.startsWith('rgba')) {
-        // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
-        const hsva = colorRgbaToHsva(displayColor);
-        displayColor = colorHsvaToRgba(hsva);
-      } else if (!hasAlpha && displayColor.startsWith('rgba')) {
-        // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
-        displayColor = colorRgbaToHex(displayColor);
-      }
-    }
+    // 格式化颜色显示
+    const displayColor = this.formatColorForDisplay(currentColor);
     
     if (this.input) {
       this.input.value = displayColor;
@@ -349,64 +299,77 @@ export default class ewColorPickerInputPlugin {
   }
 
   update(color: string) {
-    // 根据配置格式化颜色显示
-    const hasAlpha = !!this.ewColorPicker.options.alpha;
-    const hasColorModePlugin = !!this.ewColorPicker.plugins?.ewColorPickerColorMode;
-    
-    let displayColor = color;
-    
     // 检查颜色是否有效
     if (!color || color.indexOf('NaN') !== -1) {
       // 如果颜色无效，使用默认颜色
-      if (hasAlpha) {
-        displayColor = 'rgba(255,0,0,1)';
-      } else if (hasColorModePlugin) {
-        const currentMode = this.ewColorPicker.currentMode || 'HSV';
-        if (currentMode === 'HSL') {
-          displayColor = 'hsl(0, 100%, 50%)';
-        } else {
-          displayColor = '#ff0000';
-        }
+      color = this.getDefaultColor();
+    }
+    
+    // 格式化颜色显示
+    const displayColor = this.formatColorForDisplay(color);
+    this.setValue(displayColor);
+  }
+
+  // 获取默认颜色
+  private getDefaultColor(): string {
+    if (this.hasAlpha) {
+      return 'rgba(255,0,0,1)';
+    } else if (this.ewColorPicker.plugins?.ewColorPickerColorMode) {
+      // 如果集成了颜色模式插件，根据当前模式设置格式
+      const currentMode = this.ewColorPicker.currentMode || 'HSV';
+      if (currentMode === 'HSL') {
+        return 'hsl(0, 100%, 50%)';
+      }else if(currentMode === 'RGB'){
+        return 'rgba(255,0,0,1)';
       } else {
-        displayColor = '#ff0000';
+        return '#ff0000';
       }
     } else {
-      // 根据配置格式化颜色显示
-      if (hasColorModePlugin) {
-        const colorModePlugin = this.ewColorPicker.plugins.ewColorPickerColorMode;
-        if (colorModePlugin && colorModePlugin.getCurrentMode() === 'hex') {
-          // HEX 模式下，将颜色转换为 HEX 格式显示
-          if (displayColor && !displayColor.startsWith('#')) {
-            const rgbaString = colorToRgba(displayColor);
-            if (rgbaString) {
-              const rgba = parseRgbaString(rgbaString);
-              if (rgba) {
-                displayColor = rgbaToHex(rgba);
-              }
+      return '#ff0000';
+    }
+  }
+
+  // 格式化颜色用于显示
+  private formatColorForDisplay(color: string): string {
+    if (!color) return '';
+    
+    const hasColorModePlugin = !!this.ewColorPicker.plugins?.ewColorPickerColorMode;
+    let displayColor = color;
+    
+    if (hasColorModePlugin) {
+      const colorModePlugin = this.ewColorPicker.plugins.ewColorPickerColorMode;
+      if (colorModePlugin && colorModePlugin.getCurrentMode() === 'hex') {
+        // HEX 模式下，将颜色转换为 HEX 格式显示
+        if (displayColor && !displayColor.startsWith('#')) {
+          const rgbaString = colorToRgba(displayColor);
+          if (rgbaString) {
+            const rgba = parseRgbaString(rgbaString);
+            if (rgba) {
+              displayColor = rgbaToHex(rgba);
             }
           }
-        } else if (hasAlpha && !color.startsWith('rgba')) {
-          // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
-          const hsva = colorRgbaToHsva(color);
-          displayColor = colorHsvaToRgba(hsva);
-        } else if (!hasAlpha && color.startsWith('rgba')) {
-          // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
-          displayColor = colorRgbaToHex(color);
         }
-      } else {
-        // 没有集成颜色模式插件时的原有逻辑
-        if (hasAlpha && !color.startsWith('rgba')) {
-          // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
-          const hsva = colorRgbaToHsva(color);
-          displayColor = colorHsvaToRgba(hsva);
-        } else if (!hasAlpha && color.startsWith('rgba')) {
-          // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
-          displayColor = colorRgbaToHex(color);
-        }
+      } else if (this.hasAlpha && !color.startsWith('rgba')) {
+        // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
+        const hsva = colorRgbaToHsva(color);
+        displayColor = colorHsvaToRgba(hsva);
+      } else if (!this.hasAlpha && color.startsWith('rgba')) {
+        // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
+        displayColor = colorRgbaToHex(color);
+      }
+    } else {
+      // 没有集成颜色模式插件时的原有逻辑
+      if (this.hasAlpha && !color.startsWith('rgba')) {
+        // 如果开启了 alpha 但颜色不是 rgba 格式，转换为 rgba
+        const hsva = colorRgbaToHsva(color);
+        displayColor = colorHsvaToRgba(hsva);
+      } else if (!this.hasAlpha && color.startsWith('rgba')) {
+        // 如果没有开启 alpha 但颜色是 rgba 格式，转换为 hex
+        displayColor = colorRgbaToHex(color);
       }
     }
     
-    this.setValue(displayColor);
+    return displayColor;
   }
 
   destroy() {
@@ -420,12 +383,12 @@ export default class ewColorPickerInputPlugin {
   }
 
   // 新增 install 方法，便于测试
-  install(core: any) {
+  install(core: ewColorPicker) {
     this.ewColorPicker = core;
     this.handleOptions();
     
     // 注册事件监听器
-    if (core.on && typeof core.on === 'function') {
+    if (isFunction(core?.on)) {
       core.on('change', (color: string) => {
         // 当颜色改变时，更新输入框
         this.update(color);
