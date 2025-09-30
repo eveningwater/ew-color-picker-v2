@@ -301,8 +301,12 @@ export default class ewColorPickerInputPlugin {
   update(color: string) {
     // 检查颜色是否有效
     if (!color || color.indexOf('NaN') !== -1) {
-      // 如果颜色无效，使用默认颜色
-      color = this.getDefaultColor();
+      // 如果颜色无效且没有设置 defaultColor，不设置默认颜色
+      if (this.ewColorPicker.currentColor === '') {
+        color = '';
+      } else {
+        color = this.getDefaultColor();
+      }
     }
     
     // 格式化颜色显示

@@ -16,6 +16,7 @@ import {
   isObject,
   colorRgbaToHsva,
   colorHsvaToRgba,
+  getStyle,
 } from "@ew-color-picker/utils";
 
 import { ewColorPickerOptions } from "@ew-color-picker/core";
@@ -88,10 +89,13 @@ export default class ewColorPickerPanelPlugin {
     if (isFunction(this.ewColorPicker?.on)) {
       this.ewColorPicker.on("change", (color: string) => {
         // 当颜色改变时，更新面板背景色和光标位置
+        console.log('[Panel] 收到颜色变化事件:', color);
         if (color && this.panel) {
           const hsva = colorRgbaToHsva(color);
+          console.log('[Panel] 转换后的 HSVA:', hsva);
           this.updateHueBg(hsva.h);
           this.updateCursorPosition(hsva.s, hsva.v);
+          console.log('[Panel] 光标位置已更新');
         }
       });
     }
@@ -381,9 +385,9 @@ export default class ewColorPickerPanelPlugin {
     if (!this.cursor || !this.panel) return;
 
     // 检查面板是否可见
-    const panelStyle = window.getComputedStyle(this.panel);
-    if (panelStyle.display === 'none' || panelStyle.visibility === 'hidden') {
-      // 面板不可见时，跳过更新
+    const display = getStyle(this.panel, 'display');
+    const visibility = getStyle(this.panel, 'visibility');
+    if (display === 'none' || visibility === 'hidden') {
       return;
     }
 

@@ -154,20 +154,16 @@ export default class InputNumber {
       return;
     }
 
-    // 应用精度限制
-    const precision = this.options.precision!;
-    const roundedValue =
-      Math.round(numValue * Math.pow(10, precision)) / Math.pow(10, precision);
-
-    this.updateValue(roundedValue, false);
+    // 只更新当前值，不应用精度限制，让用户完整输入
+    this.currentValue = numValue;
   }
 
   private handleBlur(event: FocusEvent) {
     this.isFocused = false;
     this.removeClass(this.container!, "ew-input-number--focused");
 
-    // 格式化显示值
-    this.formatDisplayValue();
+    // 应用精度限制和边界检查
+    this.updateValue(this.currentValue, false);
 
     // 触发blur回调
     this.options.onBlur!(this.currentValue);

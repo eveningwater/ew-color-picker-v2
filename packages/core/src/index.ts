@@ -388,10 +388,10 @@ export default class ewColorPicker extends EventEmitter {
     if (!panelContainer) return;
 
     // 只有在面板真正需要显示时才设置默认颜色
-    // 如果当前没有颜色，且没有设置默认颜色，则设置默认的红色
+    // 如果当前没有颜色，且设置了默认颜色，则使用默认颜色
     const { defaultColor, pickerAnimationTime, togglePicker } = this.options || {};
-    if (!this.currentColor) {
-      let defaultColorValue = defaultColor || "#ff0000";
+    if (!this.currentColor && defaultColor) {
+      let defaultColorValue = defaultColor;
       this.currentColor = defaultColorValue;
       let rgbaColor = colorToRgba(defaultColorValue);
       if (!rgbaColor) {
@@ -686,7 +686,8 @@ export default class ewColorPicker extends EventEmitter {
       if (rgbaColor) {
         this.setColor(defaultColor);
       } else {
-        this.setColor("#ff0000");
+        // 如果颜色无效，设置为空字符串而不是默认红色
+        this.setColor("");
       }
     }
 

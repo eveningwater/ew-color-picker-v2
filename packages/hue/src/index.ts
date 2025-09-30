@@ -44,9 +44,12 @@ export default class ewColorPickerHuePlugin {
     if (this.ewColorPicker.on && typeof this.ewColorPicker.on === "function") {
       this.ewColorPicker.on("change", (color: string) => {
         // 当颜色改变时，更新 hue 滑块位置
+        console.log('[Hue] 收到颜色变化事件:', color);
         if (color && this.hueThumb) {
           const hsva = colorRgbaToHsva(color);
+          console.log('[Hue] 转换后的 HSVA:', hsva);
           this.updateHueThumbPosition(hsva.h);
+          console.log('[Hue] 色相滑块位置已更新');
         }
       });
     }

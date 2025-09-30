@@ -159,7 +159,7 @@ export function colorHsvaToRgba(hsva: HsvaColor, alpha?: number): string {
   if (alpha !== undefined && alpha >= 0 && alpha <= 1) a = alpha;
   // 将透明度限制为1位小数
   a = Math.round(a * 10) / 10;
-  return `rgba(${Math.ceil(r)}, ${Math.ceil(g)}, ${Math.ceil(b)}, ${a})`;
+  return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`;
 }
 /**
  * hsla to rgba
@@ -192,7 +192,7 @@ export function colorHslaToRgba(hsla: HslaColor): string {
   }
   // 将透明度限制为1位小数
   a = Math.round(a * 10) / 10;
-  return `rgba(${Math.ceil(r * 255)}, ${Math.ceil(g * 255)}, ${Math.ceil(b * 255)}, ${a})`;
+  return `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, ${a})`;
 }
 /**
  * rgba to hsla
@@ -300,7 +300,7 @@ export function colorRgbaToHsva(rgba: string): HsvaColor {
   
   if (diff !== 0) {
     if (max === rNorm) {
-      h = 60 * (((gNorm - bNorm) / diff) % 6);
+      h = 60 * ((gNorm - bNorm) / diff);
     } else if (max === gNorm) {
       h = 60 * ((bNorm - rNorm) / diff + 2);
     } else if (max === bNorm) {

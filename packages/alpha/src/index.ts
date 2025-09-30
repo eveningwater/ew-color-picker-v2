@@ -147,9 +147,11 @@ export default class ewColorPickerAlphaPlugin {
     }
 
     // 设置初始 thumb 位置
-    const currentColor = this.ewColorPicker.getColor() || "#ff0000";
-    const hsva = colorRgbaToHsva(currentColor);
-    this.updateAlphaThumbPosition(hsva.a);
+    const currentColor = this.ewColorPicker.getColor();
+    if (currentColor) {
+      const hsva = colorRgbaToHsva(currentColor);
+      this.updateAlphaThumbPosition(hsva.a);
+    }
   }
 
   bindEvents() {
@@ -217,7 +219,11 @@ export default class ewColorPickerAlphaPlugin {
 
   updateAlpha(alpha: number) {
     // 只更新 alpha，保持 h/s/v 不变
-    let currentColor = this.ewColorPicker.getColor() || "#ff0000";
+    let currentColor = this.ewColorPicker.getColor();
+    if (!currentColor) {
+      // 如果没有当前颜色，不进行更新
+      return;
+    }
     const hsva = colorRgbaToHsva(currentColor);
     hsva.a = alpha;
     const newColor = colorHsvaToRgba(hsva);

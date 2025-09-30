@@ -100,7 +100,10 @@ export default class ewColorPickerButtonPlugin {
   // 更新配置并重新渲染
   updateOptions(): void {
     this.handleOptions();
-    this.render();
+    // 延迟执行，确保在颜色模式插件之后执行
+    setTimeout(() => {
+      this.render();
+    }, 0);
   }
 
   run() {
@@ -109,8 +112,11 @@ export default class ewColorPickerButtonPlugin {
       return;
     }
     
-    this.render();
-    this.bindEvents();
+    // 延迟执行，确保在颜色模式插件之后执行
+    setTimeout(() => {
+      this.render();
+      this.bindEvents();
+    }, 0);
   }
 
   render() {
@@ -270,7 +276,7 @@ export default class ewColorPickerButtonPlugin {
     const bottomRow = $('.ew-color-picker-bottom-row', panelContainer);
     if (!bottomRow) return;
     
-    const btnGroup = $('.ew-color-picker-drop-btn-group', panelContainer);
+    const btnGroup = $('.ew-color-picker-drop-btn-group', bottomRow);
     if (!btnGroup) return;
     
     // 检查当前颜色模式
@@ -292,7 +298,7 @@ export default class ewColorPickerButtonPlugin {
   }
 
   // 新增 install 方法，便于测试
-  install(core: any) {
+  install(core: ewColorPicker) {
     this.ewColorPicker = core;
     this.handleOptions();
     this.run?.();

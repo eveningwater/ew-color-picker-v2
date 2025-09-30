@@ -141,7 +141,7 @@ export function injectStyles(styles?: string, id?: string): void {
       
       .ew-color-picker-box {
         position: relative;
-        background-color: #000000;
+        background-color: #fff;
         transition: background-color 0.3s;
         display: inline-block;
         outline: none;
