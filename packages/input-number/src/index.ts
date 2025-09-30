@@ -1,5 +1,6 @@
 import { ApplyOrder, isUndefined } from "@ew-color-picker/utils";
-import InputNumber, { InputNumberOptions } from "./input-number";
+import InputNumber from "./input-number";
+import type { InputNumberOptions } from "./input-number";
 import ewColorPicker from "@ew-color-picker/core";
 
 
@@ -76,5 +77,6 @@ export class ewColorPickerInputNumberPlugin {
   }
 }
 
-export { InputNumber, InputNumberOptions };
+export { InputNumber };
+export type { InputNumberOptions };
 export default ewColorPickerInputNumberPlugin;

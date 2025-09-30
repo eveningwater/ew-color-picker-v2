@@ -67,7 +67,6 @@ export interface ewColorPickerMergeOptionsData
   extends Omit<ewColorPickerOptions, "el">,
     ewColorPickerCustomOptions {
   el: ewColorPickerMountedElement;
-  [key: string]: any;
 }
 
 export interface ewColorPickerBindPluginOptions {

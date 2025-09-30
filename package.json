@@ -22,6 +22,7 @@
     "build:core": "pnpm -r build:core",
     "build:all": "node scripts/build.js",
     "dev": "pnpm -r dev",
+    "dev:preview": "node scripts/dev-server.js",
     "clean": "pnpm -r clean",
     "build:docs": "node scripts/build-docs.js & cd docs && npm run build",
     "start:docs": "cd docs && npm run start",
@@ -57,6 +58,7 @@
     "@vitest/coverage-v8": "^2.1.8",
     "@vitest/ui": "^2.1.8",
     "chalk": "5.3.0",
+    "chokidar": "^4.0.3",
     "execa": "9.1.0",
     "happy-dom": "^14.12.0",
     "inquirer": "9.2.23",
@@ -71,6 +73,7 @@
     "sass": "^1.83.0",
     "tslib": "^2.6.0",
     "typescript": "5.4.5",
+    "vite": "^7.1.7",
     "vitest": "^2.1.8",
     "zlib": "1.0.5"
   }

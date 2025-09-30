@@ -57,17 +57,17 @@
         </div>
     </div>
 
-    <!-- 引入主包 -->
-    <script src="../packages/ew-color-picker/dist/index.js"></script>
-
-    <script>
+    <!-- 开发模式：使用 ES modules 直接导入源码，Vite 会处理 -->
+    <script type="module">
+        import ewColorPicker from '../packages/ew-color-picker/src/index.ts';
      
         const options = {
             predefineColor: [],
             hueDirection: 'horizontal',    // vertical | horizontal
             alphaDirection: 'horizontal',  // vertical | horizontal
             isClickOutside: true,
-            togglePickerAnimation: 'height'
+            togglePickerAnimation: 'height',
+            autoPanelPosition: true
         }
             
         // 基础颜色选择器
@@ -85,7 +85,6 @@
         colorPicker1.on('toggle', function(flag) {
             console.log('🔄 面板状态变化:', flag ? '显示' : '隐藏');
         });
-
     </script>
 </body>
 </html>

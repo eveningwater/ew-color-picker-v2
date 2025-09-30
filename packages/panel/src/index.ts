@@ -3,7 +3,7 @@ import {
   on,
   setStyle,
   getRect,
-  getClientSize,
+  getElementSize,
   isFunction,
   ApplyOrder,
   extend,
@@ -31,7 +31,7 @@ export default class ewColorPickerPanelPlugin {
   static pluginName = "ewColorPickerPanel";
   static applyOrder = ApplyOrder.Post;
 
-  options: PanelOptions & Omit<ewColorPickerOptions, "el"> = {} as any;
+  options: PanelOptions & Omit<ewColorPickerOptions, "el"> = {};
 
   // DOM 元素
   panel: HTMLElement | null = null;
@@ -75,9 +75,9 @@ export default class ewColorPickerPanelPlugin {
 
   constructor(public ewColorPicker: ewColorPicker) {
     this.handleOptions();
-    
+
     // 注册颜色变化事件监听器
-    if (isFunction(this.ewColorPicker.on)) {
+    if (isFunction(this.ewColorPicker?.on)) {
       this.ewColorPicker.on("change", (color: string) => {
         // 当颜色改变时，更新面板背景色和光标位置
         if (color && this.panel) {
@@ -87,12 +87,12 @@ export default class ewColorPickerPanelPlugin {
         }
       });
     }
-    
+
     this.run();
   }
 
   handleOptions() {
-    if (this.ewColorPicker && this.ewColorPicker.options && isObject(this.ewColorPicker.options)) {
+    if (isObject(this.ewColorPicker?.options)) {
       this.options = extend(this.options, this.ewColorPicker.options);
       this.isHueHorizontal = this.options.hueDirection === "horizontal";
       this.isAlphaHorizontal = this.options.alphaDirection === "horizontal";
@@ -113,21 +113,17 @@ export default class ewColorPickerPanelPlugin {
   }
 
   render() {
-    // 检查 ewColorPicker 实例是否存在
     if (!this.ewColorPicker) {
-      warn("[ewColorPicker warning]: ewColorPicker instance not found");
       return;
     }
-    
+
     // 直接使用面板容器
     const panelContainer = this.ewColorPicker.getMountPoint("panelContainer");
     if (!panelContainer) {
-      warn("[ewColorPicker warning]: Panel container not found");
       return;
     }
 
     const oldPanel = $(".ew-color-picker-panel", panelContainer);
-
 
     // 动态计算面板宽度
     let panelWidth = 285;
@@ -150,8 +146,8 @@ export default class ewColorPickerPanelPlugin {
     this.panelHeight = 180;
 
     setStyle(this.panel, {
-      '--panel-width': panelWidth + "px",
-      '--panel-height': this.panelHeight + "px",
+      "--panel-width": panelWidth + "px",
+      "--panel-height": this.panelHeight + "px",
     });
 
     // 组装面板结构
@@ -180,7 +176,7 @@ export default class ewColorPickerPanelPlugin {
     setTimeout(() => {
       this.calculateContainerSize();
       // 确保 ewColorPicker 实例存在且已完全初始化
-      if (this.ewColorPicker && typeof this.ewColorPicker.getMountPoint === 'function') {
+      if (isFunction(this.ewColorPicker?.getMountPoint)) {
         this.handleAutoPosition();
       }
     }, 0);
@@ -189,7 +185,7 @@ export default class ewColorPickerPanelPlugin {
     this.updateHueBg();
 
     // 根据当前颜色设置初始光标位置
-    if (this.ewColorPicker && typeof this.ewColorPicker.getColor === 'function') {
+    if (isFunction(this.ewColorPicker?.getColor)) {
       const currentColor = this.ewColorPicker.getColor();
       if (currentColor) {
         const hsva = colorRgbaToHsva(currentColor);
@@ -209,17 +205,19 @@ export default class ewColorPickerPanelPlugin {
       // 静默处理，避免测试时的警告噪音
       return;
     }
-    
+
     // 面板点击事件
     on(this.panel, "click", (event) =>
       this.handlePanelClick(event as MouseEvent)
     );
-    
+
     // 鼠标拖拽事件
     on(this.panel, "mousedown", () => this.handlePanelMouseDown());
-    
+
     // 触摸设备支持
-    on(this.panel, "touchstart", (event) => this.handlePanelTouchStart(event as TouchEvent));
+    on(this.panel, "touchstart", (event) =>
+      this.handlePanelTouchStart(event as TouchEvent)
+    );
   }
 
   handlePanelTouchStart(event: TouchEvent) {
@@ -270,8 +268,14 @@ export default class ewColorPickerPanelPlugin {
       const y = touch.clientY - rect.top;
 
       // 计算饱和度和明度，确保边界值准确
-      const saturation = Math.max(0, Math.min(100, (x / this.panelWidth) * 100));
-      const value = Math.max(0, Math.min(100, (1 - y / this.panelHeight) * 100));
+      const saturation = Math.max(
+        0,
+        Math.min(100, (x / this.panelWidth) * 100)
+      );
+      const value = Math.max(
+        0,
+        Math.min(100, (1 - y / this.panelHeight) * 100)
+      );
 
       // 使用节流函数更新，提升拖拽性能
       this.throttledUpdate(saturation, value);
@@ -436,7 +440,6 @@ export default class ewColorPickerPanelPlugin {
 
       // 尝试多种方法获取容器尺寸
       const containerRect = getRect(panelContainer);
-      const clientSize = getClientSize(panelContainer);
       const offsetWidth = panelContainer.offsetWidth;
       const offsetHeight = panelContainer.offsetHeight;
 
@@ -456,366 +459,130 @@ export default class ewColorPickerPanelPlugin {
   }
 
   handleAutoPosition() {
-    try {
-      // 早期返回：如果 ewColorPicker 不存在，直接返回
-      if (!this.ewColorPicker) {
-        return;
-      }
-      
-      // 自动定位逻辑
-      if (
-        this.ewColorPicker.options &&
-        this.ewColorPicker.options.autoPanelPosition &&
-        this.ewColorPicker.options.hasBox
-      ) {
-        const rootElement = this.ewColorPicker.getMountPoint("root");
-        if (!rootElement) {
-          return;
-        }
-        
-        const colorBox = $(".ew-color-picker-box", rootElement);
-        if (!colorBox) {
-          return;
-        }
-        
-        // 获取box相对于根容器的位置和尺寸
-        const boxRect = getRect(colorBox);
-        const rootRect = getRect(rootElement);
-        const boxLeft = boxRect.left - rootRect.left;
-        const boxTop = boxRect.top - rootRect.top;
-        const boxWidth = colorBox.offsetWidth;
-        const boxHeight = colorBox.offsetHeight;
+    const { autoPanelPosition, ewColorPickerBox, panelPlacement } =
+      this.ewColorPicker?.options || {};
 
-        // 解析位置字符串
-        const [position, align] = (
-          this.ewColorPicker.options.panelPlacement || "bottom"
-        ).split("-");
+    if (!autoPanelPosition || !ewColorPickerBox) return;
 
-        // 暂时去掉智能位置选择，只使用配置的位置
-        let finalPosition = position;
-        let finalAlign = align || "";
+    const rootElement = this.ewColorPicker.getMountPoint("root");
+    const colorBox = $(".ew-color-picker-box", rootElement);
+    if (!rootElement || !colorBox) return;
 
-        // 重新计算容器尺寸，确保获取到正确的值
-        this.calculateContainerSize();
+    // 重新计算容器尺寸
+    this.calculateContainerSize();
 
-        // 计算所有方向的位置值
-        const positionMap = this.calculateAllPositions(boxWidth, boxHeight);
+    // 计算位置
+    const { offsetWidth: boxWidth, offsetHeight: boxHeight } =
+      getElementSize(colorBox);
+    const [position = "bottom", align = "center"] = (
+      panelPlacement || "bottom"
+    ).split("-");
 
-        // 获取当前配置的位置
-        const currentPosition =
-          positionMap[`${finalPosition}-${finalAlign}`] ||
-          positionMap[`${finalPosition}-center`];
-        let left = currentPosition.left;
-        let top = currentPosition.top;
+    let { left, top } = this.calculatePosition(
+      position,
+      align,
+      boxWidth,
+      boxHeight
+    );
 
-        // 边界检测和调整
-        const adjustedPosition = this.adjustPositionForBoundaries(
-          left,
-          top,
-          finalPosition,
-          finalAlign,
-          positionMap
-        );
-        left = adjustedPosition.left;
-        top = adjustedPosition.top;
+    // 边界调整
+    const adjusted = this.adjustForViewport(rootElement, left, top);
 
-        // 应用位置（相对于根容器）
-        const panelContainer =
-          this.ewColorPicker.getMountPoint("panelContainer");
-        if (panelContainer) {
-          setStyle(panelContainer, {
-            position: "absolute",
-            left: `${left}px`,
-            top: `${top}px`,
-          });
-        }
-      }
-    } catch (error) {
-      // 静默处理错误，避免测试时的噪音
-      console.warn("[ewColorPicker warning]: handleAutoPosition error:", error);
+    // 应用位置
+    const panelContainer = this.ewColorPicker.getMountPoint("panelContainer");
+    if (panelContainer) {
+      setStyle(panelContainer, {
+        position: "absolute",
+        left: `${adjusted.left}px`,
+        top: `${adjusted.top}px`,
+      });
     }
   }
 
-  calculateAllPositions(boxWidth: number, boxHeight: number) {
-    const positionMap: Record<string, { left: number; top: number }> = {};
-
-    // 计算所有方向和对齐方式的位置
-    const positions = ["top", "bottom", "left", "right"];
-    const aligns = ["start", "end", "center"];
-
-    positions.forEach((position) => {
-      aligns.forEach((align) => {
-        const key = `${position}-${align}`;
-        let left = 0;
-        let top = 0;
-
-        switch (position) {
-          case "top":
-            // top: 面板底部紧贴box顶部
-            top = -this.containerHeight - boxHeight / 2;
-            if (align === "start") {
-              // top-start: 面板左边缘与box左边缘对齐
-              left = -this.containerWidth;
-            } else if (align === "end") {
-              // top-end: 面板右边缘与box右边缘对齐
-              left = boxWidth;
-            } else {
-              // top-center: 面板中心与box中心对齐
-              left = -this.containerWidth / 2 + boxWidth / 2;
-            }
-            break;
-
-          case "bottom":
-            // bottom: 面板顶部紧贴box底部
-            top = boxHeight;
-            if (align === "start") {
-              // bottom-start: 面板左边缘与box左边缘对齐
-              left = -this.containerWidth;
-            } else if (align === "end") {
-              // bottom-end: 面板右边缘与box右边缘对齐
-              left = boxWidth;
-            } else {
-              // bottom-center: 面板中心与box中心对齐
-              left = -this.containerWidth / 2;
-            }
-            break;
-
-          case "left":
-            // left: 面板右边缘紧贴box左边缘
-            left = -this.containerWidth - 5;
-            if (align === "start") {
-              // left-start: 面板顶部与box顶部对齐
-              top = -this.containerHeight - boxHeight / 2;
-            } else if (align === "end") {
-              // left-end: 面板底部与box底部对齐
-              top = boxHeight;
-            } else {
-              // left-center: 面板中心与box中心对齐
-              top = -this.containerHeight / 2;
-            }
-            break;
-
-          case "right":
-            // right: 面板左边缘紧贴box右边缘
-            left = boxWidth + 5;
-            if (align === "start") {
-              // right-start: 面板顶部与box顶部对齐
-              top = -this.containerHeight - boxHeight / 2;
-            } else if (align === "end") {
-              // right-end: 面板底部与box底部对齐
-              top = boxHeight;
-            } else {
-              // right-center: 面板中心与box中心对齐
-              top = -this.containerHeight / 2;
-            }
-            break;
-        }
-
-        positionMap[key] = { left, top };
-      });
-    });
-
-    return positionMap;
-  }
-
-  adjustPositionForBoundaries(
-    left: number,
-    top: number,
+  // 计算面板位置（相对于 box）
+  calculatePosition(
     position: string,
     align: string,
-    positionMap: Record<string, { left: number; top: number }>
+    boxWidth: number,
+    boxHeight: number
   ) {
-    const margin = 8; // 边界边距
-    const rootElement = this.ewColorPicker.getMountPoint("root");
-    const colorBox = rootElement?.querySelector(
-      ".ew-color-picker-box"
-    ) as HTMLElement;
-
-    if (!rootElement || !colorBox) {
-      return { left, top };
-    }
-
-    // 获取根容器在视口中的位置
-    const rootRect = getRect(rootElement);
-    
-    // 修复视口尺寸获取问题
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-
-    // 计算面板在视口中的绝对位置
-    const panelLeftInViewport = rootRect.left + left;
-    const panelTopInViewport = rootRect.top + top;
-    const panelRightInViewport = panelLeftInViewport + this.containerWidth;
-    const panelBottomInViewport = panelTopInViewport + this.containerHeight;
-
-    // 检测边界问题
-    const boundaryIssues = {
-      top: panelTopInViewport < margin,
-      bottom: panelBottomInViewport > viewportHeight - margin,
-      left: panelLeftInViewport < margin,
-      right: panelRightInViewport > viewportWidth - margin,
+    const gap = 5; // box 和 panel 之间的间距
+    const positions: Record<string, { left: number; top: number }> = {
+      // 顶部
+      top: {
+        left:
+          align === "start"
+            ? -this.containerWidth
+            : align === "end"
+            ? boxWidth
+            : (boxWidth - this.containerWidth) / 2,
+        top: -this.containerHeight - boxHeight / 2,
+      },
+      // 底部
+      bottom: {
+        left:
+          align === "start"
+            ? -this.containerWidth
+            : align === "end"
+            ? boxWidth
+            : (boxWidth - this.containerWidth) / 2,
+        top: boxHeight,
+      },
+      // 左侧
+      left: {
+        left: -this.containerWidth - gap,
+        top:
+          align === "start"
+            ? -this.containerHeight - boxHeight / 2
+            : align === "end"
+            ? boxHeight
+            : (boxHeight - this.containerHeight) / 2,
+      },
+      // 右侧
+      right: {
+        left: boxWidth + gap,
+        top:
+          align === "start"
+            ? -this.containerHeight - boxHeight / 2
+            : align === "end"
+            ? boxHeight
+            : (boxHeight - this.containerHeight) / 2,
+      },
     };
 
-    // 如果没有边界问题，直接返回原位置
-    if (
-      !boundaryIssues.top &&
-      !boundaryIssues.bottom &&
-      !boundaryIssues.left &&
-      !boundaryIssues.right
-    ) {
-      return { left, top };
-    }
-
-    // 小屏幕特殊处理：如果面板宽度超过视口宽度的80%，采用移动端定位策略
-    const isSmallScreen = this.containerWidth > viewportWidth * 0.8;
-
-    if (isSmallScreen) {
-      // 获取box的尺寸
-      const boxWidth = colorBox.offsetWidth;
-      const boxHeight = colorBox.offsetHeight;
-
-      // 移动端定位：面板显示在box下方，水平定位在视口右侧
-      const mobileTop = boxHeight; // 面板顶部对齐box底部
-      const mobileLeft = -(viewportWidth - this.containerWidth); // 水平定位在视口右侧
-
-      return { left: mobileLeft, top: mobileTop };
-    }
-
-    // 智能边界调整策略 - 尝试所有可能的位置组合
-    const allPositions = ["top", "bottom", "left", "right"];
-    const allAligns = ["start", "end", "center"];
-
-    let bestPosition = { left, top };
-    let bestIssuesCount = Object.values(boundaryIssues).filter(Boolean).length;
-    let bestPositionKey = `${position}-${align}`;
-
-    // 遍历所有可能的位置和对齐组合
-    for (const testPosition of allPositions) {
-      for (const testAlign of allAligns) {
-        const testPositionKey = `${testPosition}-${testAlign}`;
-        const testPositionValue = positionMap[testPositionKey];
-
-        if (testPositionValue) {
-          // 计算测试位置在视口中的绝对位置
-          const testPanelLeftInViewport =
-            rootRect.left + testPositionValue.left;
-          const testPanelTopInViewport = rootRect.top + testPositionValue.top;
-          const testPanelRightInViewport =
-            testPanelLeftInViewport + this.containerWidth;
-          const testPanelBottomInViewport =
-            testPanelTopInViewport + this.containerHeight;
-
-          // 检测测试位置的边界问题
-          const testBoundaryIssues = {
-            top: testPanelTopInViewport < margin,
-            bottom: testPanelBottomInViewport > viewportHeight - margin,
-            left: testPanelLeftInViewport < margin,
-            right: testPanelRightInViewport > viewportWidth - margin,
-          };
-
-          const testIssuesCount =
-            Object.values(testBoundaryIssues).filter(Boolean).length;
-
-          // 如果这个位置比当前最好的位置更好，更新最佳位置
-          if (testIssuesCount < bestIssuesCount) {
-            bestIssuesCount = testIssuesCount;
-            bestPosition = testPositionValue;
-            bestPositionKey = testPositionKey;
-          }
-        }
-      }
-    }
-
-    // 如果找到了更好的位置，返回它
-    if (
-      bestIssuesCount < Object.values(boundaryIssues).filter(Boolean).length
-    ) {
-      return bestPosition;
-    }
-
-    // 如果所有位置都有问题，尝试强制居中
-    const forcedCenterLeft = Math.max(
-      margin,
-      (viewportWidth - this.containerWidth) / 2
-    );
-    const forcedCenterTop = Math.max(
-      margin,
-      (viewportHeight - this.containerHeight) / 2
-    );
-
-    const finalLeft = Math.min(
-      forcedCenterLeft,
-      viewportWidth - this.containerWidth - margin
-    );
-    const finalTop = Math.min(
-      forcedCenterTop,
-      viewportHeight - this.containerHeight - margin
-    );
-
-    return { left: finalLeft, top: finalTop };
+    return positions[position] || positions.bottom;
   }
 
-  calculatePosition(position: string, align: string) {
-    const rootElement = this.ewColorPicker.getMountPoint("root");
-    const colorBox = rootElement?.querySelector(
-      ".ew-color-picker-box"
-    ) as HTMLElement;
+  // 视口边界调整
+  adjustForViewport(rootElement: HTMLElement, left: number, top: number) {
+    const margin = 8;
+    const rootRect = getRect(rootElement);
+    const viewportWidth =
+      window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight =
+      window.innerHeight || document.documentElement.clientHeight;
 
-    if (!colorBox) {
-      return { left: 0, top: 0 };
-    }
+    // 计算面板在视口中的位置
+    const panelRect = {
+      left: rootRect.left + left,
+      top: rootRect.top + top,
+      right: rootRect.left + left + this.containerWidth,
+      bottom: rootRect.top + top + this.containerHeight,
+    };
 
-    const boxWidth = colorBox.offsetWidth;
-    const boxHeight = colorBox.offsetHeight;
+    // 检查是否超出边界
+    const overflow = {
+      left: margin - panelRect.left,
+      top: margin - panelRect.top,
+      right: panelRect.right - (viewportWidth - margin),
+      bottom: panelRect.bottom - (viewportHeight - margin),
+    };
 
-    let left = 0;
-    let top = 0;
-
-    switch (position) {
-      case "top":
-        top = -this.containerHeight - boxHeight / 2;
-        if (align === "start") {
-          left = -this.containerWidth;
-        } else if (align === "end") {
-          left = boxWidth;
-        } else {
-          left = -this.containerWidth / 2 + boxWidth / 2;
-        }
-        break;
-
-      case "bottom":
-        top = boxHeight;
-        if (align === "start") {
-          left = -this.containerWidth;
-        } else if (align === "end") {
-          left = boxWidth;
-        } else {
-          left = -this.containerWidth / 2;
-        }
-        break;
-
-      case "left":
-        left = -this.containerWidth - 5;
-        if (align === "start") {
-          top = -this.containerHeight - boxHeight / 2;
-        } else if (align === "end") {
-          top = boxHeight;
-        } else {
-          top = -this.containerHeight / 2;
-        }
-        break;
-
-      case "right":
-        left = boxWidth + 5;
-        if (align === "start") {
-          top = -this.containerHeight - boxHeight / 2;
-        } else if (align === "end") {
-          top = boxHeight;
-        } else {
-          top = -this.containerHeight / 2;
-        }
-        break;
-    }
+    // 简单调整：哪边超出就往回推
+    if (overflow.left > 0) left += overflow.left;
+    if (overflow.right > 0) left -= overflow.right;
+    if (overflow.top > 0) top += overflow.top;
+    if (overflow.bottom > 0) top -= overflow.bottom;
 
     return { left, top };
   }
@@ -840,12 +607,12 @@ export default class ewColorPickerPanelPlugin {
   }
 
   // 新增 install 方法，便于测试
-  install(core: any) {
+  install(core: ewColorPicker) {
     this.ewColorPicker = core;
     this.handleOptions();
 
     // 注册事件监听器
-    if (core.on && typeof core.on === "function") {
+    if (isFunction(core?.on)) {
       core.on("change", (color: string) => {
         // 当颜色改变时，更新面板光标位置
         const hsva = colorRgbaToHsva(color);

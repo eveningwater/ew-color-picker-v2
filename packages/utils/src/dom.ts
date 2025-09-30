@@ -156,10 +156,14 @@ export const checkContainer = (el: string | HTMLElement | undefined): HTMLElemen
 // 将 removeNode 作为 removeElement 的别名
 export const removeNode = removeElement;
 
-export function getClientSize(el: HTMLElement) {
+export function getElementSize(el: HTMLElement) {
   return {
-    width: el.clientWidth,
-    height: el.clientHeight,
+    clientWidth: el.clientWidth,
+    clientHeight: el.clientHeight,
+    offsetWidth: el.offsetWidth,
+    offsetHeight: el.offsetHeight,
+    scrollWidth: el.scrollWidth,
+    scrollHeight: el.scrollHeight,
   };
 }
 

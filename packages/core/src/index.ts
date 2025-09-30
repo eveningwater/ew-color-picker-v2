@@ -26,7 +26,8 @@ import {
   isString,
   isHTMLElement,
 } from "@ew-color-picker/utils";
-import ewColorPickerMergeOptions, {
+import ewColorPickerMergeOptions from "./mergeOptions";
+import type {
   ewColorPickerMergeOptionsData,
   ewColorPickerMountedElement,
   ewColorPickerOptions,
@@ -68,7 +69,7 @@ export interface HsvaColor {
 }
 
 // 重新导出类型
-export {
+export type {
   ewColorPickerOptions,
   ewColorPickerConstructorOptions,
   WrapperElement,
@@ -115,7 +116,7 @@ const EVENT_TYPES = [
 ];
 
 // 默认动画时间
-const DEFAULT_ANIMATION_TIME = 200;
+export const DEFAULT_ANIMATION_TIME = 200;
 
 export default class ewColorPicker extends EventEmitter {
   // 静态属性
@@ -185,6 +186,8 @@ export default class ewColorPicker extends EventEmitter {
     super(EVENT_TYPES);
 
     this.options = this.normalizeOptions(options, secondOptions);
+
+    console.log(66666, this.options, options, secondOptions);
 
     // 初始化实例
     this.init();
@@ -418,9 +421,9 @@ export default class ewColorPicker extends EventEmitter {
         this.syncAllPlugins(this.currentColor);
 
         setTimeout(() => {
-          const { handleAutoPosition } = this.plugins.ewColorPickerPanel || {};
-          if (isFunction(handleAutoPosition)) {
-            handleAutoPosition();
+          const panelPlugin = this.plugins.ewColorPickerPanel;
+          if (panelPlugin && isFunction(panelPlugin.handleAutoPosition)) {
+            panelPlugin.handleAutoPosition.call(panelPlugin);
           }
           on(document, "mousedown", this._onDocumentClick, { capture: true });
         }, 0);
