@@ -68,6 +68,14 @@ export default class ewColorPickerPanelPlugin {
     const now = Date.now();
     if (now - this.lastUpdateTime >= this.throttleDelay) {
       this.lastUpdateTime = now;
+      
+      // 添加边界检查，防止异常值
+      if (isNaN(saturation) || isNaN(value) || 
+          saturation < 0 || saturation > 100 || 
+          value < 0 || value > 100) {
+        return;
+      }
+      
       this.updateCursorPosition(saturation, value);
       this.updateColor(saturation, value);
     }
@@ -262,6 +270,10 @@ export default class ewColorPickerPanelPlugin {
     event.preventDefault();
 
     if (event.touches.length > 0) {
+      // 确保使用最新的面板尺寸
+      this.panelWidth = this.panel.offsetWidth;
+      this.panelHeight = this.panel.offsetHeight;
+
       const touch = event.touches[0];
       const rect = getRect(this.panel);
       const x = touch.clientX - rect.left;
@@ -291,6 +303,10 @@ export default class ewColorPickerPanelPlugin {
       event.stopPropagation();
       return;
     }
+
+    // 确保使用最新的面板尺寸
+    this.panelWidth = this.panel.offsetWidth;
+    this.panelHeight = this.panel.offsetHeight;
 
     const rect = getRect(this.panel);
     const x = event.clientX - rect.left;
@@ -345,6 +361,10 @@ export default class ewColorPickerPanelPlugin {
     // 阻止默认行为，避免选中文本
     event.preventDefault();
 
+    // 确保使用最新的面板尺寸
+    this.panelWidth = this.panel.offsetWidth;
+    this.panelHeight = this.panel.offsetHeight;
+
     const rect = getRect(this.panel);
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -360,9 +380,46 @@ export default class ewColorPickerPanelPlugin {
   updateCursorPosition(saturation: number, value: number) {
     if (!this.cursor || !this.panel) return;
 
+    // 检查面板是否可见
+    const panelStyle = window.getComputedStyle(this.panel);
+    if (panelStyle.display === 'none' || panelStyle.visibility === 'hidden') {
+      // 面板不可见时，跳过更新
+      return;
+    }
+
     // 重新计算面板尺寸，确保获取到正确的值
-    this.panelWidth = this.panel.offsetWidth;
-    this.panelHeight = this.panel.offsetHeight;
+    let currentPanelWidth = this.panel.offsetWidth;
+    let currentPanelHeight = this.panel.offsetHeight;
+    
+    // 如果面板尺寸为0，尝试使用 getBoundingClientRect 或使用缓存值
+    if (currentPanelWidth === 0 || currentPanelHeight === 0) {
+      const rect = getRect(this.panel);
+      currentPanelWidth = rect.width || this.panelWidth || 285;
+      currentPanelHeight = rect.height || this.panelHeight || 180;
+      
+      // 如果仍然为0，使用默认值
+      if (currentPanelWidth === 0 || currentPanelHeight === 0) {
+        currentPanelWidth = 285;
+        currentPanelHeight = 180;
+      }
+    }
+    
+    // 更新实例变量
+    this.panelWidth = currentPanelWidth;
+    this.panelHeight = currentPanelHeight;
+
+    // 动态获取光标尺寸
+    const cursorSize = getElementSize(this.cursor);
+    const cursorOffset = {
+      x: cursorSize.offsetWidth / 2,
+      y: cursorSize.offsetHeight / 2
+    };
+
+    // 如果光标尺寸为0，使用默认值（防止元素未完全渲染）
+    if (cursorSize.offsetWidth === 0 || cursorSize.offsetHeight === 0) {
+      cursorOffset.x = 2; // 默认 4px 宽度的一半
+      cursorOffset.y = 2; // 默认 4px 高度的一半
+    }
 
     // 计算相对面板的坐标
     // 饱和度：0-100 对应 left: 0-panelWidth
@@ -370,11 +427,15 @@ export default class ewColorPickerPanelPlugin {
     let left = (saturation / 100) * this.panelWidth;
     let top = (1 - value / 100) * this.panelHeight;
 
-    // 确保边界值准确
-    // 当饱和度为100%时，光标应该在最右边
-    // 当明度为100%时，光标应该在最上边
-    left = Math.max(0, Math.min(left, this.panelWidth));
-    top = Math.max(0, Math.min(top, this.panelHeight));
+    // 边界处理：考虑光标尺寸，确保光标完全在面板内
+    // 当饱和度为 0% 时，光标中心应该在左边缘内 cursorOffset.x 处
+    // 当饱和度为 100% 时，光标中心应该在右边缘内 cursorOffset.x 处
+    // 当明度为 0% 时，光标中心应该在底边缘内 cursorOffset.y 处
+    // 当明度为 100% 时，光标中心应该在顶边缘内 cursorOffset.y 处
+    left = Math.max(cursorOffset.x, Math.min(left, this.panelWidth - cursorOffset.x));
+    top = Math.max(cursorOffset.y, Math.min(top, this.panelHeight - cursorOffset.y));
+
+    // 由于 CSS 使用了 transform: translate(-50%, -50%)，直接设置目标位置即可
     setStyle(this.cursor, {
       left: `${left}px`,
       top: `${top}px`,
@@ -425,36 +486,45 @@ export default class ewColorPickerPanelPlugin {
   calculateContainerSize() {
     const panelContainer = this.ewColorPicker.getMountPoint("panelContainer");
     if (panelContainer) {
-      // 临时让容器可见以获取尺寸，但设置为不可见
-      const originalDisplay = panelContainer.style.display;
-      const originalVisibility = panelContainer.style.visibility;
-      const originalPosition = panelContainer.style.position;
+      // 先尝试直接获取尺寸
+      let containerWidth = panelContainer.offsetWidth;
+      let containerHeight = panelContainer.offsetHeight;
+      
+      // 如果尺寸为0，尝试临时显示来获取尺寸
+      if (containerWidth === 0 || containerHeight === 0) {
+        const originalDisplay = panelContainer.style.display;
+        const originalVisibility = panelContainer.style.visibility;
+        const originalPosition = panelContainer.style.position;
 
-      setStyle(panelContainer, {
-        display: "block",
-        visibility: "hidden",
-        position: "absolute",
-        left: "-9999px",
-        top: "-9999px",
-      });
+        setStyle(panelContainer, {
+          display: "block",
+          visibility: "hidden",
+          position: "absolute",
+          left: "-9999px",
+          top: "-9999px",
+        });
 
-      // 尝试多种方法获取容器尺寸
-      const containerRect = getRect(panelContainer);
-      const offsetWidth = panelContainer.offsetWidth;
-      const offsetHeight = panelContainer.offsetHeight;
+        // 强制重排以获取真实尺寸
+        panelContainer.offsetHeight;
+        
+        // 尝试多种方法获取容器尺寸
+        const containerRect = getRect(panelContainer);
+        containerWidth = panelContainer.offsetWidth || containerRect.width;
+        containerHeight = panelContainer.offsetHeight || containerRect.height;
 
-      // 优先使用 offsetWidth/offsetHeight，如果为0则使用 getBoundingClientRect
-      this.containerWidth = offsetWidth || containerRect.width;
-      this.containerHeight = offsetHeight || containerRect.height;
-
-      // 恢复原始样式
-      setStyle(panelContainer, {
-        display: originalDisplay,
-        visibility: originalVisibility,
-        position: originalPosition,
-        left: "",
-        top: "",
-      });
+        // 恢复原始样式
+        setStyle(panelContainer, {
+          display: originalDisplay,
+          visibility: originalVisibility,
+          position: originalPosition,
+          left: "",
+          top: "",
+        });
+      }
+      
+      // 如果仍然为0，使用默认值
+      this.containerWidth = containerWidth || 320;
+      this.containerHeight = containerHeight || 200;
     }
   }
 

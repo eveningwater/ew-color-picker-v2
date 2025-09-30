@@ -265,13 +265,14 @@
 
 // 颜色光标
 .ew-color-picker-panel-cursor {
-  left: 100%;
+  left: 0;
   top: 0;
   cursor: default;
   width: 4px;
   height: 4px;
   border-radius: 50%;
   box-shadow: 0 0 0 3px #fff, inset 0 0 2px 2px rgba(0, 0, 0, 0.4), 0 0 2px 3px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%); // 使光标中心对准定位点
 }
 
 // 底部容器
@@ -316,7 +317,7 @@
 
 // 输入框样式
 .ew-color-picker-input {
-  width: 180px;
+  width: 100%;
   height: 32px;
   line-height: 32px;
   border: 1px solid #dcdfe6;
@@ -325,6 +326,7 @@
   font-size: 14px;
   transition: border-color 0.2s;
   outline: none;
+  box-sizing: border-box;
 }
 .ew-color-picker-input:focus {
   border-color: #4096ef;

@@ -129,18 +129,12 @@ export default class ewColorPickerButtonPlugin {
     }
     
     // 查找或创建按钮容器
-    let btnGroup = $('.ew-color-picker-drop-btn-group', panelContainer);
+    let btnGroup = $('.ew-color-picker-drop-btn-group', bottomRow);
     if (!btnGroup) {
       btnGroup = create('div');
       addClass(btnGroup, 'ew-color-picker-drop-btn-group');
-      // 插入到 bottomRow 之后
-      if (bottomRow.nextSibling) {
-        // 如果 bottomRow 有下一个兄弟节点，在它之前插入
-        insertNode(panelContainer, btnGroup, undefined, bottomRow.nextSibling);
-      } else {
-        // 如果没有下一个兄弟节点，追加到末尾
-        insertNode(panelContainer, btnGroup);
-      }
+      // 插入到 bottomRow 内部
+      insertNode(bottomRow, btnGroup);
     }
     
     // 清空旧内容
