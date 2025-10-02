@@ -261,8 +261,6 @@ export default class ewColorPicker extends EventEmitter {
   }
 
   private initCoreProperties(): void {
-    this.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
-
     const { defaultColor, alphaDirection, hueDirection } = this.options;
 
     if (defaultColor) {
@@ -290,10 +288,14 @@ export default class ewColorPicker extends EventEmitter {
       const newHsva = colorRgbaToHsva(rgbaColor);
       if (!isNaN(newHsva.h)) {
         this.hsvaColor = newHsva;
+      } else {
+        // 如果转换失败，使用默认值
+        this.hsvaColor = { h: 0, s: 100, v: 100, a: 1 };
       }
     } else {
-      // 没有默认颜色时，设置为空字符串
+      // 没有默认颜色时，设置为空字符串，hsvaColor 也设置为空值
       this.currentColor = "";
+      this.hsvaColor = { h: 0, s: 0, v: 0, a: 0 };
     }
     this.panelWidth = 0;
     this.panelHeight = 0;
@@ -388,12 +390,12 @@ export default class ewColorPicker extends EventEmitter {
     if (!panelContainer) return;
 
     // 只有在面板真正需要显示时才设置默认颜色
-    // 如果当前没有颜色，且设置了默认颜色，则使用默认颜色
-    const { defaultColor, pickerAnimationTime, togglePicker } = this.options || {};
-    if (!this.currentColor && defaultColor) {
-      let defaultColorValue = defaultColor;
-      this.currentColor = defaultColorValue;
-      let rgbaColor = colorToRgba(defaultColorValue);
+    // 如果当前没有颜色，则设置默认的红色用于面板显示
+    const { pickerAnimationTime, togglePicker } = this.options || {};
+    if (!this.currentColor) {
+      // 设置默认的红色用于面板显示
+      this.currentColor = "#ff0000";
+      let rgbaColor = colorToRgba("#ff0000");
       if (!rgbaColor) {
         rgbaColor = "rgba(255, 0, 0, 1)";
       }

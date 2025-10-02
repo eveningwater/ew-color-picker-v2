@@ -477,7 +477,8 @@ export default class ewColorPickerPanelPlugin {
           const hsva = colorRgbaToHsva(currentColor);
           targetHue = hsva.h;
         } else {
-          targetHue = 0; // 默认红色
+          // 如果没有颜色，不设置背景色
+          return;
         }
       }
       const hueColor = colorHsvaToRgba({ h: targetHue, s: 100, v: 100, a: 1 });
